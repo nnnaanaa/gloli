@@ -8,61 +8,197 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg:        #110508;
+      --card:      #fdf6f9;
+      --accent:    #8b2a50;
+      --accent-lt: #c8739a;
+      --border:    #c9a0b4;
+      --thead-bg:  #2a0d1a;
+      --thead-fg:  #f0d8e8;
+      --text:      #1c0910;
+      --muted:     #7a4a60;
+    }
+
     *, *::before, *::after { box-sizing: border-box; }
-    body {
-      font-family: 'Shippori Mincho', serif;
-      padding: 20px;
-      max-width: 900px;
-      margin: 0 auto;
+
+    html {
+      background: var(--bg);
       background-image: url('gothic1.png'), url('gothic2.png');
       background-size: auto 100vh, auto 100vh;
       background-position: left center, right center;
       background-repeat: no-repeat, no-repeat;
       background-attachment: fixed, fixed;
     }
-    h1 { font-family: 'Cinzel Decorative', serif; margin-bottom: 20px; font-size: clamp(1.4rem, 4vw, 2rem); }
-    h2 { font-family: 'Cinzel Decorative', serif; margin: 20px 0 8px; font-size: clamp(1rem, 3vw, 1.3rem); }
-    h3 { font-family: 'Cinzel Decorative', serif; }
-    input, select, textarea { padding: 6px 8px; margin: 2px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Shippori Mincho', serif; }
-    button { padding: 6px 14px; cursor: pointer; border: none; border-radius: 4px; background: #c8739a; color: white; font-family: 'Shippori Mincho', serif; }
-    button.del { background: #e57373; }
-    button.edit { background: #7986cb; }
-    button.save { background: #66bb6a; }
-    tr.editing td { background: #fffde7; }
+
+    body {
+      font-family: 'Shippori Mincho', serif;
+      color: var(--text);
+      padding: 28px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card);
+      min-height: 100vh;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      box-shadow: 0 0 60px rgba(139,42,80,0.18);
+    }
+
+    h1 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      color: var(--text);
+      text-align: center;
+      letter-spacing: 0.08em;
+      padding-bottom: 14px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    h1::before { content: '✦ '; color: var(--accent-lt); }
+    h1::after  { content: ' ✦'; color: var(--accent-lt); }
+
+    h2 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(0.95rem, 3vw, 1.2rem);
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin: 22px 0 10px;
+    }
+    h2::before { content: '❖ '; font-size: 0.75em; opacity: 0.7; }
+
+    h3 { font-family: 'Cinzel Decorative', serif; color: var(--text); letter-spacing: 0.05em; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    input, select, textarea {
+      padding: 6px 10px;
+      margin: 2px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      font-family: 'Shippori Mincho', serif;
+      background: #fff8fb;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-lt);
+      box-shadow: 0 0 0 2px rgba(200,115,154,0.18);
+    }
+
+    button {
+      padding: 5px 13px;
+      cursor: pointer;
+      border: 1px solid var(--accent);
+      border-radius: 0;
+      background: var(--accent);
+      color: #feeef5;
+      font-family: 'Shippori Mincho', serif;
+      font-size: 0.875rem;
+      letter-spacing: 0.04em;
+      transition: opacity .15s;
+    }
+    button:hover { opacity: 0.82; }
+    button.del  { background: #7a1c2a; border-color: #5a0c1a; }
+    button.edit { background: #3e2460; border-color: #2e1450; }
+    button.save { background: #1c5236; border-color: #0c4226; }
+
+    tr.editing td { background: #fff0f5; }
+
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; }
-    th, td { border: 1px solid #ddd; padding: 7px 10px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    th { background: #f5f5f5; font-weight: 600; }
-    a { color: #c8739a; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tabs button { background: #ddd; color: #333; }
-    .tabs button.active { background: #c8739a; color: white; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.88rem;
+      table-layout: fixed;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 7px 10px;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    th { background: var(--thead-bg); color: var(--thead-fg); font-weight: 600; letter-spacing: 0.04em; }
+    tr:nth-child(even) td { background: rgba(201,160,180,0.07); }
+    tr:hover td { background: rgba(200,115,154,0.1); }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+    .tabs button {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 0;
+      padding: 7px 18px;
+      margin-bottom: -1px;
+    }
+    .tabs button.active {
+      background: var(--card);
+      color: var(--accent);
+      border-bottom: 1px solid var(--card);
+      font-weight: 600;
+    }
+    .tabs button:hover:not(.active) { background: rgba(201,160,180,0.15); opacity: 1; }
+
     .tab { display: none; }
     .tab.active { display: block; }
+
     .form-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
     .form-row input, .form-row select { flex: 1 1 140px; min-width: 0; }
     .form-row input[type="number"] { flex: 0 1 100px; }
     .form-row button { flex: 0 0 auto; }
+
     .col-img { width: 60px; }
-    .col-img img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; display: block; margin: auto; }
-    .col-price { width: 80px; }
+    .col-img img { width: 50px; height: 50px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; display: block; margin: auto; }
+    .col-price    { width: 80px; }
     .col-priority { width: 70px; }
-    .col-actions { width: 110px; white-space: nowrap; }
-    .img-preview { width: 100%; max-height: 200px; object-fit: contain; border-radius: 4px; margin-top: 8px; display: none; }
+    .col-actions  { width: 110px; white-space: nowrap; }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(17,5,8,0.6); z-index: 100;
+    }
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 40px rgba(139,42,80,0.25);
+      padding: 28px;
+      max-width: 500px;
+      margin: 60px auto;
+      position: relative;
+    }
+    .modal-box h3 { margin: 0 0 18px; }
+    .modal-grid { display: grid; gap: 8px; }
+    .modal-grid input, .modal-grid select { width: 100%; }
+    .modal-footer { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
+    .modal-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 2px; display: block; }
+    .img-preview { width: 100%; max-height: 200px; object-fit: contain; border: 1px solid var(--border); margin-top: 6px; display: none; }
 
     @media (max-width: 1300px) {
-      body { background-image: none; }
+      html { background-image: none; }
     }
     @media (max-width: 600px) {
-      body { padding: 12px; }
+      body { padding: 14px 12px; }
       .form-row input, .form-row select { flex: 1 1 100%; }
       table { font-size: 0.8rem; }
       th, td { padding: 5px 6px; }
       .col-img { width: 44px; }
       .col-img img { width: 36px; height: 36px; }
-      .col-price { width: 64px; }
-      .col-priority { width: 56px; }
-      .col-actions { width: 90px; }
+      .col-price    { width: 60px; }
+      .col-priority { width: 54px; }
+      .col-actions  { width: 90px; }
+      .modal-box { margin: 20px 12px; padding: 20px; }
     }
   </style>
 </head>
@@ -103,30 +239,30 @@
 </div>
 
 <!-- 編集モーダル（アイテム） -->
-<div id="edit-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:100">
-  <div style="background:white;padding:24px;border-radius:8px;max-width:500px;margin:80px auto;position:relative">
-    <h3 style="margin:0 0 16px">アイテム編集</h3>
+<div id="edit-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>アイテム編集</h3>
     <input type="hidden" id="edit-id">
-    <div style="display:grid;gap:8px">
-      <input id="edit-url" placeholder="URL（必須）" style="width:100%;box-sizing:border-box">
-      <input id="edit-name" placeholder="商品名" style="width:100%;box-sizing:border-box">
-      <select id="edit-brand" style="width:100%;box-sizing:border-box"><option value="">ブランド</option></select>
-      <select id="edit-category" style="width:100%;box-sizing:border-box"><option value="">カテゴリー</option></select>
-      <input id="edit-price" type="number" placeholder="価格" style="width:100%;box-sizing:border-box">
-      <select id="edit-priority" style="width:100%;box-sizing:border-box">
+    <div class="modal-grid">
+      <input id="edit-url" placeholder="URL（必須）">
+      <input id="edit-name" placeholder="商品名">
+      <select id="edit-brand"><option value="">ブランド</option></select>
+      <select id="edit-category"><option value="">カテゴリー</option></select>
+      <input id="edit-price" type="number" placeholder="価格">
+      <select id="edit-priority">
         <option value="LOW">低</option>
         <option value="MEDIUM">中</option>
         <option value="HIGH">高</option>
         <option value="GRAIL">GRAIL</option>
       </select>
-      <input id="edit-notes" placeholder="メモ" style="width:100%;box-sizing:border-box">
+      <input id="edit-notes" placeholder="メモ">
       <div>
-        <label style="font-size:0.9rem">画像</label>
-        <input id="edit-image-file" type="file" accept="image/*" style="width:100%;box-sizing:border-box" onchange="previewImg(this)">
+        <label class="modal-label">画像</label>
+        <input id="edit-image-file" type="file" accept="image/*" onchange="previewImg(this)">
         <img id="edit-image-preview" class="img-preview">
       </div>
     </div>
-    <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+    <div class="modal-footer">
       <button onclick="closeEdit()">キャンセル</button>
       <button class="save" onclick="saveItem()">保存</button>
     </div>
@@ -134,8 +270,8 @@
 </div>
 
 <!-- 画像拡大モーダル -->
-<div id="img-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:200;cursor:pointer" onclick="this.style.display='none'">
-  <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:8px">
+<div id="img-modal" style="display:none;position:fixed;inset:0;background:rgba(17,5,8,0.8);z-index:200;cursor:pointer" onclick="this.style.display='none'">
+  <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #c9a0b4">
 </div>
 
 <!-- ブランド -->
@@ -249,7 +385,7 @@ async function openEdit(id) {
   const preview = get('edit-image-preview');
   if (i.imageUrl) { preview.src = i.imageUrl + '?t=' + Date.now(); preview.style.display = 'block'; }
   else { preview.style.display = 'none'; preview.src = ''; }
-  get('edit-modal').style.display = 'block';
+  get('edit-modal').style.display = 'block';  // modal-overlay uses display:block
 }
 
 function previewImg(input) {
