@@ -2,8 +2,12 @@
 FROM gradle:8.8-jdk21 AS build
 WORKDIR /app
 COPY build.gradle.kts settings.gradle.kts ./
-# プラグイン・依存関係を先にキャッシュ（build.gradle.kts が変わらない限り再ダウンロード不要）
-RUN gradle --no-daemon dependencies || true
+# ダミーソースでコンパイルを走らせ、全依存JARをキャッシュ
+# （build.gradle.kts が変わらない限りこのレイヤーは再利用される）
+RUN mkdir -p src/main/kotlin && \
+    echo 'package com.mortlace' > src/main/kotlin/Dummy.kt && \
+    gradle --no-daemon compileKotlin; \
+    rm -rf src
 COPY src/ src/
 RUN gradle bootJar --no-daemon
 
