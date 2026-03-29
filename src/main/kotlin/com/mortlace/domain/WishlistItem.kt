@@ -36,6 +36,8 @@ class WishlistItem(
     @Enumerated(EnumType.STRING)
     var priority: Priority = Priority.MEDIUM,
 
+    var imagePath: String? = null,
+
     @CreationTimestamp
     @Column(updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

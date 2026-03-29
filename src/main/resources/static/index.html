@@ -43,6 +43,11 @@
     .form-row input, .form-row select { flex: 1 1 140px; min-width: 0; }
     .form-row input[type="number"] { flex: 0 1 100px; }
     .form-row button { flex: 0 0 auto; }
+    .cell-trunc { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cell-img { width: 60px; text-align: center; }
+    .cell-img img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; }
+    .cell-actions { white-space: nowrap; }
+    .img-preview { width: 100%; max-height: 200px; object-fit: contain; border-radius: 4px; margin-top: 8px; display: none; }
 
     @media (max-width: 1300px) {
       body { background-image: none; }
@@ -85,7 +90,7 @@
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th>URL</th><th>商品名</th><th>ブランド</th><th>カテゴリー</th><th>価格</th><th>優先度</th><th>メモ</th><th></th></tr></thead>
+      <thead><tr><th>画像</th><th>URL</th><th>商品名</th><th>ブランド</th><th>カテゴリー</th><th>価格</th><th>優先度</th><th>メモ</th><th></th></tr></thead>
       <tbody id="w-list"></tbody>
     </table>
   </div>
@@ -109,12 +114,22 @@
         <option value="GRAIL">GRAIL</option>
       </select>
       <input id="edit-notes" placeholder="メモ" style="width:100%;box-sizing:border-box">
+      <div>
+        <label style="font-size:0.9rem">画像</label>
+        <input id="edit-image-file" type="file" accept="image/*" style="width:100%;box-sizing:border-box" onchange="previewImg(this)">
+        <img id="edit-image-preview" class="img-preview">
+      </div>
     </div>
     <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
       <button onclick="closeEdit()">キャンセル</button>
       <button class="save" onclick="saveItem()">保存</button>
     </div>
   </div>
+</div>
+
+<!-- 画像拡大モーダル -->
+<div id="img-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:200;cursor:pointer" onclick="this.style.display='none'">
+  <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:8px">
 </div>
 
 <!-- ブランド -->
@@ -170,15 +185,16 @@ async function api(path, opt) {
 async function loadItems() {
   const items = await (await api('/wishlist')).json();
   get('w-list').innerHTML = items.length ? items.map(i => `<tr>
-    <td><a href="${esc(i.url)}" target="_blank">${esc(i.url)}</a></td>
-    <td>${esc(i.name)}</td>
-    <td>${esc(i.brand?.name)}</td>
-    <td>${esc(i.category?.name)}</td>
-    <td>${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
+    <td class="cell-img">${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="画像" onclick="viewImg('${esc(i.imageUrl)}')">` : ''}</td>
+    <td class="cell-trunc"><a href="${esc(i.url)}" target="_blank" title="${esc(i.url)}">${esc(i.url)}</a></td>
+    <td class="cell-trunc" title="${esc(i.name)}">${esc(i.name)}</td>
+    <td class="cell-trunc" title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
+    <td class="cell-trunc" title="${esc(i.category?.name)}">${esc(i.category?.name)}</td>
+    <td style="white-space:nowrap">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
     <td>${esc(i.priority)}</td>
-    <td>${esc(i.notes)}</td>
-    <td><button class="edit" onclick="openEdit(${i.id})">編集</button> <button class="del" onclick="delItem(${i.id})">削除</button></td>
-  </tr>`).join('') : '<tr><td colspan="8">なし</td></tr>';
+    <td class="cell-trunc" title="${esc(i.notes)}">${esc(i.notes)}</td>
+    <td class="cell-actions"><button class="edit" onclick="openEdit(${i.id})">編集</button> <button class="del" onclick="delItem(${i.id})">削除</button></td>
+  </tr>`).join('') : '<tr><td colspan="9">なし</td></tr>';
 }
 
 async function addItem() {
@@ -222,7 +238,25 @@ async function openEdit(id) {
   const cSel = get('edit-category');
   cSel.innerHTML = get('w-category').innerHTML;
   cSel.value = i.category?.id ?? '';
+  // 画像プレビュー
+  get('edit-image-file').value = '';
+  const preview = get('edit-image-preview');
+  if (i.imageUrl) { preview.src = i.imageUrl + '?t=' + Date.now(); preview.style.display = 'block'; }
+  else { preview.style.display = 'none'; preview.src = ''; }
   get('edit-modal').style.display = 'block';
+}
+
+function previewImg(input) {
+  const preview = get('edit-image-preview');
+  if (input.files && input.files[0]) {
+    preview.src = URL.createObjectURL(input.files[0]);
+    preview.style.display = 'block';
+  }
+}
+
+function viewImg(url) {
+  get('img-modal-src').src = url + '?t=' + Date.now();
+  get('img-modal').style.display = 'block';
 }
 
 function closeEdit() {
@@ -245,6 +279,12 @@ async function saveItem() {
   if (price) body.price = +price;
   if (notes) body.notes = notes;
   await api('/wishlist/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  const imgFile = get('edit-image-file').files[0];
+  if (imgFile) {
+    const fd = new FormData();
+    fd.append('file', imgFile);
+    await api('/wishlist/'+id+'/image', { method:'POST', body:fd });
+  }
   closeEdit();
   loadItems();
 }
