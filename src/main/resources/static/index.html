@@ -30,8 +30,8 @@
     button.save { background: #66bb6a; }
     tr.editing td { background: #fffde7; }
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; min-width: 500px; }
-    th, td { border: 1px solid #ddd; padding: 7px 10px; text-align: left; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; table-layout: fixed; }
+    th, td { border: 1px solid #ddd; padding: 7px 10px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     th { background: #f5f5f5; font-weight: 600; }
     a { color: #c8739a; }
     .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -43,10 +43,11 @@
     .form-row input, .form-row select { flex: 1 1 140px; min-width: 0; }
     .form-row input[type="number"] { flex: 0 1 100px; }
     .form-row button { flex: 0 0 auto; }
-    .cell-trunc { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .cell-img { width: 60px; text-align: center; }
-    .cell-img img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; }
-    .cell-actions { white-space: nowrap; }
+    .col-img { width: 60px; }
+    .col-img img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; display: block; margin: auto; }
+    .col-price { width: 80px; }
+    .col-priority { width: 70px; }
+    .col-actions { width: 110px; white-space: nowrap; }
     .img-preview { width: 100%; max-height: 200px; object-fit: contain; border-radius: 4px; margin-top: 8px; display: none; }
 
     @media (max-width: 1300px) {
@@ -55,8 +56,13 @@
     @media (max-width: 600px) {
       body { padding: 12px; }
       .form-row input, .form-row select { flex: 1 1 100%; }
-      table { font-size: 0.8rem; min-width: 400px; }
-      th, td { padding: 5px 7px; }
+      table { font-size: 0.8rem; }
+      th, td { padding: 5px 6px; }
+      .col-img { width: 44px; }
+      .col-img img { width: 36px; height: 36px; }
+      .col-price { width: 64px; }
+      .col-priority { width: 56px; }
+      .col-actions { width: 90px; }
     }
   </style>
 </head>
@@ -90,7 +96,7 @@
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th>画像</th><th>URL</th><th>商品名</th><th>ブランド</th><th>カテゴリー</th><th>価格</th><th>優先度</th><th>メモ</th><th></th></tr></thead>
+      <thead><tr><th class="col-img">画像</th><th>URL</th><th>商品名</th><th>ブランド</th><th>カテゴリー</th><th class="col-price">価格</th><th class="col-priority">優先度</th><th>メモ</th><th class="col-actions"></th></tr></thead>
       <tbody id="w-list"></tbody>
     </table>
   </div>
@@ -185,15 +191,15 @@ async function api(path, opt) {
 async function loadItems() {
   const items = await (await api('/wishlist')).json();
   get('w-list').innerHTML = items.length ? items.map(i => `<tr>
-    <td class="cell-img">${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="画像" onclick="viewImg('${esc(i.imageUrl)}')">` : ''}</td>
-    <td class="cell-trunc"><a href="${esc(i.url)}" target="_blank" title="${esc(i.url)}">${esc(i.url)}</a></td>
-    <td class="cell-trunc" title="${esc(i.name)}">${esc(i.name)}</td>
-    <td class="cell-trunc" title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
-    <td class="cell-trunc" title="${esc(i.category?.name)}">${esc(i.category?.name)}</td>
-    <td style="white-space:nowrap">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
-    <td>${esc(i.priority)}</td>
-    <td class="cell-trunc" title="${esc(i.notes)}">${esc(i.notes)}</td>
-    <td class="cell-actions"><button class="edit" onclick="openEdit(${i.id})">編集</button> <button class="del" onclick="delItem(${i.id})">削除</button></td>
+    <td class="col-img">${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="画像" onclick="viewImg('${esc(i.imageUrl)}')">` : ''}</td>
+    <td title="${esc(i.url)}"><a href="${esc(i.url)}" target="_blank">${esc(i.url)}</a></td>
+    <td title="${esc(i.name)}">${esc(i.name)}</td>
+    <td title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
+    <td title="${esc(i.category?.name)}">${esc(i.category?.name)}</td>
+    <td class="col-price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
+    <td class="col-priority">${esc(i.priority)}</td>
+    <td title="${esc(i.notes)}">${esc(i.notes)}</td>
+    <td class="col-actions"><button class="edit" onclick="openEdit(${i.id})">編集</button> <button class="del" onclick="delItem(${i.id})">削除</button></td>
   </tr>`).join('') : '<tr><td colspan="9">なし</td></tr>';
 }
 
