@@ -13,6 +13,7 @@ data class WishlistItemResponse(
     val category: CategoryResponse?,
     val notes: String?,
     val priority: Priority,
+    val imageUrl: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )

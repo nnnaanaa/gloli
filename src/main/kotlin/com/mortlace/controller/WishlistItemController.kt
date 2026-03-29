@@ -8,7 +8,10 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/wishlist")
@@ -43,4 +46,20 @@ class WishlistItemController(private val service: WishlistItemService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "アイテム削除")
     fun delete(@PathVariable id: Long) = service.delete(id)
+
+    @PostMapping("/{id}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(summary = "画像アップロード")
+    fun uploadImage(
+        @PathVariable id: Long,
+        @RequestParam file: MultipartFile
+    ): WishlistItemResponse = service.uploadImage(id, file)
+
+    @GetMapping("/{id}/image")
+    @Operation(summary = "画像取得")
+    fun getImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
+        val (bytes, contentType) = service.getImage(id)
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .body(bytes)
+    }
 }
