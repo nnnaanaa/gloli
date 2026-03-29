@@ -9,15 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #110508;
-      --card:      #fdf6f9;
-      --accent:    #8b2a50;
-      --accent-lt: #c8739a;
-      --border:    #c9a0b4;
-      --thead-bg:  #2a0d1a;
-      --thead-fg:  #f0d8e8;
-      --text:      #1c0910;
-      --muted:     #7a4a60;
+      --bg:        #0d0408;
+      --card:      #1a0810;
+      --accent:    #c8739a;
+      --accent-lt: #e0a0bc;
+      --border:    #4a1e30;
+      --thead-bg:  #0d0408;
+      --thead-fg:  #e8c8d8;
+      --text:      #f0e0e8;
+      --muted:     #a07888;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -41,7 +41,7 @@
       min-height: 100vh;
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      box-shadow: 0 0 60px rgba(139,42,80,0.18);
+      box-shadow: 0 0 60px rgba(200,115,154,0.12);
     }
 
     h1 {
@@ -54,8 +54,6 @@
       margin-bottom: 24px;
       border-bottom: 1px solid var(--border);
     }
-    h1::before { content: '✦ '; color: var(--accent-lt); }
-    h1::after  { content: ' ✦'; color: var(--accent-lt); }
 
     h2 {
       font-family: 'Cinzel Decorative', serif;
@@ -64,11 +62,10 @@
       letter-spacing: 0.05em;
       margin: 22px 0 10px;
     }
-    h2::before { content: '❖ '; font-size: 0.75em; opacity: 0.7; }
 
     h3 { font-family: 'Cinzel Decorative', serif; color: var(--text); letter-spacing: 0.05em; }
 
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--accent-lt); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
     input, select, textarea {
@@ -77,14 +74,14 @@
       border: 1px solid var(--border);
       border-radius: 0;
       font-family: 'Shippori Mincho', serif;
-      background: #fff8fb;
+      background: #120610;
       color: var(--text);
       font-size: 0.9rem;
     }
     input:focus, select:focus {
       outline: none;
-      border-color: var(--accent-lt);
-      box-shadow: 0 0 0 2px rgba(200,115,154,0.18);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(200,115,154,0.2);
     }
 
     button {
@@ -104,7 +101,7 @@
     button.edit { background: #3e2460; border-color: #2e1450; }
     button.save { background: #1c5236; border-color: #0c4226; }
 
-    tr.editing td { background: #fff0f5; }
+    tr.editing td { background: #2a0d1c; }
 
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table {
@@ -124,7 +121,7 @@
       white-space: nowrap;
     }
     th { background: var(--thead-bg); color: var(--thead-fg); font-weight: 600; letter-spacing: 0.04em; }
-    tr:nth-child(even) td { background: rgba(201,160,180,0.07); }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
     tr:hover td { background: rgba(200,115,154,0.1); }
 
     .tabs {
@@ -145,11 +142,11 @@
     }
     .tabs button.active {
       background: var(--card);
-      color: var(--accent);
+      color: var(--accent-lt);
       border-bottom: 1px solid var(--card);
       font-weight: 600;
     }
-    .tabs button:hover:not(.active) { background: rgba(201,160,180,0.15); opacity: 1; }
+    .tabs button:hover:not(.active) { background: rgba(200,115,154,0.1); opacity: 1; }
 
     .tab { display: none; }
     .tab.active { display: block; }
@@ -167,12 +164,12 @@
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(17,5,8,0.6); z-index: 100;
+      background: rgba(8,2,6,0.75); z-index: 100;
     }
     .modal-box {
       background: var(--card);
       border: 1px solid var(--border);
-      box-shadow: 0 8px 40px rgba(139,42,80,0.25);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
       padding: 28px;
       max-width: 500px;
       margin: 60px auto;
@@ -206,102 +203,102 @@
 <h1>mortlace</h1>
 
 <div class="tabs">
-  <button class="active" onclick="show('wishlist',this)">アイテム</button>
-  <button onclick="show('brands',this)">ブランド</button>
-  <button onclick="show('categories',this)">カテゴリー</button>
+  <button class="active" onclick="show('wishlist',this)">Items</button>
+  <button onclick="show('brands',this)">Brands</button>
+  <button onclick="show('categories',this)">Categories</button>
 </div>
 
-<!-- ウィッシュリスト -->
+<!-- wishlist -->
 <div id="wishlist" class="tab active">
-  <h2>追加</h2>
+  <h2>Add Item</h2>
   <div class="form-row">
-    <input id="w-url" placeholder="URL（必須）">
-    <input id="w-name" placeholder="商品名">
-    <select id="w-brand"><option value="">ブランド</option></select>
-    <select id="w-category"><option value="">カテゴリー</option></select>
-    <input id="w-price" type="number" placeholder="価格">
+    <input id="w-url" placeholder="URL (required)">
+    <input id="w-name" placeholder="Name">
+    <select id="w-brand"><option value="">Brand</option></select>
+    <select id="w-category"><option value="">Category</option></select>
+    <input id="w-price" type="number" placeholder="Price">
     <select id="w-priority">
-      <option value="MEDIUM">中</option>
-      <option value="LOW">低</option>
-      <option value="HIGH">高</option>
-      <option value="GRAIL">GRAIL</option>
+      <option value="MEDIUM">Medium</option>
+      <option value="LOW">Low</option>
+      <option value="HIGH">High</option>
+      <option value="GRAIL">Grail</option>
     </select>
-    <input id="w-notes" placeholder="メモ">
-    <button onclick="addItem()">追加</button>
+    <input id="w-notes" placeholder="Notes">
+    <button onclick="addItem()">Add</button>
   </div>
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th class="col-img">画像</th><th>URL</th><th>商品名</th><th>ブランド</th><th>カテゴリー</th><th class="col-price">価格</th><th class="col-priority">優先度</th><th>メモ</th><th class="col-actions"></th></tr></thead>
+      <thead><tr><th class="col-img">Image</th><th>URL</th><th>Name</th><th>Brand</th><th>Category</th><th class="col-price">Price</th><th class="col-priority">Priority</th><th>Notes</th><th class="col-actions"></th></tr></thead>
       <tbody id="w-list"></tbody>
     </table>
   </div>
 </div>
 
-<!-- 編集モーダル（アイテム） -->
+<!-- edit modal -->
 <div id="edit-modal" class="modal-overlay">
   <div class="modal-box">
-    <h3>アイテム編集</h3>
+    <h3>Edit Item</h3>
     <input type="hidden" id="edit-id">
     <div class="modal-grid">
-      <input id="edit-url" placeholder="URL（必須）">
-      <input id="edit-name" placeholder="商品名">
-      <select id="edit-brand"><option value="">ブランド</option></select>
-      <select id="edit-category"><option value="">カテゴリー</option></select>
-      <input id="edit-price" type="number" placeholder="価格">
+      <input id="edit-url" placeholder="URL (required)">
+      <input id="edit-name" placeholder="Name">
+      <select id="edit-brand"><option value="">Brand</option></select>
+      <select id="edit-category"><option value="">Category</option></select>
+      <input id="edit-price" type="number" placeholder="Price">
       <select id="edit-priority">
-        <option value="LOW">低</option>
-        <option value="MEDIUM">中</option>
-        <option value="HIGH">高</option>
-        <option value="GRAIL">GRAIL</option>
+        <option value="LOW">Low</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="HIGH">High</option>
+        <option value="GRAIL">Grail</option>
       </select>
-      <input id="edit-notes" placeholder="メモ">
+      <input id="edit-notes" placeholder="Notes">
       <div>
-        <label class="modal-label">画像</label>
+        <label class="modal-label">Image</label>
         <input id="edit-image-file" type="file" accept="image/*" onchange="previewImg(this)">
         <img id="edit-image-preview" class="img-preview">
       </div>
     </div>
     <div class="modal-footer">
-      <button onclick="closeEdit()">キャンセル</button>
-      <button class="save" onclick="saveItem()">保存</button>
+      <button onclick="closeEdit()">Cancel</button>
+      <button class="save" onclick="saveItem()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- 画像拡大モーダル -->
+<!-- image viewer -->
 <div id="img-modal" style="display:none;position:fixed;inset:0;background:rgba(17,5,8,0.8);z-index:200;cursor:pointer" onclick="this.style.display='none'">
   <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #c9a0b4">
 </div>
 
-<!-- ブランド -->
+<!-- brands -->
 <div id="brands" class="tab">
-  <h2>追加</h2>
+  <h2>Add Brand</h2>
   <div class="form-row">
-    <input id="b-name" placeholder="ブランド名（必須）">
-    <input id="b-url" placeholder="公式URL">
-    <button onclick="addBrand()">追加</button>
+    <input id="b-name" placeholder="Brand name (required)">
+    <input id="b-url" placeholder="Official URL">
+    <button onclick="addBrand()">Add</button>
   </div>
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th>名前</th><th>URL</th><th></th></tr></thead>
+      <thead><tr><th>Name</th><th>URL</th><th></th></tr></thead>
       <tbody id="b-list"></tbody>
     </table>
   </div>
 </div>
 
-<!-- カテゴリー -->
+<!-- categories -->
 <div id="categories" class="tab">
-  <h2>追加</h2>
+  <h2>Add Category</h2>
   <div class="form-row">
-    <input id="c-name" placeholder="カテゴリー名（必須）">
-    <button onclick="addCategory()">追加</button>
+    <input id="c-name" placeholder="Category name (required)">
+    <button onclick="addCategory()">Add</button>
   </div>
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th>名前</th><th></th></tr></thead>
+      <thead><tr><th>Name</th><th></th></tr></thead>
       <tbody id="c-list"></tbody>
     </table>
   </div>
@@ -327,7 +324,7 @@ async function api(path, opt) {
 async function loadItems() {
   const items = await (await api('/wishlist')).json();
   get('w-list').innerHTML = items.length ? items.map(i => `<tr>
-    <td class="col-img">${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="画像" onclick="viewImg('${esc(i.imageUrl)}')">` : ''}</td>
+    <td class="col-img">${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="image" onclick="viewImg('${esc(i.imageUrl)}')">` : ''}</td>
     <td title="${esc(i.url)}"><a href="${esc(i.url)}" target="_blank">${esc(i.url)}</a></td>
     <td title="${esc(i.name)}">${esc(i.name)}</td>
     <td title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
@@ -335,13 +332,13 @@ async function loadItems() {
     <td class="col-price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
     <td class="col-priority">${esc(i.priority)}</td>
     <td title="${esc(i.notes)}">${esc(i.notes)}</td>
-    <td class="col-actions"><button class="edit" onclick="openEdit(${i.id})">編集</button> <button class="del" onclick="delItem(${i.id})">削除</button></td>
-  </tr>`).join('') : '<tr><td colspan="9">なし</td></tr>';
+    <td class="col-actions"><button class="edit" onclick="openEdit(${i.id})">Edit</button> <button class="del" onclick="delItem(${i.id})">Delete</button></td>
+  </tr>`).join('') : '<tr><td colspan="9">No items</td></tr>';
 }
 
 async function addItem() {
   const url = get('w-url').value.trim();
-  if (!url) return alert('URLは必須です');
+  if (!url) return alert('URL is required.');
   const body = { url, priority: get('w-priority').value };
   const name = get('w-name').value.trim();
   const brandId = get('w-brand').value;
@@ -360,7 +357,7 @@ async function addItem() {
 }
 
 async function delItem(id) {
-  if (confirm('削除しますか？')) { await api('/wishlist/'+id, {method:'DELETE'}); loadItems(); }
+  if (confirm('Delete this item?')) { await api('/wishlist/'+id, {method:'DELETE'}); loadItems(); }
 }
 
 let _editItem = null;
@@ -407,7 +404,7 @@ function closeEdit() {
 
 async function saveItem() {
   const url = get('edit-url').value.trim();
-  if (!url) return alert('URLは必須です');
+  if (!url) return alert('URL is required.');
   const id = get('edit-id').value;
   const body = { url, priority: get('edit-priority').value };
   const name = get('edit-name').value.trim();
@@ -437,28 +434,28 @@ async function loadBrands() {
   ['w-brand'].forEach(sid => {
     const sel = get(sid);
     const cur = sel.value;
-    sel.innerHTML = '<option value="">ブランド</option>' + brands.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
+    sel.innerHTML = '<option value="">Brand</option>' + brands.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
     sel.value = cur;
   });
   get('b-list').innerHTML = brands.map(b => `<tr>
     <td>${esc(b.name)}</td>
     <td>${b.url ? `<a href="${esc(b.url)}" target="_blank">${esc(b.url)}</a>` : ''}</td>
-    <td><button class="edit" onclick="editBrand(${b.id},'${esc(b.name)}','${esc(b.url??'')}')">編集</button> <button class="del" onclick="delBrand(${b.id})">削除</button></td>
-  </tr>`).join('') || '<tr><td colspan="3">なし</td></tr>';
+    <td><button class="edit" onclick="editBrand(${b.id},'${esc(b.name)}','${esc(b.url??'')}')">Edit</button> <button class="del" onclick="delBrand(${b.id})">Delete</button></td>
+  </tr>`).join('') || '<tr><td colspan="3">No brands</td></tr>';
 }
 
 async function addBrand() {
   const name = get('b-name').value.trim();
-  if (!name) return alert('ブランド名は必須です');
+  if (!name) return alert('Brand name is required.');
   const url = get('b-url').value.trim();
   await api('/brands', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, url:url||null}) })
-    .catch(s => s===409 ? alert('既に存在します') : null);
+    .catch(s => s===409 ? alert('Already exists.') : null);
   get('b-name').value = get('b-url').value = '';
   loadBrands();
 }
 
 async function delBrand(id) {
-  if (confirm('削除しますか？')) { await api('/brands/'+id, {method:'DELETE'}); loadBrands(); }
+  if (confirm('Delete this brand?')) { await api('/brands/'+id, {method:'DELETE'}); loadBrands(); }
 }
 
 function editBrand(id, name, url) {
@@ -466,20 +463,20 @@ function editBrand(id, name, url) {
   if (!row) return;
   row.classList.add('editing');
   row.innerHTML = `
-    <td><input id="eb-name-${id}" value="${esc(name)}" placeholder="ブランド名（必須）"></td>
-    <td><input id="eb-url-${id}" value="${esc(url)}" placeholder="公式URL" size="30"></td>
+    <td><input id="eb-name-${id}" value="${esc(name)}" placeholder="Brand name (required)"></td>
+    <td><input id="eb-url-${id}" value="${esc(url)}" placeholder="Official URL" size="30"></td>
     <td>
-      <button class="save" onclick="saveBrand(${id})">保存</button>
-      <button onclick="loadBrands()">キャンセル</button>
+      <button class="save" onclick="saveBrand(${id})">Save</button>
+      <button onclick="loadBrands()">Cancel</button>
     </td>`;
 }
 
 async function saveBrand(id) {
   const name = get('eb-name-'+id).value.trim();
-  if (!name) return alert('ブランド名は必須です');
+  if (!name) return alert('Brand name is required.');
   const url = get('eb-url-'+id).value.trim();
   await api('/brands/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, url:url||null}) })
-    .catch(s => s===409 ? alert('既に存在します') : null);
+    .catch(s => s===409 ? alert('Already exists.') : null);
   loadBrands();
 }
 
@@ -489,26 +486,26 @@ async function loadCategories() {
   ['w-category'].forEach(sid => {
     const sel = get(sid);
     const cur = sel.value;
-    sel.innerHTML = '<option value="">カテゴリー</option>' + cats.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+    sel.innerHTML = '<option value="">Category</option>' + cats.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
     sel.value = cur;
   });
   get('c-list').innerHTML = cats.map(c => `<tr>
     <td>${esc(c.name)}</td>
-    <td><button class="edit" onclick="editCategory(${c.id},'${esc(c.name)}')">編集</button> <button class="del" onclick="delCategory(${c.id})">削除</button></td>
-  </tr>`).join('') || '<tr><td colspan="2">なし</td></tr>';
+    <td><button class="edit" onclick="editCategory(${c.id},'${esc(c.name)}')">Edit</button> <button class="del" onclick="delCategory(${c.id})">Delete</button></td>
+  </tr>`).join('') || '<tr><td colspan="2">No categories</td></tr>';
 }
 
 async function addCategory() {
   const name = get('c-name').value.trim();
-  if (!name) return alert('カテゴリー名は必須です');
+  if (!name) return alert('Category name is required.');
   await api('/categories', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) })
-    .catch(s => s===409 ? alert('既に存在します') : null);
+    .catch(s => s===409 ? alert('Already exists.') : null);
   get('c-name').value = '';
   loadCategories();
 }
 
 async function delCategory(id) {
-  if (confirm('削除しますか？')) { await api('/categories/'+id, {method:'DELETE'}); loadCategories(); }
+  if (confirm('Delete this category?')) { await api('/categories/'+id, {method:'DELETE'}); loadCategories(); }
 }
 
 function editCategory(id, name) {
@@ -516,18 +513,18 @@ function editCategory(id, name) {
   if (!row) return;
   row.classList.add('editing');
   row.innerHTML = `
-    <td><input id="ec-name-${id}" value="${esc(name)}" placeholder="カテゴリー名（必須）"></td>
+    <td><input id="ec-name-${id}" value="${esc(name)}" placeholder="Category name (required)"></td>
     <td>
-      <button class="save" onclick="saveCategory(${id})">保存</button>
-      <button onclick="loadCategories()">キャンセル</button>
+      <button class="save" onclick="saveCategory(${id})">Save</button>
+      <button onclick="loadCategories()">Cancel</button>
     </td>`;
 }
 
 async function saveCategory(id) {
   const name = get('ec-name-'+id).value.trim();
-  if (!name) return alert('カテゴリー名は必須です');
+  if (!name) return alert('Category name is required.');
   await api('/categories/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) })
-    .catch(s => s===409 ? alert('既に存在します') : null);
+    .catch(s => s===409 ? alert('Already exists.') : null);
   loadCategories();
 }
 
