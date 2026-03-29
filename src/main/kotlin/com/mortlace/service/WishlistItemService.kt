@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 @Service
 @Transactional
@@ -84,17 +86,19 @@ class WishlistItemService(
 
     fun delete(id: Long) {
         val item = repo.findById(id).orElseThrow { notFound(id) }
-        item.imagePath?.let { File("./data/images/$it").delete() }
+        item.imagePath?.let { File("./data/images/$it").absoluteFile.delete() }
         repo.deleteById(id)
     }
 
     fun uploadImage(id: Long, file: MultipartFile): WishlistItemResponse {
         val item = repo.findById(id).orElseThrow { notFound(id) }
-        val dir = File("./data/images").also { it.mkdirs() }
+        val dir = File("./data/images").absoluteFile.also { it.mkdirs() }
         val ext = file.originalFilename?.substringAfterLast('.', "jpg") ?: "jpg"
         item.imagePath?.let { File(dir, it).delete() }
         val filename = "$id.$ext"
-        file.transferTo(File(dir, filename))
+        file.inputStream.use { input ->
+            Files.copy(input, File(dir, filename).toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
         item.imagePath = filename
         return repo.save(item).toResponse()
     }
@@ -102,7 +106,7 @@ class WishlistItemService(
     fun getImage(id: Long): Pair<ByteArray, String> {
         val item = repo.findById(id).orElseThrow { notFound(id) }
         val path = item.imagePath ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "画像がありません")
-        val file = File("./data/images/$path")
+        val file = File("./data/images/$path").absoluteFile
         if (!file.exists()) throw ResponseStatusException(HttpStatus.NOT_FOUND, "画像ファイルが見つかりません")
         val contentType = when (path.substringAfterLast('.').lowercase()) {
             "png" -> "image/png"
