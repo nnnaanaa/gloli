@@ -6,7 +6,8 @@ COPY build.gradle.kts settings.gradle.kts ./
 # （build.gradle.kts が変わらない限りこのレイヤーは再利用される）
 RUN mkdir -p src/main/kotlin && \
     echo 'package com.mortlace' > src/main/kotlin/Dummy.kt && \
-    gradle --no-daemon compileKotlin; \
+    gradle --no-daemon compileKotlin && \
+    gradle --no-daemon dependencies --configuration runtimeClasspath; \
     rm -rf src
 COPY src/ src/
 RUN gradle bootJar --no-daemon
