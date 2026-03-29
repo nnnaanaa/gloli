@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mortlace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Shippori Mincho', serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+      background-image: url('gothic1.png'), url('gothic2.png');
+      background-size: auto 100vh, auto 100vh;
+      background-position: left center, right center;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed, fixed;
+    }
+    h1 { font-family: 'Cinzel Decorative', serif; margin-bottom: 20px; font-size: clamp(1.4rem, 4vw, 2rem); }
+    h2 { font-family: 'Cinzel Decorative', serif; margin: 20px 0 8px; font-size: clamp(1rem, 3vw, 1.3rem); }
+    h3 { font-family: 'Cinzel Decorative', serif; }
+    input, select, textarea { padding: 6px 8px; margin: 2px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Shippori Mincho', serif; }
+    button { padding: 6px 14px; cursor: pointer; border: none; border-radius: 4px; background: #c8739a; color: white; font-family: 'Shippori Mincho', serif; }
+    button.del { background: #e57373; }
+    button.edit { background: #7986cb; }
+    button.save { background: #66bb6a; }
+    tr.editing td { background: #fffde7; }
+    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; min-width: 500px; }
+    th, td { border: 1px solid #ddd; padding: 7px 10px; text-align: left; }
+    th { background: #f5f5f5; font-weight: 600; }
+    a { color: #c8739a; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tabs button { background: #ddd; color: #333; }
+    .tabs button.active { background: #c8739a; color: white; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .form-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .form-row input, .form-row select { flex: 1 1 140px; min-width: 0; }
+    .form-row input[type="number"] { flex: 0 1 100px; }
+    .form-row button { flex: 0 0 auto; }
+
+    @media (max-width: 1300px) {
+      body { background-image: none; }
+    }
+    @media (max-width: 600px) {
+      body { padding: 12px; }
+      .form-row input, .form-row select { flex: 1 1 100%; }
+      table { font-size: 0.8rem; min-width: 400px; }
+      th, td { padding: 5px 7px; }
+    }
+  </style>
+</head>
+<body>
+<h1>mortlace</h1>
+
+<div class="tabs">
+  <button class="active" onclick="show('wishlist',this)">アイテム</button>
+  <button onclick="show('brands',this)">ブランド</button>
+  <button onclick="show('categories',this)">カテゴリー</button>
+</div>
+
+<!-- ウィッシュリスト -->
+<div id="wishlist" class="tab active">
+  <h2>追加</h2>
+  <div class="form-row">
+    <input id="w-url" placeholder="URL（必須）">
+    <input id="w-name" placeholder="商品名">
+    <select id="w-brand"><option value="">ブランド</option></select>
+    <select id="w-category"><option value="">カテゴリー</option></select>
+    <input id="w-price" type="number" placeholder="価格">
+    <select id="w-priority">
+      <option value="MEDIUM">中</option>
+      <option value="LOW">低</option>
+      <option value="HIGH">高</option>
+      <option value="GRAIL">GRAIL</option>
+    </select>
+    <input id="w-notes" placeholder="メモ">
+    <button onclick="addItem()">追加</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>URL</th><th>商品名</th><th>ブランド</th><th>カテゴリー</th><th>価格</th><th>優先度</th><th>メモ</th><th></th></tr></thead>
+      <tbody id="w-list"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 編集モーダル（アイテム） -->
+<div id="edit-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:100">
+  <div style="background:white;padding:24px;border-radius:8px;max-width:500px;margin:80px auto;position:relative">
+    <h3 style="margin:0 0 16px">アイテム編集</h3>
+    <input type="hidden" id="edit-id">
+    <div style="display:grid;gap:8px">
+      <input id="edit-url" placeholder="URL（必須）" style="width:100%;box-sizing:border-box">
+      <input id="edit-name" placeholder="商品名" style="width:100%;box-sizing:border-box">
+      <select id="edit-brand" style="width:100%;box-sizing:border-box"><option value="">ブランド</option></select>
+      <select id="edit-category" style="width:100%;box-sizing:border-box"><option value="">カテゴリー</option></select>
+      <input id="edit-price" type="number" placeholder="価格" style="width:100%;box-sizing:border-box">
+      <select id="edit-priority" style="width:100%;box-sizing:border-box">
+        <option value="LOW">低</option>
+        <option value="MEDIUM">中</option>
+        <option value="HIGH">高</option>
+        <option value="GRAIL">GRAIL</option>
+      </select>
+      <input id="edit-notes" placeholder="メモ" style="width:100%;box-sizing:border-box">
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeEdit()">キャンセル</button>
+      <button class="save" onclick="saveItem()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ブランド -->
+<div id="brands" class="tab">
+  <h2>追加</h2>
+  <div class="form-row">
+    <input id="b-name" placeholder="ブランド名（必須）">
+    <input id="b-url" placeholder="公式URL">
+    <button onclick="addBrand()">追加</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>名前</th><th>URL</th><th></th></tr></thead>
+      <tbody id="b-list"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- カテゴリー -->
+<div id="categories" class="tab">
+  <h2>追加</h2>
+  <div class="form-row">
+    <input id="c-name" placeholder="カテゴリー名（必須）">
+    <button onclick="addCategory()">追加</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>名前</th><th></th></tr></thead>
+      <tbody id="c-list"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+const get = id => document.getElementById(id);
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+async function api(path, opt) {
+  const r = await fetch('/api' + path, opt);
+  return r.ok ? r : Promise.reject(r.status);
+}
+
+// ---- ウィッシュリスト ----
+async function loadItems() {
+  const items = await (await api('/wishlist')).json();
+  get('w-list').innerHTML = items.length ? items.map(i => `<tr>
+    <td><a href="${esc(i.url)}" target="_blank">${esc(i.url)}</a></td>
+    <td>${esc(i.name)}</td>
+    <td>${esc(i.brand?.name)}</td>
+    <td>${esc(i.category?.name)}</td>
+    <td>${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
+    <td>${esc(i.priority)}</td>
+    <td>${esc(i.notes)}</td>
+    <td><button class="edit" onclick="openEdit(${i.id})">編集</button> <button class="del" onclick="delItem(${i.id})">削除</button></td>
+  </tr>`).join('') : '<tr><td colspan="8">なし</td></tr>';
+}
+
+async function addItem() {
+  const url = get('w-url').value.trim();
+  if (!url) return alert('URLは必須です');
+  const body = { url, priority: get('w-priority').value };
+  const name = get('w-name').value.trim();
+  const brandId = get('w-brand').value;
+  const categoryId = get('w-category').value;
+  const price = get('w-price').value;
+  const notes = get('w-notes').value.trim();
+  if (name) body.name = name;
+  if (brandId) body.brandId = +brandId;
+  if (categoryId) body.categoryId = +categoryId;
+  if (price) body.price = +price;
+  if (notes) body.notes = notes;
+  await api('/wishlist', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  get('w-url').value = get('w-name').value = get('w-price').value = get('w-notes').value = '';
+  get('w-brand').value = get('w-category').value = '';
+  loadItems();
+}
+
+async function delItem(id) {
+  if (confirm('削除しますか？')) { await api('/wishlist/'+id, {method:'DELETE'}); loadItems(); }
+}
+
+let _editItem = null;
+async function openEdit(id) {
+  _editItem = await (await api('/wishlist/'+id)).json();
+  const i = _editItem;
+  get('edit-id').value = i.id;
+  get('edit-url').value = i.url ?? '';
+  get('edit-name').value = i.name ?? '';
+  get('edit-price').value = i.price ?? '';
+  get('edit-notes').value = i.notes ?? '';
+  get('edit-priority').value = i.priority ?? 'MEDIUM';
+  // セレクトの選択肢を同期してから値をセット
+  const bSel = get('edit-brand');
+  bSel.innerHTML = get('w-brand').innerHTML;
+  bSel.value = i.brand?.id ?? '';
+  const cSel = get('edit-category');
+  cSel.innerHTML = get('w-category').innerHTML;
+  cSel.value = i.category?.id ?? '';
+  get('edit-modal').style.display = 'block';
+}
+
+function closeEdit() {
+  get('edit-modal').style.display = 'none';
+}
+
+async function saveItem() {
+  const url = get('edit-url').value.trim();
+  if (!url) return alert('URLは必須です');
+  const id = get('edit-id').value;
+  const body = { url, priority: get('edit-priority').value };
+  const name = get('edit-name').value.trim();
+  const brandId = get('edit-brand').value;
+  const categoryId = get('edit-category').value;
+  const price = get('edit-price').value;
+  const notes = get('edit-notes').value.trim();
+  if (name) body.name = name;
+  if (brandId) body.brandId = +brandId;
+  if (categoryId) body.categoryId = +categoryId;
+  if (price) body.price = +price;
+  if (notes) body.notes = notes;
+  await api('/wishlist/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  closeEdit();
+  loadItems();
+}
+
+// ---- ブランド ----
+async function loadBrands() {
+  const brands = await (await api('/brands')).json();
+  ['w-brand'].forEach(sid => {
+    const sel = get(sid);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">ブランド</option>' + brands.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
+    sel.value = cur;
+  });
+  get('b-list').innerHTML = brands.map(b => `<tr>
+    <td>${esc(b.name)}</td>
+    <td>${b.url ? `<a href="${esc(b.url)}" target="_blank">${esc(b.url)}</a>` : ''}</td>
+    <td><button class="edit" onclick="editBrand(${b.id},'${esc(b.name)}','${esc(b.url??'')}')">編集</button> <button class="del" onclick="delBrand(${b.id})">削除</button></td>
+  </tr>`).join('') || '<tr><td colspan="3">なし</td></tr>';
+}
+
+async function addBrand() {
+  const name = get('b-name').value.trim();
+  if (!name) return alert('ブランド名は必須です');
+  const url = get('b-url').value.trim();
+  await api('/brands', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, url:url||null}) })
+    .catch(s => s===409 ? alert('既に存在します') : null);
+  get('b-name').value = get('b-url').value = '';
+  loadBrands();
+}
+
+async function delBrand(id) {
+  if (confirm('削除しますか？')) { await api('/brands/'+id, {method:'DELETE'}); loadBrands(); }
+}
+
+function editBrand(id, name, url) {
+  const row = [...document.querySelectorAll('#b-list tr')].find(r => r.innerHTML.includes(`editBrand(${id},`));
+  if (!row) return;
+  row.classList.add('editing');
+  row.innerHTML = `
+    <td><input id="eb-name-${id}" value="${esc(name)}" placeholder="ブランド名（必須）"></td>
+    <td><input id="eb-url-${id}" value="${esc(url)}" placeholder="公式URL" size="30"></td>
+    <td>
+      <button class="save" onclick="saveBrand(${id})">保存</button>
+      <button onclick="loadBrands()">キャンセル</button>
+    </td>`;
+}
+
+async function saveBrand(id) {
+  const name = get('eb-name-'+id).value.trim();
+  if (!name) return alert('ブランド名は必須です');
+  const url = get('eb-url-'+id).value.trim();
+  await api('/brands/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, url:url||null}) })
+    .catch(s => s===409 ? alert('既に存在します') : null);
+  loadBrands();
+}
+
+// ---- カテゴリー ----
+async function loadCategories() {
+  const cats = await (await api('/categories')).json();
+  ['w-category'].forEach(sid => {
+    const sel = get(sid);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">カテゴリー</option>' + cats.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+    sel.value = cur;
+  });
+  get('c-list').innerHTML = cats.map(c => `<tr>
+    <td>${esc(c.name)}</td>
+    <td><button class="edit" onclick="editCategory(${c.id},'${esc(c.name)}')">編集</button> <button class="del" onclick="delCategory(${c.id})">削除</button></td>
+  </tr>`).join('') || '<tr><td colspan="2">なし</td></tr>';
+}
+
+async function addCategory() {
+  const name = get('c-name').value.trim();
+  if (!name) return alert('カテゴリー名は必須です');
+  await api('/categories', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) })
+    .catch(s => s===409 ? alert('既に存在します') : null);
+  get('c-name').value = '';
+  loadCategories();
+}
+
+async function delCategory(id) {
+  if (confirm('削除しますか？')) { await api('/categories/'+id, {method:'DELETE'}); loadCategories(); }
+}
+
+function editCategory(id, name) {
+  const row = [...document.querySelectorAll('#c-list tr')].find(r => r.innerHTML.includes(`editCategory(${id},`));
+  if (!row) return;
+  row.classList.add('editing');
+  row.innerHTML = `
+    <td><input id="ec-name-${id}" value="${esc(name)}" placeholder="カテゴリー名（必須）"></td>
+    <td>
+      <button class="save" onclick="saveCategory(${id})">保存</button>
+      <button onclick="loadCategories()">キャンセル</button>
+    </td>`;
+}
+
+async function saveCategory(id) {
+  const name = get('ec-name-'+id).value.trim();
+  if (!name) return alert('カテゴリー名は必須です');
+  await api('/categories/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) })
+    .catch(s => s===409 ? alert('既に存在します') : null);
+  loadCategories();
+}
+
+loadItems(); loadBrands(); loadCategories();
+</script>
+</body>
+</html>

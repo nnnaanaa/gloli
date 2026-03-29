@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wishlistdb
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:wishlist}
+    password: ${DB_PASS:changeme}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
