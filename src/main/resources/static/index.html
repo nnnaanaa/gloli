@@ -9,15 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #0d0408;
-      --card:      #1a0810;
-      --accent:    #c8739a;
-      --accent-lt: #e0a0bc;
-      --border:    #4a1e30;
-      --thead-bg:  #0d0408;
-      --thead-fg:  #e8c8d8;
-      --text:      #f0e0e8;
-      --muted:     #a07888;
+      --bg:        #080808;
+      --card:      #101010;
+      --accent:    #a8a4b8;
+      --accent-lt: #ccc8d8;
+      --border:    #282430;
+      --thead-bg:  #080808;
+      --thead-fg:  #ccc8d8;
+      --text:      #ece8f4;
+      --muted:     #706c7c;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -45,13 +45,13 @@
       padding: 28px 24px;
       max-width: 900px;
       margin: 0 auto;
-      background: rgba(26, 8, 16, 0.82);
+      background: rgba(10, 9, 10, 0.90);
       min-height: 100vh;
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      box-shadow: 0 0 60px rgba(200,115,154,0.12),
-                  inset 0 0 0 5px rgba(13,4,8,0.9),
-                  inset 0 0 0 6px rgba(200,115,154,0.18);
+      box-shadow: 0 0 60px rgba(168,164,184,0.08),
+                  inset 0 0 0 5px rgba(8,8,8,0.95),
+                  inset 0 0 0 6px rgba(168,164,184,0.20);
       position: relative;
       z-index: 1;
     }
@@ -107,7 +107,17 @@ h2 {
       margin: 22px 0 10px;
     }
 
-    h2::before { content: '✝ '; font-family: serif; font-weight: normal; font-size: 0.85em; opacity: 0.75; }
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border: 1px solid var(--accent);
+      transform: rotate(45deg);
+      margin-right: 10px;
+      vertical-align: middle;
+      opacity: 0.75;
+    }
 
     h3 { font-family: 'Cinzel Decorative', serif; color: var(--text); letter-spacing: 0.05em; }
 
@@ -120,14 +130,14 @@ h2 {
       border: 1px solid var(--border);
       border-radius: 0;
       font-family: 'Shippori Mincho', serif;
-      background: #120610;
+      background: #0c0c0c;
       color: var(--text);
       font-size: 0.9rem;
     }
     input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(200,115,154,0.2);
+      box-shadow: 0 0 0 2px rgba(168,164,184,0.2);
     }
 
     button {
@@ -136,16 +146,16 @@ h2 {
       border: 1px solid var(--accent);
       border-radius: 0;
       background: var(--accent);
-      color: #feeef5;
+      color: #eceaf4;
       font-family: 'Shippori Mincho', serif;
       font-size: 0.875rem;
       letter-spacing: 0.04em;
       transition: opacity .15s;
     }
     button:hover { opacity: 0.82; }
-    button.del  { background: #7a1c2a; border-color: #5a0c1a; }
-    button.edit { background: #3e2460; border-color: #2e1450; }
-    button.save { background: #1c5236; border-color: #0c4226; }
+    button.del  { background: #2a1212; border-color: #1c0a0a; }
+    button.edit { background: #1c1824; border-color: #12101a; }
+    button.save { background: #121c16; border-color: #0a1410; }
 
     /* ---- generic table (Brands / Categories) ---- */
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -167,7 +177,7 @@ h2 {
     }
     th { background: var(--thead-bg); color: var(--thead-fg); font-weight: 600; letter-spacing: 0.04em; }
     tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
-    tr:hover td { background: rgba(200,115,154,0.1); }
+    tr:hover td { background: rgba(168,164,184,0.07); }
 
     /* ---- Sort bar ---- */
     .sort-bar {
@@ -188,9 +198,21 @@ h2 {
       opacity: 1;
     }
     .sort-bar button:hover { border-color: var(--accent); color: var(--accent-lt); }
-    .sort-bar button.active { border-color: var(--accent); color: var(--accent-lt); background: rgba(200,115,154,0.08); }
-    .sort-bar button.active::after { content: ' ▲'; font-size: 0.7em; }
-    .sort-bar button.active.desc::after { content: ' ▼'; }
+    .sort-bar button.active { border-color: var(--accent); color: var(--accent-lt); background: rgba(168,164,184,0.08); }
+    .sort-bar button.active::after {
+      content: '';
+      display: inline-block;
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 5px solid var(--accent);
+      vertical-align: middle;
+      margin-left: 5px;
+    }
+    .sort-bar button.active.desc::after {
+      border-bottom: none;
+      border-top: 5px solid var(--accent);
+    }
 
     /* ---- Items: card layout (all screen sizes) ---- */
     #wishlist .table-wrap { overflow-x: visible; }
@@ -216,17 +238,17 @@ h2 {
       opacity: 0.4;
       flex-shrink: 0;
     }
-    #wishlist tr:hover { box-shadow: 0 0 0 1px var(--accent), 0 2px 18px rgba(200,115,154,0.12); }
+    #wishlist tr:hover { box-shadow: 0 0 0 1px var(--accent), 0 2px 18px rgba(168,164,184,0.10); }
     #wishlist tr:hover td,
     #wishlist tr:nth-child(even) td { background: transparent; }
     #wishlist tr.editing { box-shadow: 0 0 0 1px var(--accent-lt); }
-    #wishlist tr.editing td { background: #2a0d1c; }
+    #wishlist tr.editing td { background: #1c1c1c; }
     #wishlist td {
       display: flex;
       align-items: flex-start;
       gap: 10px;
       border: none;
-      border-bottom: 1px solid rgba(74,30,48,0.4);
+      border-bottom: 1px solid rgba(50,46,60,0.5);
       padding: 7px 10px;
       white-space: normal;
       text-overflow: clip;
@@ -271,7 +293,7 @@ h2 {
       border-bottom: 1px solid var(--card);
       font-weight: 600;
     }
-    .tabs button:hover:not(.active) { background: rgba(200,115,154,0.1); opacity: 1; }
+    .tabs button:hover:not(.active) { background: rgba(168,164,184,0.08); opacity: 1; }
 
     .tab { display: none; }
     .tab.active { display: block; }
@@ -285,7 +307,7 @@ h2 {
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(8,2,6,0.75); z-index: 100;
+      background: rgba(4,4,4,0.85); z-index: 100;
     }
     .modal-box {
       background: var(--card);
@@ -305,13 +327,21 @@ h2 {
 
     /* モーダルにも内枠 */
     .modal-box {
-      box-shadow: 0 8px 40px rgba(0,0,0,0.6),
-                  inset 0 0 0 3px rgba(13,4,8,0.9),
-                  inset 0 0 0 4px rgba(200,115,154,0.15);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.7),
+                  inset 0 0 0 3px rgba(8,8,8,0.95),
+                  inset 0 0 0 4px rgba(168,164,184,0.15);
     }
 
     /* タブのアクティブ装飾 */
-    .tabs button.active::after { content: ' ✦'; color: var(--accent); font-size: 0.65em; vertical-align: middle; }
+    .tabs button.active::after {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      transform: rotate(45deg);
+      margin: 3px auto 0;
+    }
 
     /* スクロールバー */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -406,8 +436,8 @@ h2 {
 </div>
 
 <!-- image viewer -->
-<div id="img-modal" style="display:none;position:fixed;inset:0;background:rgba(17,5,8,0.8);z-index:200;cursor:pointer" onclick="this.style.display='none'">
-  <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #c9a0b4">
+<div id="img-modal" style="display:none;position:fixed;inset:0;background:rgba(4,4,4,0.90);z-index:200;cursor:pointer" onclick="this.style.display='none'">
+  <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #a8a4b8">
 </div>
 
 <!-- brands -->
