@@ -24,11 +24,19 @@
 
     html {
       background: var(--bg);
-      background-image: url('gothic1.png'), url('gothic2.png');
-      background-size: auto 100vh, auto 100vh;
-      background-position: left center, right center;
-      background-repeat: no-repeat, no-repeat;
-      background-attachment: fixed, fixed;
+    }
+
+    html::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url('gothic1.png');
+      background-size: auto 100vh;
+      background-position: center center;
+      background-repeat: no-repeat;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
     }
 
     body {
@@ -37,11 +45,44 @@
       padding: 28px 24px;
       max-width: 900px;
       margin: 0 auto;
-      background: var(--card);
+      background: rgba(26, 8, 16, 0.82);
       min-height: 100vh;
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      box-shadow: 0 0 60px rgba(200,115,154,0.12);
+      box-shadow: 0 0 60px rgba(200,115,154,0.12),
+                  inset 0 0 0 5px rgba(13,4,8,0.9),
+                  inset 0 0 0 6px rgba(200,115,154,0.18);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 4隅のL字ブラケット */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--accent), var(--accent)),
+        linear-gradient(var(--accent), var(--accent)),
+        linear-gradient(var(--accent), var(--accent)),
+        linear-gradient(var(--accent), var(--accent)),
+        linear-gradient(var(--accent), var(--accent)),
+        linear-gradient(var(--accent), var(--accent)),
+        linear-gradient(var(--accent), var(--accent)),
+        linear-gradient(var(--accent), var(--accent));
+      background-size:
+        1px 28px, 28px 1px,
+        1px 28px, 28px 1px,
+        1px 28px, 28px 1px,
+        1px 28px, 28px 1px;
+      background-position:
+        0 0,       0 0,
+        100% 0,    100% 0,
+        0 100%,    0 100%,
+        100% 100%, 100% 100%;
+      background-repeat: no-repeat;
+      opacity: 0.45;
+      pointer-events: none;
     }
 
     h1 {
@@ -50,18 +91,23 @@
       color: var(--text);
       text-align: center;
       letter-spacing: 0.08em;
-      padding-bottom: 14px;
+      padding-bottom: 18px;
       margin-bottom: 24px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: none;
+      border-image: linear-gradient(to right, transparent, var(--border) 15%, var(--accent) 50%, var(--border) 85%, transparent) 1;
+      border-bottom-width: 1px;
+      border-bottom-style: solid;
     }
 
-    h2 {
+h2 {
       font-family: 'Cinzel Decorative', serif;
       font-size: clamp(0.95rem, 3vw, 1.2rem);
       color: var(--accent);
       letter-spacing: 0.05em;
       margin: 22px 0 10px;
     }
+
+    h2::before { content: '✝ '; font-family: serif; font-weight: normal; font-size: 0.85em; opacity: 0.75; }
 
     h3 { font-family: 'Cinzel Decorative', serif; color: var(--text); letter-spacing: 0.05em; }
 
@@ -101,8 +147,7 @@
     button.edit { background: #3e2460; border-color: #2e1450; }
     button.save { background: #1c5236; border-color: #0c4226; }
 
-    tr.editing td { background: #2a0d1c; }
-
+    /* ---- generic table (Brands / Categories) ---- */
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table {
       width: 100%;
@@ -123,6 +168,86 @@
     th { background: var(--thead-bg); color: var(--thead-fg); font-weight: 600; letter-spacing: 0.04em; }
     tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
     tr:hover td { background: rgba(200,115,154,0.1); }
+
+    /* ---- Sort bar ---- */
+    .sort-bar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin: 10px 0 4px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .sort-bar button {
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      opacity: 1;
+    }
+    .sort-bar button:hover { border-color: var(--accent); color: var(--accent-lt); }
+    .sort-bar button.active { border-color: var(--accent); color: var(--accent-lt); background: rgba(200,115,154,0.08); }
+    .sort-bar button.active::after { content: ' ▲'; font-size: 0.7em; }
+    .sort-bar button.active.desc::after { content: ' ▼'; }
+
+    /* ---- Items: card layout (all screen sizes) ---- */
+    #wishlist .table-wrap { overflow-x: visible; }
+    #wishlist table { display: block; border: none; table-layout: auto; margin-top: 14px; }
+    #wishlist thead { display: none; }
+    #wishlist tbody {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    #wishlist tr {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: box-shadow 0.15s;
+    }
+    #wishlist tr::before {
+      content: '';
+      display: block;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--accent) 25%, var(--accent) 75%, transparent);
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+    #wishlist tr:hover { box-shadow: 0 0 0 1px var(--accent), 0 2px 18px rgba(200,115,154,0.12); }
+    #wishlist tr:hover td,
+    #wishlist tr:nth-child(even) td { background: transparent; }
+    #wishlist tr.editing { box-shadow: 0 0 0 1px var(--accent-lt); }
+    #wishlist tr.editing td { background: #2a0d1c; }
+    #wishlist td {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border: none;
+      border-bottom: 1px solid rgba(74,30,48,0.4);
+      padding: 7px 10px;
+      white-space: normal;
+      text-overflow: clip;
+      overflow: visible;
+      width: auto !important;
+    }
+    #wishlist td:last-child { border-bottom: none; }
+    #wishlist td::before {
+      content: attr(data-label);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      min-width: 68px;
+      flex-shrink: 0;
+    }
+    #wishlist td.col-img { justify-content: center; padding: 12px; }
+    #wishlist td.col-img::before { display: none; }
+    #wishlist td.col-img img { width: 100px; height: 100px; }
+    #wishlist td.col-actions { justify-content: flex-end; padding: 8px 10px; margin-top: auto; }
+    #wishlist td.col-actions::before { display: none; }
+    #wishlist td a { word-break: break-all; }
 
     .tabs {
       display: flex;
@@ -156,11 +281,7 @@
     .form-row input[type="number"] { flex: 0 1 100px; }
     .form-row button { flex: 0 0 auto; }
 
-    .col-img { width: 60px; }
-    .col-img img { width: 50px; height: 50px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; display: block; margin: auto; }
-    .col-price    { width: 80px; }
-    .col-priority { width: 70px; }
-    .col-actions  { width: 110px; white-space: nowrap; }
+    .col-img img { object-fit: cover; border: 1px solid var(--border); cursor: pointer; display: block; }
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -182,20 +303,29 @@
     .modal-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 2px; display: block; }
     .img-preview { width: 100%; max-height: 200px; object-fit: contain; border: 1px solid var(--border); margin-top: 6px; display: none; }
 
-    @media (max-width: 1300px) {
-      html { background-image: none; }
+    /* モーダルにも内枠 */
+    .modal-box {
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6),
+                  inset 0 0 0 3px rgba(13,4,8,0.9),
+                  inset 0 0 0 4px rgba(200,115,154,0.15);
     }
+
+    /* タブのアクティブ装飾 */
+    .tabs button.active::after { content: ' ✦'; color: var(--accent); font-size: 0.65em; vertical-align: middle; }
+
+    /* スクロールバー */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
     @media (max-width: 600px) {
       body { padding: 14px 12px; }
       .form-row input, .form-row select { flex: 1 1 100%; }
-      table { font-size: 0.8rem; }
-      th, td { padding: 5px 6px; }
-      .col-img { width: 44px; }
-      .col-img img { width: 36px; height: 36px; }
-      .col-price    { width: 60px; }
-      .col-priority { width: 54px; }
-      .col-actions  { width: 90px; }
       .modal-box { margin: 20px 12px; padding: 20px; }
+      #brands table, #categories table { font-size: 0.8rem; }
+      #brands th, #brands td, #categories th, #categories td { padding: 5px 6px; }
+      #wishlist tbody { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -225,6 +355,15 @@
     </select>
     <input id="w-notes" placeholder="Notes">
     <button onclick="addItem()">Add</button>
+  </div>
+
+  <div class="sort-bar">
+    Sort:
+    <button data-field="name"     onclick="sortBy('name')">Name</button>
+    <button data-field="brand"    onclick="sortBy('brand')">Brand</button>
+    <button data-field="category" onclick="sortBy('category')">Category</button>
+    <button data-field="price"    onclick="sortBy('price')">Price</button>
+    <button data-field="priority" onclick="sortBy('priority')">Priority</button>
   </div>
 
   <div class="table-wrap">
@@ -321,19 +460,50 @@ async function api(path, opt) {
 }
 
 // ---- ウィッシュリスト ----
-async function loadItems() {
-  const items = await (await api('/wishlist')).json();
+let _items = [], _sortField = null, _sortAsc = true;
+const PRIORITY_ORDER = { LOW: 1, MEDIUM: 2, HIGH: 3, GRAIL: 4 };
+
+function renderItems() {
+  const items = [..._items];
+  if (_sortField) {
+    items.sort((a, b) => {
+      let va, vb, r;
+      if (_sortField === 'price') {
+        va = a.price ?? -1; vb = b.price ?? -1; r = va - vb;
+      } else if (_sortField === 'priority') {
+        va = PRIORITY_ORDER[a.priority] ?? 0; vb = PRIORITY_ORDER[b.priority] ?? 0; r = va - vb;
+      } else {
+        const get2 = (i) => (_sortField === 'brand' ? i.brand?.name : _sortField === 'category' ? i.category?.name : i.name) ?? '';
+        r = get2(a).localeCompare(get2(b), 'ja');
+      }
+      return _sortAsc ? r : -r;
+    });
+  }
   get('w-list').innerHTML = items.length ? items.map(i => `<tr>
-    <td class="col-img">${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="image" onclick="viewImg('${esc(i.imageUrl)}')">` : ''}</td>
-    <td title="${esc(i.url)}"><a href="${esc(i.url)}" target="_blank">${esc(i.url)}</a></td>
-    <td title="${esc(i.name)}">${esc(i.name)}</td>
-    <td title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
-    <td title="${esc(i.category?.name)}">${esc(i.category?.name)}</td>
-    <td class="col-price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
-    <td class="col-priority">${esc(i.priority)}</td>
-    <td title="${esc(i.notes)}">${esc(i.notes)}</td>
-    <td class="col-actions"><button class="edit" onclick="openEdit(${i.id})">Edit</button> <button class="del" onclick="delItem(${i.id})">Delete</button></td>
+    <td class="col-img" data-label="">${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="image" onclick="viewImg('${esc(i.imageUrl)}')">` : ''}</td>
+    <td data-label="URL" title="${esc(i.url)}"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a></td>
+    <td data-label="Name" title="${esc(i.name)}">${esc(i.name)}</td>
+    <td data-label="Brand" title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
+    <td data-label="Category" title="${esc(i.category?.name)}">${esc(i.category?.name)}</td>
+    <td class="col-price" data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
+    <td class="col-priority" data-label="Priority">${esc(i.priority)}</td>
+    <td data-label="Notes" title="${esc(i.notes)}">${esc(i.notes)}</td>
+    <td class="col-actions" data-label=""><button class="edit" onclick="openEdit(${i.id})">Edit</button> <button class="del" onclick="delItem(${i.id})">Delete</button></td>
   </tr>`).join('') : '<tr><td colspan="9">No items</td></tr>';
+}
+
+function sortBy(field) {
+  if (_sortField === field) { _sortAsc = !_sortAsc; }
+  else { _sortField = field; _sortAsc = true; }
+  document.querySelectorAll('.sort-bar button').forEach(btn => {
+    btn.className = btn.dataset.field === field ? (_sortAsc ? 'active' : 'active desc') : '';
+  });
+  renderItems();
+}
+
+async function loadItems() {
+  _items = await (await api('/wishlist')).json();
+  renderItems();
 }
 
 async function addItem() {
