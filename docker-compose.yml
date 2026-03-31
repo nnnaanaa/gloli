@@ -12,6 +12,8 @@ services:
       postgres:
         condition: service_healthy
     restart: on-failure
+    volumes:
+      - app_data:/app/data
 
   postgres:
     image: postgres:16-alpine
@@ -31,3 +33,4 @@ services:
 
 volumes:
   postgres_data:
+  app_data:

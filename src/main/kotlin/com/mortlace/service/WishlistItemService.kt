@@ -57,7 +57,8 @@ class WishlistItemService(
             brand = brand,
             category = category,
             notes = req.notes,
-            priority = req.priority
+            priority = req.priority,
+            imageUrl = req.imageUrl
         )
         return repo.save(item).toResponse()
     }
@@ -81,6 +82,11 @@ class WishlistItemService(
         item.category = category
         item.notes = req.notes
         item.priority = req.priority
+        if (req.imageUrl != null) {
+            item.imagePath?.let { File("./data/images/$it").absoluteFile.delete() }
+            item.imagePath = null
+        }
+        item.imageUrl = req.imageUrl
         return repo.save(item).toResponse()
     }
 
@@ -100,6 +106,7 @@ class WishlistItemService(
             Files.copy(input, File(dir, filename).toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
         item.imagePath = filename
+        item.imageUrl = null
         return repo.save(item).toResponse()
     }
 
@@ -126,7 +133,7 @@ class WishlistItemService(
         category = category?.let { CategoryResponse(it.id, it.name) },
         notes = notes,
         priority = priority,
-        imageUrl = if (imagePath != null) "/api/wishlist/$id/image" else null,
+        imageUrl = imageUrl ?: if (imagePath != null) "/api/wishlist/$id/image" else null,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

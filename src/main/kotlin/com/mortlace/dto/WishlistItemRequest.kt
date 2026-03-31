@@ -16,5 +16,6 @@ data class WishlistItemRequest(
     val brandId: Long? = null,
     val categoryId: Long? = null,
     val notes: String? = null,
-    val priority: Priority = Priority.MEDIUM
+    val priority: Priority = Priority.MEDIUM,
+    val imageUrl: String? = null
 )

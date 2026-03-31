@@ -38,6 +38,9 @@ class WishlistItem(
 
     var imagePath: String? = null,
 
+    @Column(length = 2048)
+    var imageUrl: String? = null,
+
     @CreationTimestamp
     @Column(updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
