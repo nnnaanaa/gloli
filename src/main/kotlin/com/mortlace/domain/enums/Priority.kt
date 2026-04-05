@@ -4,5 +4,5 @@ enum class Priority {
     LOW,
     MEDIUM,
     HIGH,
-    GRAIL  // ロリィタコミュニティ用語: 最上位の夢アイテム
+    GRAIL  // Lolita community term: the ultimate dream item
 }

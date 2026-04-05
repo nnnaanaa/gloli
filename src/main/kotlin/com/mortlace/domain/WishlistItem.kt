@@ -41,6 +41,20 @@ class WishlistItem(
     @Column(length = 2048)
     var imageUrl: String? = null,
 
+    @Column(length = 64)
+    var contentHash: String? = null,
+
+    @Column(nullable = false, columnDefinition = "boolean not null default false")
+    var hasUpdate: Boolean = false,
+
+    @Column(columnDefinition = "TEXT")
+    var contentSnapshot: String? = null,
+
+    @Column(columnDefinition = "TEXT")
+    var previousSnapshot: String? = null,
+
+    var lastCheckedAt: LocalDateTime? = null,
+
     @CreationTimestamp
     @Column(updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

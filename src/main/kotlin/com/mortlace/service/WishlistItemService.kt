@@ -42,12 +42,12 @@ class WishlistItemService(
     fun create(req: WishlistItemRequest): WishlistItemResponse {
         val brand = req.brandId?.let {
             brandRepo.findById(it).orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND, "ブランドが見つかりません: id=$it")
+                ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found: id=$it")
             }
         }
         val category = req.categoryId?.let {
             categoryRepo.findById(it).orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND, "カテゴリーが見つかりません: id=$it")
+                ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found: id=$it")
             }
         }
         val item = WishlistItem(
@@ -67,12 +67,12 @@ class WishlistItemService(
         val item = repo.findById(id).orElseThrow { notFound(id) }
         val brand = req.brandId?.let {
             brandRepo.findById(it).orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND, "ブランドが見つかりません: id=$it")
+                ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found: id=$it")
             }
         }
         val category = req.categoryId?.let {
             categoryRepo.findById(it).orElseThrow {
-                ResponseStatusException(HttpStatus.NOT_FOUND, "カテゴリーが見つかりません: id=$it")
+                ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found: id=$it")
             }
         }
         item.name = req.name
@@ -112,9 +112,9 @@ class WishlistItemService(
 
     fun getImage(id: Long): Pair<ByteArray, String> {
         val item = repo.findById(id).orElseThrow { notFound(id) }
-        val path = item.imagePath ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "画像がありません")
+        val path = item.imagePath ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No image")
         val file = File("./data/images/$path").absoluteFile
-        if (!file.exists()) throw ResponseStatusException(HttpStatus.NOT_FOUND, "画像ファイルが見つかりません")
+        if (!file.exists()) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Image file not found")
         val contentType = when (path.substringAfterLast('.').lowercase()) {
             "png" -> "image/png"
             "gif" -> "image/gif"
@@ -122,6 +122,12 @@ class WishlistItemService(
             else -> "image/jpeg"
         }
         return file.readBytes() to contentType
+    }
+
+    fun dismissUpdate(id: Long): WishlistItemResponse {
+        val item = repo.findById(id).orElseThrow { notFound(id) }
+        item.hasUpdate = false
+        return repo.save(item).toResponse()
     }
 
     private fun WishlistItem.toResponse() = WishlistItemResponse(
@@ -134,10 +140,14 @@ class WishlistItemService(
         notes = notes,
         priority = priority,
         imageUrl = imageUrl ?: if (imagePath != null) "/api/wishlist/$id/image" else null,
+        hasUpdate = hasUpdate,
+        lastCheckedAt = lastCheckedAt,
+        contentSnapshot = contentSnapshot,
+        previousSnapshot = previousSnapshot,
         createdAt = createdAt,
         updatedAt = updatedAt
     )
 
     private fun notFound(id: Long) =
-        ResponseStatusException(HttpStatus.NOT_FOUND, "アイテムが見つかりません: id=$id")
+        ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found: id=$id")
 }

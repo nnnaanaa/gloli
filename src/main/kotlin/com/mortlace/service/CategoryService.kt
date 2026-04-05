@@ -21,7 +21,7 @@ class CategoryService(private val repo: CategoryRepository) {
 
     fun create(req: CategoryRequest): CategoryResponse {
         if (repo.existsByName(req.name)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "カテゴリー名が既に存在します: ${req.name}")
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Category name already exists: ${req.name}")
         }
         return repo.save(Category(name = req.name)).toResponse()
     }
@@ -40,5 +40,5 @@ class CategoryService(private val repo: CategoryRepository) {
     private fun Category.toResponse() = CategoryResponse(id = id, name = name)
 
     private fun notFound(id: Long) =
-        ResponseStatusException(HttpStatus.NOT_FOUND, "カテゴリーが見つかりません: id=$id")
+        ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found: id=$id")
 }

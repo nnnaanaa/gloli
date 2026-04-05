@@ -21,7 +21,7 @@ class BrandService(private val repo: BrandRepository) {
 
     fun create(req: BrandRequest): BrandResponse {
         if (repo.existsByName(req.name)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "ブランド名が既に存在します: ${req.name}")
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Brand name already exists: ${req.name}")
         }
         return repo.save(Brand(name = req.name, url = req.url)).toResponse()
     }
@@ -41,5 +41,5 @@ class BrandService(private val repo: BrandRepository) {
     fun Brand.toResponse() = BrandResponse(id = id, name = name, url = url)
 
     private fun notFound(id: Long) =
-        ResponseStatusException(HttpStatus.NOT_FOUND, "ブランドが見つかりません: id=$id")
+        ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found: id=$id")
 }

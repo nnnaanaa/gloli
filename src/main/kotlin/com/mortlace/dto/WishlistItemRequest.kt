@@ -8,8 +8,8 @@ import java.math.BigDecimal
 data class WishlistItemRequest(
     val name: String? = null,
 
-    @field:NotBlank(message = "URLは必須です")
-    @field:Size(max = 2048, message = "URLが長すぎます")
+    @field:NotBlank(message = "URL is required")
+    @field:Size(max = 2048, message = "URL is too long")
     val url: String,
 
     val price: BigDecimal? = null,

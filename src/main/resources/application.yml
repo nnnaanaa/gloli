@@ -20,6 +20,10 @@ spring:
 server:
   port: 8080
 
+mortlace:
+  url-check:
+    interval-ms: 3600000
+
 springdoc:
   swagger-ui:
     path: /swagger-ui

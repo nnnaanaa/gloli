@@ -11,29 +11,29 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/categories")
-@Tag(name = "Categories", description = "カテゴリー管理API")
+@Tag(name = "Categories", description = "Category management API")
 class CategoryController(private val service: CategoryService) {
 
     @GetMapping
-    @Operation(summary = "カテゴリー一覧")
+    @Operation(summary = "List categories")
     fun list(): List<CategoryResponse> = service.findAll()
 
     @GetMapping("/{id}")
-    @Operation(summary = "カテゴリー1件取得")
+    @Operation(summary = "Get category by ID")
     fun get(@PathVariable id: Long): CategoryResponse = service.findById(id)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "カテゴリー追加")
+    @Operation(summary = "Add category")
     fun create(@Valid @RequestBody req: CategoryRequest): CategoryResponse = service.create(req)
 
     @PutMapping("/{id}")
-    @Operation(summary = "カテゴリー更新")
+    @Operation(summary = "Update category")
     fun update(@PathVariable id: Long, @Valid @RequestBody req: CategoryRequest): CategoryResponse =
         service.update(id, req)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "カテゴリー削除")
+    @Operation(summary = "Delete category")
     fun delete(@PathVariable id: Long) = service.delete(id)
 }

@@ -14,6 +14,10 @@ data class WishlistItemResponse(
     val notes: String?,
     val priority: Priority,
     val imageUrl: String?,
+    val hasUpdate: Boolean,
+    val lastCheckedAt: LocalDateTime?,
+    val contentSnapshot: String?,
+    val previousSnapshot: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )

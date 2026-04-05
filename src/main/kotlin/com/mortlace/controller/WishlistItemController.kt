@@ -15,11 +15,11 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/wishlist")
-@Tag(name = "Wishlist", description = "ロリィタ服ウィッシュリスト管理API")
+@Tag(name = "Wishlist", description = "Wishlist management API")
 class WishlistItemController(private val service: WishlistItemService) {
 
     @GetMapping
-    @Operation(summary = "一覧取得", description = "優先度・ブランドIDでフィルタリング可能")
+    @Operation(summary = "List items", description = "Filterable by priority, brand ID, and category ID")
     fun list(
         @RequestParam priority: Priority? = null,
         @RequestParam brandId: Long? = null,
@@ -27,16 +27,16 @@ class WishlistItemController(private val service: WishlistItemService) {
     ): List<WishlistItemResponse> = service.findAll(priority, brandId, categoryId)
 
     @GetMapping("/{id}")
-    @Operation(summary = "1件取得")
+    @Operation(summary = "Get item by ID")
     fun get(@PathVariable id: Long): WishlistItemResponse = service.findById(id)
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "アイテム追加")
+    @Operation(summary = "Add item")
     fun create(@Valid @RequestBody req: WishlistItemRequest): WishlistItemResponse = service.create(req)
 
     @PutMapping("/{id}")
-    @Operation(summary = "アイテム更新")
+    @Operation(summary = "Update item")
     fun update(
         @PathVariable id: Long,
         @Valid @RequestBody req: WishlistItemRequest
@@ -44,18 +44,22 @@ class WishlistItemController(private val service: WishlistItemService) {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "アイテム削除")
+    @Operation(summary = "Delete item")
     fun delete(@PathVariable id: Long) = service.delete(id)
 
+    @PostMapping("/{id}/dismiss-update")
+    @Operation(summary = "Dismiss update notification")
+    fun dismissUpdate(@PathVariable id: Long): WishlistItemResponse = service.dismissUpdate(id)
+
     @PostMapping("/{id}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    @Operation(summary = "画像アップロード")
+    @Operation(summary = "Upload image")
     fun uploadImage(
         @PathVariable id: Long,
         @RequestParam file: MultipartFile
     ): WishlistItemResponse = service.uploadImage(id, file)
 
     @GetMapping("/{id}/image")
-    @Operation(summary = "画像取得")
+    @Operation(summary = "Get image")
     fun getImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
         val (bytes, contentType) = service.getImage(id)
         return ResponseEntity.ok()
