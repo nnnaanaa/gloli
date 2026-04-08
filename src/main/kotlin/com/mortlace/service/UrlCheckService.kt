@@ -24,7 +24,8 @@ class UrlCheckService(private val repo: WishlistItemRepository) {
             try {
                 val (newHash, newText) = fetchContent(url) ?: return@forEach
                 val now = LocalDateTime.now()
-                if (prevHash != null && prevHash != newHash) {
+                val textChanged = prevSnapshot != null && prevSnapshot != newText
+                if (prevHash != null && prevHash != newHash && textChanged) {
                     log.info("Update detected: id=$id url=$url")
                     saveResult(id, newHash, now, hasUpdate = true, previousSnapshot = prevSnapshot, contentSnapshot = newText)
                 } else {
@@ -74,7 +75,7 @@ class UrlCheckService(private val repo: WishlistItemRepository) {
                 .replace(Regex("<(\\w+)[^>]*>"), "<$1>")
             val normalized = stripped.replace(Regex("\\s+"), " ").trim()
             val text = extractText(stripped)
-            sha256(normalized) to text
+            sha256(text) to text
         } catch (e: Exception) {
             null
         }

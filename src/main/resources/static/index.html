@@ -301,7 +301,14 @@ h2 {
     }
     #wishlist td.col-actions { justify-content: flex-end; padding: 8px 10px; margin-top: auto; }
     #wishlist td.col-actions::before { display: none; }
-    #wishlist td a { word-break: break-all; }
+    #wishlist td[data-label="URL"] { flex-wrap: wrap; align-items: center; }
+    #wishlist td[data-label="URL"] .url-value {
+      display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0;
+    }
+    #wishlist td[data-label="URL"] a {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      min-width: 0; flex: 1;
+    }
 
     .tabs {
       display: flex;
@@ -497,8 +504,9 @@ h2 {
       .modal-box { margin: 20px 12px; padding: 20px; }
       #brands table, #categories table { font-size: 0.8rem; }
       #brands th, #brands td, #categories th, #categories td { padding: 5px 6px; }
-      #wishlist tbody { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-      #wishlist td.col-img { height: 160px; }
+      #wishlist tbody { grid-template-columns: 1fr; }
+      #wishlist td.col-img { height: 180px; }
+      #wishlist td::before { min-width: 56px; font-size: 0.75rem; }
     }
   </style>
 </head>
@@ -665,7 +673,7 @@ function renderItems() {
   }
   get('w-list').innerHTML = items.length ? items.map(i => `<tr>
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
-    <td data-label="URL" title="${esc(i.url)}"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a>${i.hasUpdate ? ` <span class="update-badge" onclick="showDiff(${i.id})" title="View changes">Updated</span><button class="dismiss-x" onclick="dismissUpdate(${i.id})" title="Dismiss">×</button>` : ''}</td>
+    <td data-label="URL" title="${esc(i.url)}"><span class="url-value"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a>${i.hasUpdate ? `<span class="update-badge" onclick="showDiff(${i.id})" title="View changes">Updated</span><button class="dismiss-x" onclick="dismissUpdate(${i.id})" title="Dismiss">×</button>` : ''}</span></td>
     <td data-label="Name" title="${esc(i.name)}">${esc(i.name)}</td>
     <td data-label="Brand" title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
     <td data-label="Category" title="${esc(i.category?.name)}">${esc(i.category?.name)}</td>
