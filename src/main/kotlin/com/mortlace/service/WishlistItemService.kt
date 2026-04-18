@@ -124,12 +124,6 @@ class WishlistItemService(
         return file.readBytes() to contentType
     }
 
-    fun dismissUpdate(id: Long): WishlistItemResponse {
-        val item = repo.findById(id).orElseThrow { notFound(id) }
-        item.hasUpdate = false
-        return repo.save(item).toResponse()
-    }
-
     private fun WishlistItem.toResponse() = WishlistItemResponse(
         id = id,
         name = name,
@@ -140,10 +134,6 @@ class WishlistItemService(
         notes = notes,
         priority = priority,
         imageUrl = imageUrl ?: if (imagePath != null) "/api/wishlist/$id/image" else null,
-        hasUpdate = hasUpdate,
-        lastCheckedAt = lastCheckedAt,
-        contentSnapshot = contentSnapshot,
-        previousSnapshot = previousSnapshot,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

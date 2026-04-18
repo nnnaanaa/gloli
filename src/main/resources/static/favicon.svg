@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#0a080c" rx="4"/>
+  <rect width="32" height="32" fill="#0a0a0a" rx="4"/>
   <!-- outer 5 petals -->
   <g transform="translate(16,16)">
-    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#50486a" transform="rotate(0)"/>
-    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#50486a" transform="rotate(72)"/>
-    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#50486a" transform="rotate(144)"/>
-    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#50486a" transform="rotate(216)"/>
-    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#50486a" transform="rotate(288)"/>
+    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#3a3a3a" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#3a3a3a" transform="rotate(72)"/>
+    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#3a3a3a" transform="rotate(144)"/>
+    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#3a3a3a" transform="rotate(216)"/>
+    <ellipse cx="0" cy="-7.5" rx="3.5" ry="5.5" fill="#3a3a3a" transform="rotate(288)"/>
   </g>
   <!-- inner 5 petals (offset 36°) -->
   <g transform="translate(16,16)">
-    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#6a6280" transform="rotate(36)"/>
-    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#6a6280" transform="rotate(108)"/>
-    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#6a6280" transform="rotate(180)"/>
-    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#6a6280" transform="rotate(252)"/>
-    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#6a6280" transform="rotate(324)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#606060" transform="rotate(36)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#606060" transform="rotate(108)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#606060" transform="rotate(180)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#606060" transform="rotate(252)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="4.5" fill="#606060" transform="rotate(324)"/>
   </g>
   <!-- center -->
-  <circle cx="16" cy="16" r="4.5" fill="#8a8498"/>
-  <circle cx="16" cy="16" r="3"   fill="#a8a4b8"/>
-  <circle cx="16" cy="16" r="1.5" fill="#d4d0e4"/>
+  <circle cx="16" cy="16" r="4.5" fill="#888888"/>
+  <circle cx="16" cy="16" r="3"   fill="#b0b0b0"/>
+  <circle cx="16" cy="16" r="1.5" fill="#e0e0e0"/>
 </svg>

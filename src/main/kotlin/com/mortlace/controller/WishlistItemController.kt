@@ -47,10 +47,6 @@ class WishlistItemController(private val service: WishlistItemService) {
     @Operation(summary = "Delete item")
     fun delete(@PathVariable id: Long) = service.delete(id)
 
-    @PostMapping("/{id}/dismiss-update")
-    @Operation(summary = "Dismiss update notification")
-    fun dismissUpdate(@PathVariable id: Long): WishlistItemResponse = service.dismissUpdate(id)
-
     @PostMapping("/{id}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @Operation(summary = "Upload image")
     fun uploadImage(
