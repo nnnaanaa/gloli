@@ -15,5 +15,6 @@ data class WishlistItemResponse(
     val priority: Priority,
     val imageUrl: String?,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
+    val deletedAt: LocalDateTime?
 )

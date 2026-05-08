@@ -46,5 +46,7 @@ class WishlistItem(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @UpdateTimestamp
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    var deletedAt: LocalDateTime? = null
 )

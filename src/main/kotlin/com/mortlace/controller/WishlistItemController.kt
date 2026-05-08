@@ -42,10 +42,23 @@ class WishlistItemController(private val service: WishlistItemService) {
         @Valid @RequestBody req: WishlistItemRequest
     ): WishlistItemResponse = service.update(id, req)
 
+    @GetMapping("/deleted")
+    @Operation(summary = "List soft-deleted items")
+    fun listDeleted(): List<WishlistItemResponse> = service.findDeleted()
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete item")
+    @Operation(summary = "Soft-delete item")
+    fun softDelete(@PathVariable id: Long) = service.softDelete(id)
+
+    @DeleteMapping("/{id}/permanent")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Permanently delete item")
     fun delete(@PathVariable id: Long) = service.delete(id)
+
+    @PostMapping("/{id}/restore")
+    @Operation(summary = "Restore soft-deleted item")
+    fun restore(@PathVariable id: Long): WishlistItemResponse = service.restore(id)
 
     @PostMapping("/{id}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @Operation(summary = "Upload image")

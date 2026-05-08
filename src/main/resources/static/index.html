@@ -154,9 +154,41 @@
     }
 
     /* ---- Items: card layout ---- */
-    #wishlist .table-wrap { overflow-x: visible; }
-    #wishlist table { display: block; border: none; table-layout: auto; margin-top: 14px; }
-    #wishlist thead { display: none; }
+    #wishlist .table-wrap, #archive .table-wrap { overflow-x: visible; }
+    #wishlist table, #archive table { display: block; border: none; table-layout: auto; margin-top: 14px; }
+    #wishlist thead, #archive thead { display: none; }
+    #archive tbody {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      opacity: 0.72;
+    }
+    #archive tr {
+      display: flex; flex-direction: column;
+      border: 1px solid var(--border); background: var(--card);
+      overflow: hidden;
+    }
+    #archive tr:hover { border-color: var(--accent); opacity: 1; }
+    #archive tr:hover td, #archive tr:nth-child(even) td { background: transparent; }
+    #archive td {
+      display: flex; align-items: flex-start; gap: 10px;
+      border: none; border-bottom: 1px solid rgba(50,46,60,0.5);
+      padding: 7px 10px; white-space: normal; text-overflow: clip;
+      overflow: visible; width: auto !important;
+    }
+    #archive td:last-child { border-bottom: none; }
+    #archive td::before {
+      content: attr(data-label); color: var(--muted);
+      font-size: 0.8rem; font-weight: 600; min-width: 68px; flex-shrink: 0;
+    }
+    #archive td.col-img {
+      padding: 0; height: 160px; overflow: hidden;
+      border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    #archive td.col-img::before { display: none; }
+    #archive td.col-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #archive td.col-actions { justify-content: flex-end; padding: 8px 10px; margin-top: auto; }
+    #archive td.col-actions::before { display: none; }
     #wishlist tbody {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -261,6 +293,7 @@
     #w-notes, #w-image-url     { flex: 2 1 160px; }
 
     .sort-sep { flex: 1; }
+    .sort-label, .col-label { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -297,34 +330,116 @@
     .file-btn-label:hover { opacity: 0.82; }
     .file-name-display { font-size: 0.85rem; color: var(--muted); }
 
+    /* ---- Toast ---- */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #1e1430;
+      border: 1px solid var(--accent);
+      color: var(--accent-lt);
+      padding: 9px 22px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 300;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ---- Summary bar ---- */
+    #summary-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      align-items: center;
+      padding: 8px 12px;
+      margin: 10px 0 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    #summary-bar .s-total { color: var(--text); font-weight: 600; }
+    #summary-bar .s-price { color: var(--accent-lt); }
+    .s-chip {
+      padding: 2px 9px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.78rem;
+    }
+    .s-chip.low    { border-color: #2a3a2a; color: #7eb87e; }
+    .s-chip.medium { border-color: #2a2a3a; color: #7e8ebe; }
+    .s-chip.high   { border-color: #3a2a2a; color: #be8e7e; }
+    .s-chip.grail  { border-color: #3a1f4a; color: var(--accent-lt); }
+
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); }
     ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
+    /* === Responsive === */
+
     @media (max-width: 768px) {
-      #wishlist tbody { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      #wishlist tbody, #archive tbody {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      /* フォーム行2・3: 中間幅でも見やすく */
+      #w-name { flex: 1 1 100%; }
+      #w-brand, #w-category { flex: 1 1 120px; }
     }
 
     @media (max-width: 600px) {
-      body { padding: 14px 12px; }
+      body { padding: 12px 10px; border-left: none; border-right: none; }
+
+      /* タブ: 4つ並ぶので小さめに */
+      .tabs button { padding: 6px 10px; font-size: 0.8rem; }
+
+      /* Add form: 全フィールドを100%幅に */
       .form-row input, .form-row select { flex: 1 1 100%; }
-      #w-price, #w-priority, #w-brand, #w-category,
-      #w-name, #w-notes, #w-image-url, #w-url { flex: 1 1 100%; }
-      .modal-box { margin: 16px 12px; padding: 20px; max-height: calc(100vh - 32px); }
+      #w-url, #w-name, #w-brand, #w-category,
+      #w-price, #w-priority, #w-notes, #w-image-url { flex: 1 1 100%; }
+
+      /* ソートバー: Cols切り替えはモバイル1カラムでは不要なので非表示 */
+      .col-btn, .sort-sep, .col-label { display: none; }
+      .sort-bar { gap: 3px 4px; font-size: 0.76rem; }
+      .sort-bar button[data-field] { padding: 3px 7px; }
+
+      /* カード: 1カラム */
+      #wishlist tbody, #archive tbody { grid-template-columns: 1fr; }
+      #wishlist td.col-img { height: 200px; }
+      #archive td.col-img { height: 150px; }
+      #wishlist td::before, #archive td::before { min-width: 52px; font-size: 0.75rem; }
+
+      /* モーダル */
+      .modal-box { margin: 8px; padding: 16px; max-height: calc(100vh - 16px); }
+
+      /* ブランド・カテゴリーテーブル */
       #brands table, #categories table { font-size: 0.8rem; }
       #brands th, #brands td, #categories th, #categories td { padding: 5px 6px; }
-      #wishlist tbody { grid-template-columns: 1fr; }
-      #wishlist td.col-img { height: 180px; }
-      #wishlist td::before { min-width: 56px; font-size: 0.75rem; }
+
+      /* サマリーバー */
+      #summary-bar { font-size: 0.78rem; padding: 6px 10px; gap: 4px 8px; }
+    }
+
+    @media (max-width: 400px) {
+      .tabs button { padding: 5px 7px; font-size: 0.76rem; }
+      h1 { font-size: 1.3rem; margin-bottom: 18px; }
     }
   </style>
 </head>
 <body>
+<div id="toast"></div>
 <h1>mortlace</h1>
 
 <div class="tabs">
   <button class="active" onclick="show('wishlist',this)">Items</button>
+  <button onclick="show('archive',this)">Archive</button>
   <button onclick="show('brands',this)">Brands</button>
   <button onclick="show('categories',this)">Categories</button>
 </div>
@@ -355,19 +470,21 @@
   </div>
 
   <div class="sort-bar">
-    Sort:
+    <span class="sort-label">Sort:</span>
     <button data-field="name"     onclick="sortBy('name')">Name</button>
     <button data-field="brand"    onclick="sortBy('brand')">Brand</button>
     <button data-field="category" onclick="sortBy('category')">Category</button>
     <button data-field="price"    onclick="sortBy('price')">Price</button>
     <button data-field="priority" onclick="sortBy('priority')">Priority</button>
     <span class="sort-sep"></span>
-    Cols:
+    <span class="col-label">Cols:</span>
     <button class="col-btn active" onclick="setCols(0,this)">Auto</button>
     <button class="col-btn" onclick="setCols(2,this)">2</button>
     <button class="col-btn" onclick="setCols(3,this)">3</button>
     <button class="col-btn" onclick="setCols(4,this)">4</button>
   </div>
+
+  <div id="summary-bar"></div>
 
   <div class="table-wrap">
     <table>
@@ -420,6 +537,17 @@
   <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #a8a4b8">
 </div>
 
+<!-- archive -->
+<div id="archive" class="tab">
+  <h2>Archive</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th class="col-img">Image</th><th>Name</th><th>Brand</th><th>Price</th><th>Archived</th><th></th></tr></thead>
+      <tbody id="arc-list"></tbody>
+    </table>
+  </div>
+</div>
+
 <!-- brands -->
 <div id="brands" class="tab">
   <h2>Add Brand</h2>
@@ -454,11 +582,21 @@
 </div>
 
 <script>
+let _toastTimer;
+function showToast(msg) {
+  const el = get('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
 function show(id, btn) {
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tabs button').forEach(el => el.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
+  if (id === 'archive') loadArchive();
 }
 
 const get = id => document.getElementById(id);
@@ -472,6 +610,25 @@ async function api(path, opt) {
 // ---- Wishlist ----
 let _items = [], _sortField = null, _sortAsc = true;
 const PRIORITY_ORDER = { LOW: 1, MEDIUM: 2, HIGH: 3, GRAIL: 4 };
+
+function renderSummary() {
+  const bar = get('summary-bar');
+  if (!_items.length) { bar.innerHTML = '<span>No items</span>'; return; }
+  const total = _items.length;
+  const priced = _items.filter(i => i.price != null);
+  const totalPrice = priced.reduce((s, i) => s + Number(i.price), 0);
+  const counts = { LOW: 0, MEDIUM: 0, HIGH: 0, GRAIL: 0 };
+  _items.forEach(i => { if (counts[i.priority] != null) counts[i.priority]++; });
+  const chips = [
+    counts.LOW    ? `<span class="s-chip low">Low ${counts.LOW}</span>` : '',
+    counts.MEDIUM ? `<span class="s-chip medium">Medium ${counts.MEDIUM}</span>` : '',
+    counts.HIGH   ? `<span class="s-chip high">High ${counts.HIGH}</span>` : '',
+    counts.GRAIL  ? `<span class="s-chip grail">Grail ${counts.GRAIL}</span>` : '',
+  ].join('');
+  bar.innerHTML = `<span class="s-total">${total} items</span>`
+    + (priced.length ? `<span class="s-price">¥${totalPrice.toLocaleString()}</span>` : '')
+    + chips;
+}
 
 function renderItems() {
   const items = [..._items];
@@ -489,6 +646,7 @@ function renderItems() {
       return _sortAsc ? r : -r;
     });
   }
+  renderSummary();
   get('w-list').innerHTML = items.length ? items.map(i => `<tr>
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
     <td data-label="URL" title="${esc(i.url)}"><span class="url-value"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a></span></td>
@@ -498,7 +656,7 @@ function renderItems() {
     <td class="col-price" data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
     <td class="col-priority" data-label="Priority">${esc(i.priority)}</td>
     <td data-label="Notes" title="${esc(i.notes)}">${esc(i.notes)}</td>
-    <td class="col-actions" data-label=""><button class="edit" onclick="openEdit(${i.id})">Edit</button> <button class="del" onclick="delItem(${i.id})">Delete</button></td>
+    <td class="col-actions" data-label=""><button class="edit" onclick="openEdit(${i.id})">Edit</button> <button class="del" onclick="archiveItem(${i.id})">Archive</button></td>
   </tr>`).join('') : '<tr><td colspan="9">No items</td></tr>';
 }
 
@@ -542,11 +700,40 @@ async function addItem() {
   await api('/wishlist', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
   get('w-url').value = get('w-name').value = get('w-price').value = get('w-notes').value = get('w-image-url').value = '';
   get('w-brand').value = get('w-category').value = '';
+  showToast('Item added.');
   loadItems();
 }
 
-async function delItem(id) {
-  if (confirm('Delete this item?')) { await api('/wishlist/'+id, {method:'DELETE'}); loadItems(); }
+async function archiveItem(id) {
+  await api('/wishlist/'+id, {method:'DELETE'});
+  showToast('Item archived.');
+  loadItems();
+}
+
+async function restoreItem(id) {
+  await api('/wishlist/'+id+'/restore', {method:'POST'});
+  showToast('Item restored.');
+  loadItems(); loadArchive();
+}
+
+async function delItemPermanent(id) {
+  if (confirm('Permanently delete? This cannot be undone.')) {
+    await api('/wishlist/'+id+'/permanent', {method:'DELETE'});
+    showToast('Item deleted.');
+    loadArchive();
+  }
+}
+
+async function loadArchive() {
+  const items = await (await api('/wishlist/deleted')).json();
+  get('arc-list').innerHTML = items.length ? items.map(i => `<tr>
+    ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : '<td class="col-img" data-label=""></td>'}
+    <td data-label="Name"><a href="${esc(i.url)}" target="_blank">${esc(i.name || i.url)}</a></td>
+    <td data-label="Brand">${esc(i.brand?.name)}</td>
+    <td data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
+    <td data-label="Archived" style="font-size:0.82rem;color:var(--muted)">${i.deletedAt ? new Date(i.deletedAt).toLocaleDateString('ja-JP') : ''}</td>
+    <td class="col-actions" data-label=""><button class="edit" onclick="restoreItem(${i.id})">Restore</button> <button class="del" onclick="delItemPermanent(${i.id})">Delete</button></td>
+  </tr>`).join('') : '<tr><td colspan="6">No archived items</td></tr>';
 }
 
 let _editItem = null;
@@ -635,6 +822,7 @@ async function saveItem() {
     await api('/wishlist/'+id+'/image', { method:'POST', body:fd });
   }
   closeEdit();
+  showToast('Item saved.');
   loadItems();
 }
 

@@ -29,8 +29,8 @@ class ProductScraperService {
 
         return ScrapedProductInfo(
             name = doc.og("og:title") ?: doc.title().ifBlank { null },
-            imageUrl = doc.og("og:image")?.let { resolveUrl(url, it) },
-            brand = doc.og("og:site_name"),
+            imageUrl = parseImage(doc, url),
+            brand = parseBrand(doc),
             price = parsePrice(doc),
             description = doc.og("og:description"),
             category = parseCategory(doc)
@@ -40,23 +40,135 @@ class ProductScraperService {
     private fun Document.og(property: String): String? =
         select("meta[property=$property]").attr("content").ifBlank { null }
 
-    private fun parsePrice(doc: Document): BigDecimal? {
-        val raw = listOf(
-            "og:price:amount",
-            "product:price:amount",
-            "og:price",
-        ).firstNotNullOfOrNull { doc.og(it) } ?: return null
+    private fun Document.meta(name: String): String? =
+        select("meta[name=$name]").attr("content").ifBlank { null }
 
-        return raw.replace(Regex("[^0-9.]"), "").toBigDecimalOrNull()
+    // ---- Image ----
+    private fun parseImage(doc: Document, baseUrl: String): String? {
+        // OGP
+        listOf("og:image", "og:image:secure_url").forEach { p ->
+            doc.og(p)?.let { return resolveUrl(baseUrl, it) }
+        }
+        // Twitter card
+        doc.meta("twitter:image")?.let { return resolveUrl(baseUrl, it) }
+
+        // link rel="image_src"
+        doc.select("link[rel=image_src]").attr("href").ifBlank { null }
+            ?.let { return resolveUrl(baseUrl, it) }
+
+        // itemprop=image
+        doc.select("[itemprop=image]").firstOrNull()?.let { el ->
+            val src = el.attr("content").ifBlank { el.attr("src") }.ifBlank { null }
+            src?.let { return resolveUrl(baseUrl, it) }
+        }
+
+        // Common product image selectors (abs:src resolves relative URLs automatically)
+        val selectors = listOf(
+            "[class*=product-image] img", "[class*=product-img] img",
+            "[class*=main-image] img",    "[class*=main-img] img",
+            "[id*=main-image] img",       "[id*=main-img] img",
+            "[id*=mainImg] img",          "[class*=item-image] img",
+            "[class*=item-img] img",      "figure.product img",
+            ".swiper-slide img",          "figure img"
+        )
+        for (sel in selectors) {
+            doc.select(sel).firstOrNull()
+                ?.attr("abs:src")?.ifBlank { null }
+                ?.let { return it }
+        }
+
+        // Fallback: first large enough img in main content area
+        val mainArea = doc.select("main, article, [role=main], #main, .main, #content, .content").firstOrNull() ?: doc
+        mainArea.select("img[src]").firstOrNull { el ->
+            val w = el.attr("width").toIntOrNull() ?: 0
+            val h = el.attr("height").toIntOrNull() ?: 0
+            (w == 0 && h == 0) || (w >= 100 && h >= 100)
+        }?.attr("abs:src")?.ifBlank { null }?.let { return it }
+
+        return null
     }
 
+    // ---- Brand ----
+    private fun parseBrand(doc: Document): String? {
+        // og:site_name
+        doc.og("og:site_name")?.let { return it }
+
+        // Schema.org Product JSON-LD
+        parseSchemaOrgProduct(doc)?.get("brand")?.let { brand ->
+            (brand.get("name") ?: brand).asText()?.ifBlank { null }?.let { return it }
+        }
+
+        // itemprop=brand
+        doc.select("[itemprop=brand]").firstOrNull()?.let { el ->
+            el.attr("content").ifBlank { el.text() }.ifBlank { null }?.let { return it }
+        }
+
+        return null
+    }
+
+    // ---- Price ----
+    private fun parsePrice(doc: Document): BigDecimal? {
+        // OGP price tags
+        listOf("og:price:amount", "product:price:amount", "og:price")
+            .firstNotNullOfOrNull { doc.og(it) }
+            ?.replace(Regex("[^0-9.]"), "")?.toBigDecimalOrNull()
+            ?.let { return it }
+
+        // Schema.org Product offers
+        parseSchemaOrgProduct(doc)?.let { product ->
+            val offers = product.get("offers") ?: return@let
+            val offer = if (offers.isArray) offers.get(0) else offers
+            offer?.get("price")?.asText()
+                ?.replace(Regex("[^0-9.]"), "")?.toBigDecimalOrNull()
+                ?.let { return it }
+        }
+
+        // itemprop=price
+        doc.select("[itemprop=price]").firstOrNull()?.let { el ->
+            el.attr("content").ifBlank { el.text() }
+                .replace(Regex("[^0-9.]"), "").toBigDecimalOrNull()
+                ?.let { return it }
+        }
+
+        // Price from DOM elements with "price" in class/id
+        val priceSelectors = listOf(
+            "[class*=price]", "[id*=price]",
+            "dd", "span strong", "p strong"
+        )
+        for (sel in priceSelectors) {
+            doc.select(sel).firstOrNull { el ->
+                el.text().contains("¥") || el.text().contains("円")
+            }?.text()?.let { text ->
+                extractYenPrice(text)?.let { return it }
+            }
+        }
+
+        return null
+    }
+
+    private fun extractYenPrice(text: String): BigDecimal? {
+        // Prefer tax-included (税込) price, e.g. "¥16,500(税込)" or "16,500円(税込)"
+        val taxIncluded = Regex("""¥\s*([\d,]+)\s*\(?税込\)?""")
+        taxIncluded.find(text)?.groupValues?.get(1)
+            ?.replace(",", "")?.toBigDecimalOrNull()?.let { return it }
+
+        // Plain ¥ pattern
+        val yen = Regex("""¥\s*([\d,]+)""")
+        yen.find(text)?.groupValues?.get(1)
+            ?.replace(",", "")?.toBigDecimalOrNull()?.let { return it }
+
+        // XX,XXX円 pattern
+        val kin = Regex("""([\d,]+)\s*円""")
+        kin.find(text)?.groupValues?.get(1)
+            ?.replace(",", "")?.toBigDecimalOrNull()?.let { return it }
+
+        return null
+    }
+
+    // ---- Category ----
     private fun parseCategory(doc: Document): String? {
-        // 非標準OGPタグ（一部のサイトで使用）
         doc.og("og:category")?.let { return it }
-
-        // Schema.org BreadcrumbList JSON-LD
         parseBreadcrumb(doc)?.let { return it }
-
         return null
     }
 
@@ -72,8 +184,35 @@ class ProductScraperService {
                         .mapNotNull { it.get("name")?.asText()?.ifBlank { null } }
                         .filter { it.lowercase() !in breadcrumbSkipNames }
                     if (names.isEmpty()) continue
-                    // 最後はたいてい商品名なので、その1つ前をカテゴリーとして返す
                     return names.dropLast(1).lastOrNull() ?: names.last()
+                }
+            } catch (_: Exception) {}
+        }
+
+        // HTML breadcrumb elements
+        val breadcrumbSelectors = listOf(
+            "[class*=breadcrumb] a", "[class*=bread-crumb] a",
+            "[aria-label=breadcrumb] a", "nav.breadcrumb a"
+        )
+        for (sel in breadcrumbSelectors) {
+            val crumbs = doc.select(sel)
+                .map { it.text().trim() }
+                .filter { it.isNotBlank() && it.lowercase() !in breadcrumbSkipNames }
+            if (crumbs.size >= 2) return crumbs[crumbs.size - 2]
+            if (crumbs.size == 1) return crumbs[0]
+        }
+
+        return null
+    }
+
+    // ---- Schema.org Product JSON-LD ----
+    private fun parseSchemaOrgProduct(doc: Document): com.fasterxml.jackson.databind.JsonNode? {
+        doc.select("script[type=application/ld+json]").forEach { script ->
+            try {
+                val json = objectMapper.readTree(script.data())
+                val nodes = if (json.isArray) json.toList() else listOf(json)
+                for (node in nodes) {
+                    if (node.get("@type")?.asText() == "Product") return node
                 }
             } catch (_: Exception) {}
         }

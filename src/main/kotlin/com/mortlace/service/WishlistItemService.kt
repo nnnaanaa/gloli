@@ -28,12 +28,16 @@ class WishlistItemService(
 
     @Transactional(readOnly = true)
     fun findAll(priority: Priority?, brandId: Long?, categoryId: Long?): List<WishlistItemResponse> {
-        return repo.findAll()
+        return repo.findAllByDeletedAtIsNull()
             .filter { priority == null || it.priority == priority }
             .filter { brandId == null || it.brand?.id == brandId }
             .filter { categoryId == null || it.category?.id == categoryId }
             .map { it.toResponse() }
     }
+
+    @Transactional(readOnly = true)
+    fun findDeleted(): List<WishlistItemResponse> =
+        repo.findAllByDeletedAtIsNotNull().map { it.toResponse() }
 
     @Transactional(readOnly = true)
     fun findById(id: Long): WishlistItemResponse =
@@ -90,6 +94,18 @@ class WishlistItemService(
         return repo.save(item).toResponse()
     }
 
+    fun softDelete(id: Long) {
+        val item = repo.findById(id).orElseThrow { notFound(id) }
+        item.deletedAt = java.time.LocalDateTime.now()
+        repo.save(item)
+    }
+
+    fun restore(id: Long): WishlistItemResponse {
+        val item = repo.findById(id).orElseThrow { notFound(id) }
+        item.deletedAt = null
+        return repo.save(item).toResponse()
+    }
+
     fun delete(id: Long) {
         val item = repo.findById(id).orElseThrow { notFound(id) }
         item.imagePath?.let { File("./data/images/$it").absoluteFile.delete() }
@@ -135,7 +151,8 @@ class WishlistItemService(
         priority = priority,
         imageUrl = imageUrl ?: if (imagePath != null) "/api/wishlist/$id/image" else null,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        deletedAt = deletedAt
     )
 
     private fun notFound(id: Long) =
