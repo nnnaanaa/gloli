@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mortlace</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#7c3faa">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="mortlace">
+  <link rel="apple-touch-icon" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -89,6 +95,8 @@
       font-family: var(--font-body);
       font-size: 0.875rem;
       letter-spacing: 0.04em;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: opacity .15s, box-shadow .15s;
     }
     button:hover { opacity: 0.88; box-shadow: 0 0 0 3px rgba(124, 63, 170, 0.2); }
@@ -153,20 +161,59 @@
       border-top: 5px solid var(--accent);
     }
 
+    /* ---- Collection summary sub-bar ---- */
+    .summary-sub {
+      font-size: 0.82rem; color: var(--muted);
+      padding: 6px 12px; margin-bottom: 2px;
+    }
+
     /* ---- Items: card layout ---- */
-    #wishlist .table-wrap, #archive .table-wrap { overflow-x: visible; }
-    #wishlist table, #archive table { display: block; border: none; table-layout: auto; margin-top: 14px; }
-    #wishlist thead, #archive thead { display: none; }
+    #wishlist .table-wrap, #archive .table-wrap, #collection .table-wrap { overflow-x: visible; }
+    #wishlist table, #archive table, #collection table { display: block; border: none; table-layout: auto; margin-top: 14px; }
+    #wishlist thead, #archive thead, #collection thead { display: none; }
+    #collection tbody {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    #collection tr {
+      display: flex; flex-direction: column;
+      border: 1px solid #1a4a2a; background: var(--card);
+      overflow: hidden; transition: border-color 0.15s;
+    }
+    #collection tr:hover { border-color: #60b878; }
+    #collection tr:hover td, #collection tr:nth-child(even) td { background: transparent; }
+    #collection td {
+      display: flex; align-items: flex-start; gap: 10px;
+      border: none; border-bottom: 1px solid rgba(50,46,60,0.5);
+      padding: 7px 10px; white-space: normal; overflow: visible; width: auto !important;
+    }
+    #collection td:last-child { border-bottom: none; }
+    #collection td::before {
+      content: attr(data-label); color: var(--muted);
+      font-size: 0.8rem; font-weight: 600; min-width: 68px; flex-shrink: 0;
+    }
+    #collection td.col-img {
+      padding: 0; height: 200px; overflow: hidden;
+      border-bottom: 1px solid #1a4a2a; cursor: pointer;
+    }
+    #collection td.col-img::before { display: none; }
+    #collection td.col-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
+    #collection td.col-img:hover img { transform: scale(1.04); }
+    #collection td.col-actions { justify-content: flex-end; flex-wrap: wrap; gap: 4px; padding: 8px 10px; margin-top: auto; }
+    #collection td.col-actions::before { display: none; }
+
     #archive tbody {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 14px;
-      opacity: 0.72;
     }
     #archive tr {
       display: flex; flex-direction: column;
       border: 1px solid var(--border); background: var(--card);
       overflow: hidden;
+      opacity: 0.65;
+      transition: opacity 0.15s, border-color 0.15s;
     }
     #archive tr:hover { border-color: var(--accent); opacity: 1; }
     #archive tr:hover td, #archive tr:nth-child(even) td { background: transparent; }
@@ -187,7 +234,7 @@
     }
     #archive td.col-img::before { display: none; }
     #archive td.col-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    #archive td.col-actions { justify-content: flex-end; padding: 8px 10px; margin-top: auto; }
+    #archive td.col-actions { justify-content: flex-end; flex-wrap: wrap; gap: 4px; padding: 8px 10px; margin-top: auto; }
     #archive td.col-actions::before { display: none; }
     #wishlist tbody {
       display: grid;
@@ -244,7 +291,7 @@
       transition: transform 0.35s ease;
     }
     #wishlist td.col-img:hover img { transform: scale(1.04); }
-    #wishlist td.col-actions { justify-content: flex-end; padding: 8px 10px; margin-top: auto; }
+    #wishlist td.col-actions { justify-content: flex-end; flex-wrap: wrap; gap: 4px; padding: 8px 10px; margin-top: auto; }
     #wishlist td.col-actions::before { display: none; }
     #wishlist td[data-label="URL"] { flex-wrap: wrap; align-items: center; }
     #wishlist td[data-label="URL"] .url-value {
@@ -259,7 +306,9 @@
       display: flex;
       margin-bottom: 24px;
       flex-wrap: wrap;
+      gap: 3px;
       border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
     }
     .tabs button {
       background: transparent;
@@ -267,8 +316,9 @@
       border: 1px solid var(--border);
       border-bottom: none;
       border-radius: 6px 6px 0 0;
-      padding: 7px 18px;
+      padding: 7px 16px;
       margin-bottom: -1px;
+      white-space: nowrap;
     }
     .tabs button.active {
       background: var(--card);
@@ -294,6 +344,20 @@
 
     .sort-sep { flex: 1; }
     .sort-label, .col-label { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+
+    /* ---- Filter bar ---- */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin: 6px 0 4px;
+    }
+    .filter-bar input  { flex: 2 1 160px; min-width: 0; }
+    .filter-bar select { flex: 1 1 120px; min-width: 0; }
+    #f-clear { flex: 0 0 auto; background: transparent; border-color: var(--wine); color: #d4a0a8; font-size: 0.82rem; padding: 5px 12px; }
+    .filter-active-label { font-size: 0.78rem; color: var(--muted); margin-left: 2px; }
+
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -378,6 +442,19 @@
     .s-chip.high   { border-color: #3a2a2a; color: #be8e7e; }
     .s-chip.grail  { border-color: #3a1f4a; color: var(--accent-lt); }
 
+    /* ---- Status select ---- */
+    .status-sel {
+      padding: 2px 8px;
+      font-size: 0.78rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: border-color 0.15s;
+    }
+    .status-sel.wanted  { border-color: var(--border); color: var(--muted); background: transparent; }
+    .status-sel.ordered { border-color: #6a5010; color: #c8a040; background: #1a1408; }
+    .status-sel.owned   { border-color: #1a4a2a; color: #60b878; background: #0a1810; }
+
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); }
@@ -386,10 +463,9 @@
     /* === Responsive === */
 
     @media (max-width: 768px) {
-      #wishlist tbody, #archive tbody {
+      #wishlist tbody, #archive tbody, #collection tbody {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
-      /* フォーム行2・3: 中間幅でも見やすく */
       #w-name { flex: 1 1 100%; }
       #w-brand, #w-category { flex: 1 1 120px; }
     }
@@ -397,24 +473,39 @@
     @media (max-width: 600px) {
       body { padding: 12px 10px; border-left: none; border-right: none; }
 
-      /* タブ: 4つ並ぶので小さめに */
-      .tabs button { padding: 6px 10px; font-size: 0.8rem; }
+      /* タブ: 5つ並ぶので小さめに */
+      .tabs { gap: 2px; }
+      .tabs button { padding: 6px 9px; font-size: 0.78rem; letter-spacing: 0; }
 
-      /* Add form: 全フィールドを100%幅に */
-      .form-row input, .form-row select { flex: 1 1 100%; }
+      /* Add form: 入力を100%、ボタンも100% */
+      .form-row input, .form-row select, .form-row button { flex: 1 1 100%; }
       #w-url, #w-name, #w-brand, #w-category,
       #w-price, #w-priority, #w-notes, #w-image-url { flex: 1 1 100%; }
 
-      /* ソートバー: Cols切り替えはモバイル1カラムでは不要なので非表示 */
+      /* フィルターバー: 2カラムグリッドに */
+      .filter-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      #f-search { grid-column: 1 / -1; }
+      #f-clear  { grid-column: 1 / -1; }
+
+      /* ソートバー: Cols非表示、コンパクトに */
       .col-btn, .sort-sep, .col-label { display: none; }
       .sort-bar { gap: 3px 4px; font-size: 0.76rem; }
-      .sort-bar button[data-field] { padding: 3px 7px; }
+      .sort-bar button[data-field] { padding: 3px 7px; font-size: 0.74rem; }
 
       /* カード: 1カラム */
-      #wishlist tbody, #archive tbody { grid-template-columns: 1fr; }
-      #wishlist td.col-img { height: 200px; }
+      #wishlist tbody, #archive tbody, #collection tbody { grid-template-columns: 1fr; }
+      #wishlist td.col-img, #collection td.col-img { height: 200px; }
       #archive td.col-img { height: 150px; }
-      #wishlist td::before, #archive td::before { min-width: 52px; font-size: 0.75rem; }
+      #wishlist td::before, #archive td::before, #collection td::before { min-width: 52px; font-size: 0.75rem; }
+
+      /* カードのボタン: 小さめに */
+      #wishlist td.col-actions button,
+      #archive td.col-actions button,
+      #collection td.col-actions button { font-size: 0.78rem; padding: 4px 10px; }
 
       /* モーダル */
       .modal-box { margin: 8px; padding: 16px; max-height: calc(100vh - 16px); }
@@ -428,8 +519,9 @@
     }
 
     @media (max-width: 400px) {
-      .tabs button { padding: 5px 7px; font-size: 0.76rem; }
+      .tabs button { padding: 5px 6px; font-size: 0.72rem; }
       h1 { font-size: 1.3rem; margin-bottom: 18px; }
+      .sort-bar button[data-field] { padding: 2px 5px; font-size: 0.7rem; }
     }
   </style>
 </head>
@@ -439,6 +531,7 @@
 
 <div class="tabs">
   <button class="active" onclick="show('wishlist',this)">Items</button>
+  <button onclick="show('collection',this)">Collection</button>
   <button onclick="show('archive',this)">Archive</button>
   <button onclick="show('brands',this)">Brands</button>
   <button onclick="show('categories',this)">Categories</button>
@@ -482,6 +575,25 @@
     <button class="col-btn" onclick="setCols(2,this)">2</button>
     <button class="col-btn" onclick="setCols(3,this)">3</button>
     <button class="col-btn" onclick="setCols(4,this)">4</button>
+  </div>
+
+  <div class="filter-bar">
+    <input id="f-search" placeholder="Search…" oninput="applyFilter()" autocomplete="off">
+    <select id="f-brand"    onchange="applyFilter()"><option value="">All brands</option></select>
+    <select id="f-category" onchange="applyFilter()"><option value="">All categories</option></select>
+    <select id="f-status"   onchange="applyFilter()">
+      <option value="">All statuses</option>
+      <option value="WANTED">Wanted</option>
+      <option value="ORDERED">Ordered</option>
+    </select>
+    <select id="f-priority" onchange="applyFilter()">
+      <option value="">All priorities</option>
+      <option value="LOW">Low</option>
+      <option value="MEDIUM">Medium</option>
+      <option value="HIGH">High</option>
+      <option value="GRAIL">Grail</option>
+    </select>
+    <button id="f-clear" style="display:none" onclick="clearFilter()">✕ Clear</button>
   </div>
 
   <div id="summary-bar"></div>
@@ -535,6 +647,18 @@
 <!-- image viewer -->
 <div id="img-modal" style="display:none;position:fixed;inset:0;background:rgba(4,4,4,0.90);z-index:200;cursor:pointer" onclick="this.style.display='none'">
   <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #a8a4b8">
+</div>
+
+<!-- collection -->
+<div id="collection" class="tab">
+  <h2>Collection</h2>
+  <div id="col-summary-bar" class="summary-sub"></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th class="col-img">Image</th><th>Name</th><th>Brand</th><th>Category</th><th>Price</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="col-list"></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- archive -->
@@ -597,6 +721,7 @@ function show(id, btn) {
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
   if (id === 'archive') loadArchive();
+  if (id === 'collection') loadCollection();
 }
 
 const get = id => document.getElementById(id);
@@ -609,29 +734,66 @@ async function api(path, opt) {
 
 // ---- Wishlist ----
 let _items = [], _sortField = null, _sortAsc = true;
+let _filter = { q: '', brandId: '', categoryId: '', status: '', priority: '' };
 const PRIORITY_ORDER = { LOW: 1, MEDIUM: 2, HIGH: 3, GRAIL: 4 };
 
-function renderSummary() {
+function applyFilter() {
+  _filter.q          = get('f-search').value;
+  _filter.brandId    = get('f-brand').value;
+  _filter.categoryId = get('f-category').value;
+  _filter.status     = get('f-status').value;
+  _filter.priority   = get('f-priority').value;
+  renderItems();
+}
+
+function clearFilter() {
+  get('f-search').value = '';
+  get('f-brand').value = get('f-category').value = get('f-status').value = get('f-priority').value = '';
+  _filter = { q: '', brandId: '', categoryId: '', status: '', priority: '' };
+  renderItems();
+}
+
+function renderSummary(items, totalOverride) {
+  const src = items ?? _items;
   const bar = get('summary-bar');
   if (!_items.length) { bar.innerHTML = '<span>No items</span>'; return; }
-  const total = _items.length;
-  const priced = _items.filter(i => i.price != null);
+  const count = src.length;
+  const countLabel = totalOverride != null
+    ? `<span class="s-total">${count} / ${totalOverride} items</span>`
+    : `<span class="s-total">${count} items</span>`;
+  const ordered = src.filter(i => i.status === 'ORDERED').length;
+  const priced = src.filter(i => i.price != null);
   const totalPrice = priced.reduce((s, i) => s + Number(i.price), 0);
   const counts = { LOW: 0, MEDIUM: 0, HIGH: 0, GRAIL: 0 };
-  _items.forEach(i => { if (counts[i.priority] != null) counts[i.priority]++; });
+  src.forEach(i => { if (counts[i.priority] != null) counts[i.priority]++; });
   const chips = [
     counts.LOW    ? `<span class="s-chip low">Low ${counts.LOW}</span>` : '',
     counts.MEDIUM ? `<span class="s-chip medium">Medium ${counts.MEDIUM}</span>` : '',
     counts.HIGH   ? `<span class="s-chip high">High ${counts.HIGH}</span>` : '',
     counts.GRAIL  ? `<span class="s-chip grail">Grail ${counts.GRAIL}</span>` : '',
+    ordered       ? `<span class="s-chip" style="border-color:#6a5010;color:#c8a040">Ordered ${ordered}</span>` : '',
   ].join('');
-  bar.innerHTML = `<span class="s-total">${total} items</span>`
+  bar.innerHTML = countLabel
     + (priced.length ? `<span class="s-price">¥${totalPrice.toLocaleString()}</span>` : '')
     + chips;
 }
 
 function renderItems() {
-  const items = [..._items];
+  // --- filter ---
+  const q = _filter.q.toLowerCase().trim();
+  let items = _items.filter(i => {
+    if (q && ![ i.name, i.brand?.name, i.category?.name, i.notes, i.url ]
+              .some(v => (v || '').toLowerCase().includes(q))) return false;
+    if (_filter.brandId    && String(i.brand?.id    ?? '') !== _filter.brandId)    return false;
+    if (_filter.categoryId && String(i.category?.id ?? '') !== _filter.categoryId) return false;
+    if (_filter.status     && i.status   !== _filter.status)   return false;
+    if (_filter.priority   && i.priority !== _filter.priority) return false;
+    return true;
+  });
+  const isFiltered = q || _filter.brandId || _filter.categoryId || _filter.status || _filter.priority;
+  get('f-clear').style.display = isFiltered ? '' : 'none';
+
+  // --- sort ---
   if (_sortField) {
     items.sort((a, b) => {
       let va, vb, r;
@@ -646,7 +808,7 @@ function renderItems() {
       return _sortAsc ? r : -r;
     });
   }
-  renderSummary();
+  renderSummary(isFiltered ? items : null, isFiltered ? _items.length : null);
   get('w-list').innerHTML = items.length ? items.map(i => `<tr>
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
     <td data-label="URL" title="${esc(i.url)}"><span class="url-value"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a></span></td>
@@ -656,6 +818,7 @@ function renderItems() {
     <td class="col-price" data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
     <td class="col-priority" data-label="Priority">${esc(i.priority)}</td>
     <td data-label="Notes" title="${esc(i.notes)}">${esc(i.notes)}</td>
+    <td data-label="Status"><select class="status-sel ${(i.status||'WANTED').toLowerCase()}" onchange="updateStatus(${i.id},this)">${statusOptions(i.status)}</select></td>
     <td class="col-actions" data-label=""><button class="edit" onclick="openEdit(${i.id})">Edit</button> <button class="del" onclick="archiveItem(${i.id})">Archive</button></td>
   </tr>`).join('') : '<tr><td colspan="9">No items</td></tr>';
 }
@@ -702,6 +865,51 @@ async function addItem() {
   get('w-brand').value = get('w-category').value = '';
   showToast('Item added.');
   loadItems();
+}
+
+function statusOptions(current) {
+  return ['WANTED','ORDERED','OWNED'].map(s =>
+    `<option value="${s}" ${current===s?'selected':''}>${s[0]+s.slice(1).toLowerCase()}</option>`
+  ).join('');
+}
+
+async function updateStatus(id, sel) {
+  const status = sel.value;
+  sel.className = 'status-sel ' + status.toLowerCase();
+  await api('/wishlist/'+id+'/status?status='+status, {method:'PATCH'});
+  if (status === 'OWNED') {
+    showToast('Moved to Collection.');
+    loadItems();
+  }
+}
+
+async function loadCollection() {
+  const items = await (await api('/wishlist/owned')).json();
+  const bar = get('col-summary-bar');
+  if (items.length) {
+    const total = items.length;
+    const priced = items.filter(i => i.price != null);
+    const totalPrice = priced.reduce((s, i) => s + Number(i.price), 0);
+    bar.innerHTML = `<span style="color:var(--text);font-weight:600">${total} items</span>`
+      + (priced.length ? `&ensp;<span style="color:#60b878">¥${totalPrice.toLocaleString()}</span>` : '');
+  } else {
+    bar.innerHTML = '';
+  }
+  get('col-list').innerHTML = items.length ? items.map(i => `<tr>
+    ${i.imageUrl ? `<td class="col-img" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
+    <td data-label="Name"><a href="${esc(i.url)}" target="_blank">${esc(i.name || i.url)}</a></td>
+    <td data-label="Brand">${esc(i.brand?.name)}</td>
+    <td data-label="Category">${esc(i.category?.name)}</td>
+    <td data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
+    <td data-label="Notes">${esc(i.notes)}</td>
+    <td class="col-actions"><button class="edit" onclick="moveToWanted(${i.id})">↩ Wanted</button></td>
+  </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted)">No items in collection yet</td></tr>';
+}
+
+async function moveToWanted(id) {
+  await api('/wishlist/'+id+'/status?status=WANTED', {method:'PATCH'});
+  showToast('Moved back to Items.');
+  loadCollection(); loadItems();
 }
 
 async function archiveItem(id) {
@@ -835,6 +1043,9 @@ async function loadBrands() {
     sel.innerHTML = '<option value="">Brand</option>' + brands.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
     sel.value = cur;
   });
+  const fb = get('f-brand'), fbCur = fb.value;
+  fb.innerHTML = '<option value="">All brands</option>' + brands.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
+  fb.value = fbCur;
   get('b-list').innerHTML = brands.map(b => `<tr>
     <td>${esc(b.name)}</td>
     <td>${b.url ? `<a href="${esc(b.url)}" target="_blank">${esc(b.url)}</a>` : ''}</td>
@@ -887,6 +1098,9 @@ async function loadCategories() {
     sel.innerHTML = '<option value="">Category</option>' + cats.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
     sel.value = cur;
   });
+  const fc = get('f-category'), fcCur = fc.value;
+  fc.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  fc.value = fcCur;
   get('c-list').innerHTML = cats.map(c => `<tr>
     <td>${esc(c.name)}</td>
     <td><button class="edit" onclick="editCategory(${c.id},'${esc(c.name)}')">Edit</button> <button class="del" onclick="delCategory(${c.id})">Delete</button></td>
@@ -961,6 +1175,10 @@ async function fetchInfo(btn, prefix) {
 }
 
 loadItems(); loadBrands(); loadCategories();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
 
 </script>
 </body>

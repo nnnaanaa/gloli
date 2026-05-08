@@ -1,6 +1,7 @@
 package com.mortlace.controller
 
 import com.mortlace.domain.enums.Priority
+import com.mortlace.domain.enums.Status
 import com.mortlace.dto.WishlistItemRequest
 import com.mortlace.dto.WishlistItemResponse
 import com.mortlace.service.WishlistItemService
@@ -42,9 +43,20 @@ class WishlistItemController(private val service: WishlistItemService) {
         @Valid @RequestBody req: WishlistItemRequest
     ): WishlistItemResponse = service.update(id, req)
 
+    @GetMapping("/owned")
+    @Operation(summary = "List owned items")
+    fun listOwned(): List<WishlistItemResponse> = service.findOwned()
+
     @GetMapping("/deleted")
     @Operation(summary = "List soft-deleted items")
     fun listDeleted(): List<WishlistItemResponse> = service.findDeleted()
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Update item status")
+    fun updateStatus(
+        @PathVariable id: Long,
+        @RequestParam status: Status
+    ): WishlistItemResponse = service.updateStatus(id, status)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

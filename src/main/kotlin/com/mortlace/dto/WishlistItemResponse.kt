@@ -1,6 +1,7 @@
 package com.mortlace.dto
 
 import com.mortlace.domain.enums.Priority
+import com.mortlace.domain.enums.Status
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -13,6 +14,7 @@ data class WishlistItemResponse(
     val category: CategoryResponse?,
     val notes: String?,
     val priority: Priority,
+    val status: Status,
     val imageUrl: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,

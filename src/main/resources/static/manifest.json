@@ -1,0 +1,17 @@
+{
+  "name": "mortlace",
+  "short_name": "mortlace",
+  "description": "Lolita fashion wishlist",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07050e",
+  "theme_color": "#7c3faa",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

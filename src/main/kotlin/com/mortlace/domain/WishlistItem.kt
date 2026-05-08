@@ -1,6 +1,7 @@
 package com.mortlace.domain
 
 import com.mortlace.domain.enums.Priority
+import com.mortlace.domain.enums.Status
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -35,6 +36,9 @@ class WishlistItem(
 
     @Enumerated(EnumType.STRING)
     var priority: Priority = Priority.MEDIUM,
+
+    @Enumerated(EnumType.STRING)
+    var status: Status = Status.WANTED,
 
     var imagePath: String? = null,
 

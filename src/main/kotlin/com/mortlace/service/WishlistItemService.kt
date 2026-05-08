@@ -2,6 +2,7 @@ package com.mortlace.service
 
 import com.mortlace.domain.WishlistItem
 import com.mortlace.domain.enums.Priority
+import com.mortlace.domain.enums.Status
 import com.mortlace.dto.BrandResponse
 import com.mortlace.dto.CategoryResponse
 import com.mortlace.dto.WishlistItemRequest
@@ -29,6 +30,7 @@ class WishlistItemService(
     @Transactional(readOnly = true)
     fun findAll(priority: Priority?, brandId: Long?, categoryId: Long?): List<WishlistItemResponse> {
         return repo.findAllByDeletedAtIsNull()
+            .filter { it.status != Status.OWNED }
             .filter { priority == null || it.priority == priority }
             .filter { brandId == null || it.brand?.id == brandId }
             .filter { categoryId == null || it.category?.id == categoryId }
@@ -36,8 +38,20 @@ class WishlistItemService(
     }
 
     @Transactional(readOnly = true)
+    fun findOwned(): List<WishlistItemResponse> =
+        repo.findAllByDeletedAtIsNull()
+            .filter { it.status == Status.OWNED }
+            .map { it.toResponse() }
+
+    @Transactional(readOnly = true)
     fun findDeleted(): List<WishlistItemResponse> =
         repo.findAllByDeletedAtIsNotNull().map { it.toResponse() }
+
+    fun updateStatus(id: Long, status: Status): WishlistItemResponse {
+        val item = repo.findById(id).orElseThrow { notFound(id) }
+        item.status = status
+        return repo.save(item).toResponse()
+    }
 
     @Transactional(readOnly = true)
     fun findById(id: Long): WishlistItemResponse =
@@ -86,6 +100,7 @@ class WishlistItemService(
         item.category = category
         item.notes = req.notes
         item.priority = req.priority
+        item.status = req.status
         if (req.imageUrl != null) {
             item.imagePath?.let { File("./data/images/$it").absoluteFile.delete() }
             item.imagePath = null
@@ -149,6 +164,7 @@ class WishlistItemService(
         category = category?.let { CategoryResponse(it.id, it.name) },
         notes = notes,
         priority = priority,
+        status = status,
         imageUrl = imageUrl ?: if (imagePath != null) "/api/wishlist/$id/image" else null,
         createdAt = createdAt,
         updatedAt = updatedAt,
