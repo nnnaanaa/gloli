@@ -7,171 +7,94 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #080808;
-      --card:      #101010;
-      --accent:    #a8a4b8;
-      --accent-lt: #ccc8d8;
-      --border:    #282430;
-      --thead-bg:  #080808;
-      --thead-fg:  #ccc8d8;
-      --text:      #ece8f4;
-      --muted:     #706c7c;
+      --bg:        #07050e;
+      --card:      #0e0b18;
+      --accent:    #7c3faa;
+      --accent-lt: #a865d4;
+      --border:    #2a1648;
+      --thead-bg:  #07050e;
+      --thead-fg:  #c4a0e0;
+      --text:      #ede4f8;
+      --muted:     #7a658e;
       --wine:      #6b1a2a;
-      --wine-lt:   #9b2a40;
+      --font-body: "Plus Jakarta Sans", "Hiragino Kaku Gothic ProN", "Hiragino Kaku Gothic Pro", "Hiragino Kaku Gothic", YuGothic, "Yu Gothic", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
 
-    html {
-      background: var(--bg);
-    }
-
-    html::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url('gothic1.png');
-      background-size: auto 100vh;
-      background-position: center center;
-      background-repeat: no-repeat;
-      opacity: 0.35;
-      pointer-events: none;
-      z-index: 0;
-    }
+    html, body { background: var(--bg); }
 
     body {
-      font-family: 'Shippori Mincho', serif;
+      font-family: var(--font-body);
       color: var(--text);
       padding: 28px 24px;
       max-width: 900px;
       margin: 0 auto;
-      background-color: rgba(10, 9, 10, 0.90);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M24 16 L28 24 L24 32 L20 24 Z' fill='none' stroke='%231a1820' stroke-width='.7'/%3E%3Cline x1='24' y1='8' x2='24' y2='15' stroke='%231a1820' stroke-width='.4'/%3E%3Cline x1='24' y1='33' x2='24' y2='40' stroke='%231a1820' stroke-width='.4'/%3E%3Cline x1='8' y1='24' x2='19' y2='24' stroke='%231a1820' stroke-width='.4'/%3E%3Cline x1='29' y1='24' x2='40' y2='24' stroke='%231a1820' stroke-width='.4'/%3E%3C/svg%3E");
-      background-size: 48px 48px;
       min-height: 100vh;
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      box-shadow: 0 0 60px rgba(168,164,184,0.08),
-                  inset 0 0 0 5px rgba(8,8,8,0.95),
-                  inset 0 0 0 6px rgba(168,164,184,0.20);
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Corner L-brackets */
-    body::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(var(--accent), var(--accent)),
-        linear-gradient(var(--accent), var(--accent)),
-        linear-gradient(var(--accent), var(--accent)),
-        linear-gradient(var(--accent), var(--accent)),
-        linear-gradient(var(--accent), var(--accent)),
-        linear-gradient(var(--accent), var(--accent)),
-        linear-gradient(var(--accent), var(--accent)),
-        linear-gradient(var(--accent), var(--accent));
-      background-size:
-        1px 28px, 28px 1px,
-        1px 28px, 28px 1px,
-        1px 28px, 28px 1px,
-        1px 28px, 28px 1px;
-      background-position:
-        0 0,       0 0,
-        100% 0,    100% 0,
-        0 100%,    0 100%,
-        100% 100%, 100% 100%;
-      background-repeat: no-repeat;
-      opacity: 0.45;
-      pointer-events: none;
     }
 
     h1 {
-      font-family: 'Cinzel Decorative', serif;
+      font-family: var(--font-body);
       font-size: clamp(1.4rem, 4vw, 2rem);
       color: var(--text);
       text-align: center;
       letter-spacing: 0.14em;
-      padding-bottom: 4px;
       margin-bottom: 28px;
-      text-shadow:
-        0 0 32px rgba(168,164,184,0.18),
-        0 0 8px  rgba(168,164,184,0.10);
     }
 
-h2 {
-      font-family: 'Cinzel Decorative', serif;
+    h2 {
+      font-family: var(--font-body);
       font-size: clamp(0.95rem, 3vw, 1.2rem);
       color: var(--accent);
       letter-spacing: 0.05em;
       margin: 22px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
     }
 
-    h2::before {
-      content: '';
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border: 1px solid var(--accent);
-      transform: rotate(45deg);
-      margin-right: 10px;
-      vertical-align: middle;
-      opacity: 0.75;
-    }
-
-    h2::after {
-      content: '';
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border: 1px solid var(--accent);
-      transform: rotate(45deg);
-      margin-left: 10px;
-      vertical-align: middle;
-      opacity: 0.75;
-    }
-
-    h3 { font-family: 'Cinzel Decorative', serif; color: var(--text); letter-spacing: 0.05em; }
+    h3 { font-family: var(--font-body); color: var(--text); letter-spacing: 0.05em; }
 
     a { color: var(--accent-lt); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
     input, select, textarea {
-      padding: 6px 10px;
+      padding: 8px 12px;
       margin: 2px;
       border: 1px solid var(--border);
-      border-radius: 0;
-      font-family: 'Shippori Mincho', serif;
-      background: #0c0c0c;
+      border-radius: 6px;
+      font-family: var(--font-body);
+      background: #120d20;
       color: var(--text);
       font-size: 0.9rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus, select:focus {
+    input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(168,164,184,0.2);
+      box-shadow: 0 0 0 3px rgba(124, 63, 170, 0.25);
     }
 
     button {
-      padding: 5px 13px;
+      padding: 6px 14px;
       cursor: pointer;
       border: 1px solid var(--accent);
-      border-radius: 0;
+      border-radius: 6px;
       background: var(--accent);
-      color: #eceaf4;
-      font-family: 'Shippori Mincho', serif;
+      color: #f0eafc;
+      font-family: var(--font-body);
       font-size: 0.875rem;
       letter-spacing: 0.04em;
-      transition: opacity .15s;
+      transition: opacity .15s, box-shadow .15s;
     }
-    button:hover { opacity: 0.82; }
+    button:hover { opacity: 0.88; box-shadow: 0 0 0 3px rgba(124, 63, 170, 0.2); }
     button.del  { background: #1e0c12; border-color: var(--wine); color: #d4a0a8; }
-    button.edit { background: #1c1824; border-color: #12101a; }
-    button.save { background: #121c16; border-color: #0a1410; }
+    button.edit { background: #180e2c; border-color: #2e1a50; }
+    button.save { background: #120e20; border-color: #241840; }
 
     /* ---- generic table (Brands / Categories) ---- */
     .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -215,7 +138,7 @@ h2 {
     }
     .sort-bar button:hover { border-color: var(--accent); color: var(--accent-lt); }
     .sort-bar button.active { border-color: var(--accent); color: var(--accent-lt); background: rgba(168,164,184,0.08); }
-    .sort-bar button.active::after {
+    .sort-bar button[data-field].active::after {
       content: '';
       display: inline-block;
       width: 0; height: 0;
@@ -225,12 +148,12 @@ h2 {
       vertical-align: middle;
       margin-left: 5px;
     }
-    .sort-bar button.active.desc::after {
+    .sort-bar button[data-field].active.desc::after {
       border-bottom: none;
       border-top: 5px solid var(--accent);
     }
 
-    /* ---- Items: card layout (all screen sizes) ---- */
+    /* ---- Items: card layout ---- */
     #wishlist .table-wrap { overflow-x: visible; }
     #wishlist table { display: block; border: none; table-layout: auto; margin-top: 14px; }
     #wishlist thead { display: none; }
@@ -244,14 +167,14 @@ h2 {
       flex-direction: column;
       border: 1px solid var(--border);
       background: var(--card);
-      transition: box-shadow 0.15s;
       overflow: hidden;
+      transition: border-color 0.15s;
     }
-    #wishlist tr:hover { box-shadow: 0 0 0 1px var(--accent), 0 4px 24px rgba(107,26,42,0.25), 0 0 40px rgba(168,164,184,0.06); }
+    #wishlist tr:hover { border-color: var(--accent); }
     #wishlist tr:hover td,
     #wishlist tr:nth-child(even) td { background: transparent; }
-    #wishlist tr.editing { box-shadow: 0 0 0 1px var(--accent-lt); }
-    #wishlist tr.editing td { background: #1c1c1c; }
+    #wishlist tr.editing { border-color: var(--accent-lt); }
+    #wishlist tr.editing td { background: #160e24; }
     #wishlist td {
       display: flex;
       align-items: flex-start;
@@ -273,7 +196,6 @@ h2 {
       min-width: 68px;
       flex-shrink: 0;
     }
-    /* Image area: full-bleed card top */
     #wishlist td.col-img {
       padding: 0;
       height: 200px;
@@ -290,15 +212,6 @@ h2 {
       transition: transform 0.35s ease;
     }
     #wishlist td.col-img:hover img { transform: scale(1.04); }
-    /* Card top accent line (for cards without image) */
-    #wishlist tr:not(:has(.col-img))::before {
-      content: '';
-      display: block;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--accent) 25%, var(--accent) 75%, transparent);
-      opacity: 0.4;
-      flex-shrink: 0;
-    }
     #wishlist td.col-actions { justify-content: flex-end; padding: 8px 10px; margin-top: auto; }
     #wishlist td.col-actions::before { display: none; }
     #wishlist td[data-label="URL"] { flex-wrap: wrap; align-items: center; }
@@ -312,7 +225,6 @@ h2 {
 
     .tabs {
       display: flex;
-      gap: 0;
       margin-bottom: 24px;
       flex-wrap: wrap;
       border-bottom: 1px solid var(--border);
@@ -322,7 +234,7 @@ h2 {
       color: var(--muted);
       border: 1px solid var(--border);
       border-bottom: none;
-      border-radius: 0;
+      border-radius: 6px 6px 0 0;
       padding: 7px 18px;
       margin-bottom: -1px;
     }
@@ -337,12 +249,18 @@ h2 {
     .tab { display: none; }
     .tab.active { display: block; }
 
-    .form-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-    .form-row input, .form-row select { flex: 1 1 140px; min-width: 0; }
-    .form-row input[type="number"] { flex: 0 1 100px; }
+    .form-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 4px; }
+    .form-row input, .form-row select { flex: 1 1 130px; min-width: 0; }
     .form-row button { flex: 0 0 auto; }
 
-    .col-img img { object-fit: cover; cursor: pointer; display: block; }
+    #w-url                     { flex: 1 1 260px; }
+    #w-name                    { flex: 2 1 160px; }
+    #w-brand, #w-category      { flex: 1 1 110px; }
+    #w-priority                { flex: 0 1 100px; }
+    #w-price                   { flex: 0 0 90px; }
+    #w-notes, #w-image-url     { flex: 2 1 160px; }
+
+    .sort-sep { flex: 1; }
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -351,11 +269,13 @@ h2 {
     .modal-box {
       background: var(--card);
       border: 1px solid var(--border);
-      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      border-radius: 10px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(124,63,170,0.15);
       padding: 28px;
       max-width: 500px;
-      margin: 60px auto;
-      position: relative;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      margin: 40px auto;
     }
     .modal-box h3 { margin: 0 0 18px; }
     .modal-grid { display: grid; gap: 8px; }
@@ -364,78 +284,34 @@ h2 {
     .modal-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 2px; display: block; }
     .img-preview { width: 100%; max-height: 200px; object-fit: contain; border: 1px solid var(--border); margin-top: 6px; display: none; }
 
-    /* Inner frame for modal */
-    .modal-box {
-      box-shadow: 0 8px 40px rgba(0,0,0,0.7),
-                  inset 0 0 0 3px rgba(8,8,8,0.95),
-                  inset 0 0 0 4px rgba(168,164,184,0.15);
-    }
-
-    /* Tab active decoration */
-    .tabs button.active::after {
-      content: '';
-      display: block;
-      width: 4px;
-      height: 4px;
-      background: var(--accent);
-      transform: rotate(45deg);
-      margin: 3px auto 0;
-    }
-
-    /* Custom file input */
     .file-input-wrap { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
     .file-input-wrap input[type="file"] { display: none; }
     .file-btn-label {
-      padding: 5px 13px; cursor: pointer;
+      padding: 6px 14px; cursor: pointer;
       border: 1px solid var(--accent); background: var(--accent);
-      color: #eceaf4; font-family: 'Shippori Mincho', serif;
+      border-radius: 6px;
+      color: #f0eafc; font-family: var(--font-body);
       font-size: 0.875rem; letter-spacing: 0.04em; white-space: nowrap;
       transition: opacity .15s;
     }
     .file-btn-label:hover { opacity: 0.82; }
     .file-name-display { font-size: 0.85rem; color: var(--muted); }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); }
     ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-    /* ---- Lace decorations ---- */
-
-    /* Scallop lace hem — top and bottom of body */
-    body::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 6px; right: 6px; bottom: 0;
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='18'%3E%3Cpath d='M0 18 Q5 3 10 18 Q15 3 20 18' fill='none' stroke='%23a8a4b8' stroke-width='.8'/%3E%3Ccircle cx='10' cy='4.5' r='1.2' fill='none' stroke='%23a8a4b8' stroke-width='.6'/%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='18'%3E%3Cpath d='M0 0 Q5 15 10 0 Q15 15 20 0' fill='none' stroke='%23a8a4b8' stroke-width='.8'/%3E%3Ccircle cx='10' cy='13.5' r='1.2' fill='none' stroke='%23a8a4b8' stroke-width='.6'/%3E%3C/svg%3E");
-      background-size: 20px 18px, 20px 18px;
-      background-position: top, bottom;
-      background-repeat: repeat-x, repeat-x;
-      opacity: 0.38;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    /* Cards without image — scallop lace top instead of flat gradient */
-    #wishlist tr:not(:has(.col-img))::before {
-      content: '';
-      display: block;
-      height: 14px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='14'%3E%3Cpath d='M0 14 Q4 2 8 14 Q12 2 16 14' fill='none' stroke='%23a8a4b8' stroke-width='.8'/%3E%3Ccircle cx='8' cy='3' r='1' fill='none' stroke='%23a8a4b8' stroke-width='.6'/%3E%3C/svg%3E");
-      background-size: 16px 14px;
-      background-repeat: repeat-x;
-      background-position: center;
-      flex-shrink: 0;
-      opacity: 0.42;
+    @media (max-width: 768px) {
+      #wishlist tbody { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
     }
 
     @media (max-width: 600px) {
       body { padding: 14px 12px; }
       .form-row input, .form-row select { flex: 1 1 100%; }
-      .modal-box { margin: 20px 12px; padding: 20px; }
+      #w-price, #w-priority, #w-brand, #w-category,
+      #w-name, #w-notes, #w-image-url, #w-url { flex: 1 1 100%; }
+      .modal-box { margin: 16px 12px; padding: 20px; max-height: calc(100vh - 32px); }
       #brands table, #categories table { font-size: 0.8rem; }
       #brands th, #brands td, #categories th, #categories td { padding: 5px 6px; }
       #wishlist tbody { grid-template-columns: 1fr; }
@@ -458,9 +334,14 @@ h2 {
   <h2>Add Item</h2>
   <div class="form-row">
     <input id="w-url" placeholder="URL (required)">
+    <button onclick="fetchInfo(this,'w')">Fetch</button>
+  </div>
+  <div class="form-row">
     <input id="w-name" placeholder="Name">
     <select id="w-brand"><option value="">Brand</option></select>
     <select id="w-category"><option value="">Category</option></select>
+  </div>
+  <div class="form-row">
     <input id="w-price" type="number" placeholder="Price">
     <select id="w-priority">
       <option value="MEDIUM">Medium</option>
@@ -480,6 +361,12 @@ h2 {
     <button data-field="category" onclick="sortBy('category')">Category</button>
     <button data-field="price"    onclick="sortBy('price')">Price</button>
     <button data-field="priority" onclick="sortBy('priority')">Priority</button>
+    <span class="sort-sep"></span>
+    Cols:
+    <button class="col-btn active" onclick="setCols(0,this)">Auto</button>
+    <button class="col-btn" onclick="setCols(2,this)">2</button>
+    <button class="col-btn" onclick="setCols(3,this)">3</button>
+    <button class="col-btn" onclick="setCols(4,this)">4</button>
   </div>
 
   <div class="table-wrap">
@@ -497,6 +384,7 @@ h2 {
     <input type="hidden" id="edit-id">
     <div class="modal-grid">
       <input id="edit-url" placeholder="URL (required)">
+      <button onclick="fetchInfo(this,'edit')" style="width:100%;margin:2px 0">Fetch</button>
       <input id="edit-name" placeholder="Name">
       <select id="edit-brand"><option value="">Brand</option></select>
       <select id="edit-category"><option value="">Category</option></select>
@@ -617,10 +505,17 @@ function renderItems() {
 function sortBy(field) {
   if (_sortField === field) { _sortAsc = !_sortAsc; }
   else { _sortField = field; _sortAsc = true; }
-  document.querySelectorAll('.sort-bar button').forEach(btn => {
+  document.querySelectorAll('.sort-bar button[data-field]').forEach(btn => {
     btn.className = btn.dataset.field === field ? (_sortAsc ? 'active' : 'active desc') : '';
   });
   renderItems();
+}
+
+function setCols(n, btn) {
+  document.querySelector('#wishlist tbody').style.gridTemplateColumns =
+    n ? `repeat(${n}, 1fr)` : 'repeat(auto-fill, minmax(240px, 1fr))';
+  document.querySelectorAll('.col-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 async function loadItems() {
@@ -841,6 +736,40 @@ async function saveCategory(id) {
   await api('/categories/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) })
     .catch(s => s===409 ? alert('Already exists.') : null);
   loadCategories();
+}
+
+async function fetchInfo(btn, prefix) {
+  const url = get(prefix + '-url').value.trim();
+  if (!url) return;
+  const orig = btn.textContent;
+  btn.textContent = '···';
+  btn.disabled = true;
+  try {
+    const info = await (await api('/scrape?url=' + encodeURIComponent(url))).json();
+    if (info.name)     get(prefix + '-name').value  = info.name;
+    if (info.price)    get(prefix + '-price').value = info.price;
+    if (info.imageUrl) {
+      get(prefix + '-image-url').value = info.imageUrl;
+      if (prefix === 'edit') previewImgUrl(get('edit-image-url'));
+    }
+    if (info.brand) {
+      const sel = get(prefix + '-brand');
+      const opt = [...sel.options].find(o => o.text.toLowerCase() === info.brand.toLowerCase());
+      if (opt) sel.value = opt.value;
+    }
+    if (info.category) {
+      const sel = get(prefix + '-category');
+      const q = info.category.toLowerCase();
+      const opt = [...sel.options].find(o => o.text.toLowerCase() === q)
+               ?? [...sel.options].find(o => o.text.toLowerCase().includes(q) || q.includes(o.text.toLowerCase()));
+      if (opt) sel.value = opt.value;
+    }
+    btn.textContent = 'Done';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1000);
+  } catch {
+    btn.textContent = 'Failed';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+  }
 }
 
 loadItems(); loadBrands(); loadCategories();

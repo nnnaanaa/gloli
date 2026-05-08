@@ -1,5 +1,5 @@
 # ビルドステージ
-FROM gradle:8.8-jdk21 AS build
+FROM gradle:9.0-jdk21 AS build
 WORKDIR /app
 COPY build.gradle.kts settings.gradle.kts ./
 # ダミーソースでコンパイルを走らせ、全依存JARをキャッシュ
