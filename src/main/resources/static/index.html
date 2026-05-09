@@ -524,20 +524,28 @@
     #mascot {
       position: fixed;
       bottom: 0;
-      right: 20px;
-      width: 200px;
+      right: 16px;
+      width: 240px;
       pointer-events: none;
       z-index: 1;
       animation: mascot-float 5s ease-in-out infinite;
-      filter: drop-shadow(0 4px 28px rgba(124, 63, 170, 0.55));
-      opacity: 0.92;
+      filter:
+        drop-shadow(0 0 18px rgba(124, 63, 170, 0.85))
+        drop-shadow(0 0 50px rgba(168, 101, 212, 0.45))
+        drop-shadow(0 6px 10px rgba(0,0,0,0.6));
     }
     @keyframes mascot-float {
       0%, 100% { transform: translateY(0px); }
-      50%       { transform: translateY(-14px); }
+      50%       { transform: translateY(-16px); }
     }
-    @media (max-width: 900px) { #mascot { width: 140px; right: 8px; } }
-    @media (max-width: 600px) { #mascot { display: none; } }
+    /* Wide screen: sit just outside the 900px content column */
+    @media (min-width: 1380px) {
+      #mascot { right: calc(50vw - 710px); width: 280px; }
+    }
+    /* Tablet: shrink but keep visible */
+    @media (max-width: 900px) { #mascot { width: 160px; right: 8px; } }
+    /* Mobile: small corner mascot */
+    @media (max-width: 600px) { #mascot { width: 96px; right: 6px; bottom: 6px; } }
   </style>
 </head>
 <body>
