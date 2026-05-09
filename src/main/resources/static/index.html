@@ -533,7 +533,7 @@
       transition: opacity 0.5s ease;
     }
     #loading-screen.fade-out { opacity: 0; pointer-events: none; }
-    #loading-screen img { width: 220px; }
+    #loading-screen img { width: 220px; display: block; }
     #loading-screen .loading-title {
       margin-top: 16px;
       font-family: var(--font-body);
@@ -541,26 +541,75 @@
       letter-spacing: 0.22em;
       color: var(--accent-lt);
     }
+    .loading-bubble {
+      background: #1a1030;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 0.92rem;
+      color: var(--text);
+      letter-spacing: 0.05em;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .loading-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top: 8px solid var(--accent);
+    }
     @media (max-width: 600px) { #loading-screen img { width: 160px; } }
 
     /* ---- Mascot ---- */
-    #mascot {
+    #mascot-wrap {
       position: fixed;
       top: 16px;
       right: 16px;
-      width: 240px;
       z-index: 50;
       cursor: grab;
       user-select: none;
       touch-action: none;
     }
-    #mascot:active { cursor: grabbing; }
-    @media (max-width: 900px) { #mascot { width: 160px; } }
-    @media (max-width: 600px) { #mascot { width: 96px; } }
+    #mascot-wrap:active { cursor: grabbing; }
+    #mascot-wrap img { width: 240px; display: block; }
+    #mascot-bubble {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 10px;
+      background: #1a1030;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      color: var(--text);
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+    #mascot-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 7px solid transparent;
+      border-top: 7px solid var(--accent);
+    }
+    #mascot-wrap:hover #mascot-bubble { opacity: 1; }
+    @media (max-width: 900px) { #mascot-wrap img { width: 160px; } }
+    @media (max-width: 600px) { #mascot-wrap img { width: 96px; } }
   </style>
 </head>
 <body>
 <div id="loading-screen">
+  <div class="loading-bubble" id="loading-bubble">少々お待ちを…</div>
   <img src="/gloli.png" alt="">
   <div class="loading-title">mortlace</div>
 </div>
@@ -757,7 +806,10 @@
   </div>
 </div>
 
-<img id="mascot" src="/gloli.png" alt="">
+<div id="mascot-wrap">
+  <div id="mascot-bubble"></div>
+  <img src="/gloli.png" alt="">
+</div>
 
 <script>
 let _toastTimer;
@@ -1228,8 +1280,15 @@ async function fetchInfo(btn, prefix) {
   }
 }
 
+// ---- Loading messages ----
+const _loadMsgs = ['少々お待ちを…', 'データを読み込んでいるの…', 'もうすぐよ…'];
+let _lmi = 0;
+const _lb = document.getElementById('loading-bubble');
+const _lmTimer = setInterval(() => { _lb.textContent = _loadMsgs[++_lmi % _loadMsgs.length]; }, 1000);
+
 const _loadStart = Date.now();
 Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
+  clearInterval(_lmTimer);
   const elapsed = Date.now() - _loadStart;
   const wait = Math.max(0, 2000 - elapsed);
   setTimeout(() => {
@@ -1241,7 +1300,7 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
 
 // ---- Mascot drag ----
 (function() {
-  const el = document.getElementById('mascot');
+  const el = document.getElementById('mascot-wrap');
   let ox = 0, oy = 0, active = false;
 
   function applyPos(x, y) {
@@ -1257,13 +1316,29 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
     localStorage.setItem('mascot-pos', JSON.stringify({ left: el.offsetLeft, top: el.offsetTop }));
   }
 
-  // Restore saved position, else default to bottom-right
+  // Restore saved position, else default to top-right
   const saved = JSON.parse(localStorage.getItem('mascot-pos') || 'null');
   if (saved) {
     applyPos(saved.left, saved.top);
   } else {
     el.style.top = '16px'; el.style.right = '16px';
   }
+
+  // Hover messages
+  const _msgs = [
+    '何を買おうか悩んでるの？',
+    'またウィッシュリストが増えてる…',
+    'grailはもう手に入れた？',
+    '今日もお買い物？',
+    '気になるなら、すぐ追加したほうがいいわよ',
+    'ちゃんと予算は大丈夫？',
+  ];
+  let _mi = 0;
+  const _bubble = document.getElementById('mascot-bubble');
+  el.addEventListener('mouseenter', () => {
+    _bubble.textContent = _msgs[_mi % _msgs.length];
+    _mi++;
+  });
 
   el.addEventListener('mousedown', e => {
     active = true;
