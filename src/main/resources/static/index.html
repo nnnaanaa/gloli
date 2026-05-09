@@ -519,6 +519,25 @@
     @media (max-width: 400px) {
       h1 { font-size: 1.3rem; margin-bottom: 18px; }
     }
+
+    /* ---- Mascot ---- */
+    #mascot {
+      position: fixed;
+      bottom: 0;
+      right: 20px;
+      width: 200px;
+      pointer-events: none;
+      z-index: 1;
+      animation: mascot-float 5s ease-in-out infinite;
+      filter: drop-shadow(0 4px 28px rgba(124, 63, 170, 0.55));
+      opacity: 0.92;
+    }
+    @keyframes mascot-float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-14px); }
+    }
+    @media (max-width: 900px) { #mascot { width: 140px; right: 8px; } }
+    @media (max-width: 600px) { #mascot { display: none; } }
   </style>
 </head>
 <body>
@@ -714,6 +733,8 @@
     </table>
   </div>
 </div>
+
+<img id="mascot" src="/gloli.png" alt="">
 
 <script>
 let _toastTimer;
