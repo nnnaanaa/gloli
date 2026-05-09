@@ -566,7 +566,7 @@
     /* ---- Mascot ---- */
     #mascot-wrap {
       position: fixed;
-      top: 120px;
+      top: 16px;
       right: 16px;
       z-index: 50;
       cursor: grab;
@@ -1314,12 +1314,22 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
     localStorage.setItem('mascot-pos-v2', JSON.stringify({ left: el.offsetLeft, top: el.offsetTop }));
   }
 
-  // Restore saved position, else default to right side with room for bubble
+  // Restore saved position, else pick a random corner
   const saved = JSON.parse(localStorage.getItem('mascot-pos-v2') || 'null');
   if (saved) {
     applyPos(saved.left, saved.top);
   } else {
-    el.style.top = '120px'; el.style.right = '16px';
+    const pad = 16;
+    const iw = window.innerWidth, ih = window.innerHeight;
+    const mw = el.offsetWidth || 240, mh = el.offsetHeight || 300;
+    const corners = [
+      { x: iw - mw - pad, y: pad },
+      { x: iw - mw - pad, y: ih - mh - pad },
+      { x: pad,           y: pad },
+      { x: pad,           y: ih - mh - pad },
+    ];
+    const c = corners[Math.floor(Math.random() * corners.length)];
+    applyPos(c.x, c.y);
   }
 
   // Hover messages
