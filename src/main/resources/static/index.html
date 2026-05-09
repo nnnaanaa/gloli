@@ -1228,10 +1228,15 @@ async function fetchInfo(btn, prefix) {
   }
 }
 
+const _loadStart = Date.now();
 Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
-  const ls = document.getElementById('loading-screen');
-  ls.classList.add('fade-out');
-  setTimeout(() => ls.remove(), 550);
+  const elapsed = Date.now() - _loadStart;
+  const wait = Math.max(0, 2000 - elapsed);
+  setTimeout(() => {
+    const ls = document.getElementById('loading-screen');
+    ls.classList.add('fade-out');
+    setTimeout(() => ls.remove(), 550);
+  }, wait);
 });
 
 // ---- Mascot drag ----
