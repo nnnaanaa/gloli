@@ -526,17 +526,14 @@
       bottom: 0;
       right: 16px;
       width: 240px;
-      pointer-events: none;
-      z-index: 1;
+      z-index: 50;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
     }
-    /* Wide screen: sit just outside the 900px content column */
-    @media (min-width: 1380px) {
-      #mascot { right: calc(50vw - 710px); width: 280px; }
-    }
-    /* Tablet: shrink but keep visible */
-    @media (max-width: 900px) { #mascot { width: 160px; right: 8px; } }
-    /* Mobile: small corner mascot */
-    @media (max-width: 600px) { #mascot { width: 96px; right: 6px; bottom: 6px; } }
+    #mascot:active { cursor: grabbing; }
+    @media (max-width: 900px) { #mascot { width: 160px; } }
+    @media (max-width: 600px) { #mascot { width: 96px; } }
   </style>
 </head>
 <body>
@@ -1205,6 +1202,59 @@ async function fetchInfo(btn, prefix) {
 }
 
 loadItems(); loadBrands(); loadCategories();
+
+// ---- Mascot drag ----
+(function() {
+  const el = document.getElementById('mascot');
+  let ox = 0, oy = 0, active = false;
+
+  function applyPos(x, y) {
+    x = Math.max(0, Math.min(x, window.innerWidth  - el.offsetWidth));
+    y = Math.max(0, Math.min(y, window.innerHeight - el.offsetHeight));
+    el.style.left   = x + 'px';
+    el.style.top    = y + 'px';
+    el.style.right  = 'auto';
+    el.style.bottom = 'auto';
+  }
+
+  function savePos() {
+    localStorage.setItem('mascot-pos', JSON.stringify({ left: el.offsetLeft, top: el.offsetTop }));
+  }
+
+  // Restore saved position, else default to bottom-right
+  const saved = JSON.parse(localStorage.getItem('mascot-pos') || 'null');
+  if (saved) {
+    applyPos(saved.left, saved.top);
+  } else {
+    el.style.bottom = '0'; el.style.right = '16px';
+  }
+
+  el.addEventListener('mousedown', e => {
+    active = true;
+    const r = el.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!active) return;
+    applyPos(e.clientX - ox, e.clientY - oy);
+  });
+  document.addEventListener('mouseup', () => { if (active) { active = false; savePos(); } });
+
+  el.addEventListener('touchstart', e => {
+    active = true;
+    const t = e.touches[0], r = el.getBoundingClientRect();
+    ox = t.clientX - r.left; oy = t.clientY - r.top;
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchmove', e => {
+    if (!active) return;
+    const t = e.touches[0];
+    applyPos(t.clientX - ox, t.clientY - oy);
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchend', () => { if (active) { active = false; savePos(); } });
+})();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
