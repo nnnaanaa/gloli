@@ -178,10 +178,10 @@
     }
     #collection tr {
       display: flex; flex-direction: column;
-      border: 1px solid #1a4a2a; background: var(--card);
+      border: 1px solid var(--border); background: var(--card);
       overflow: hidden; transition: border-color 0.15s;
     }
-    #collection tr:hover { border-color: #60b878; }
+    #collection tr:hover { border-color: var(--accent); }
     #collection tr:hover td, #collection tr:nth-child(even) td { background: transparent; }
     #collection td {
       display: flex; align-items: flex-start; gap: 10px;
@@ -195,7 +195,7 @@
     }
     #collection td.col-img {
       padding: 0; height: 200px; overflow: hidden;
-      border-bottom: 1px solid #1a4a2a; cursor: pointer;
+      border-bottom: 1px solid var(--border); cursor: pointer;
     }
     #collection td.col-img::before { display: none; }
     #collection td.col-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
@@ -473,9 +473,9 @@
     @media (max-width: 600px) {
       body { padding: 12px 10px; border-left: none; border-right: none; }
 
-      /* タブ: 5つ並ぶので小さめに */
-      .tabs { gap: 2px; }
-      .tabs button { padding: 6px 9px; font-size: 0.78rem; letter-spacing: 0; }
+      /* タブ: 2行折り返し、サイズは縮めない */
+      .tabs { flex-wrap: wrap; gap: 3px; }
+      .tabs button { padding: 7px 12px; font-size: 0.85rem; letter-spacing: 0; }
 
       /* Add form: 入力を100%、ボタンも100% */
       .form-row input, .form-row select, .form-row button { flex: 1 1 100%; }
@@ -491,10 +491,8 @@
       #f-search { grid-column: 1 / -1; }
       #f-clear  { grid-column: 1 / -1; }
 
-      /* ソートバー: Cols非表示、コンパクトに */
-      .col-btn, .sort-sep, .col-label { display: none; }
-      .sort-bar { gap: 3px 4px; font-size: 0.76rem; }
-      .sort-bar button[data-field] { padding: 3px 7px; font-size: 0.74rem; }
+      /* ソートバー: スペーサーのみ非表示、Colsボタンは表示 */
+      .sort-sep { display: none; }
 
       /* カード: 1カラム */
       #wishlist tbody, #archive tbody, #collection tbody { grid-template-columns: 1fr; }
@@ -519,9 +517,7 @@
     }
 
     @media (max-width: 400px) {
-      .tabs button { padding: 5px 6px; font-size: 0.72rem; }
       h1 { font-size: 1.3rem; margin-bottom: 18px; }
-      .sort-bar button[data-field] { padding: 2px 5px; font-size: 0.7rem; }
     }
   </style>
 </head>
