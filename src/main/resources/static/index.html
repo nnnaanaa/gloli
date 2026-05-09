@@ -567,10 +567,10 @@
     <button data-field="priority" onclick="sortBy('priority')">Priority</button>
     <span class="sort-sep"></span>
     <span class="col-label">Cols:</span>
-    <button class="col-btn active" onclick="setCols(0,this)">Auto</button>
-    <button class="col-btn" onclick="setCols(2,this)">2</button>
-    <button class="col-btn" onclick="setCols(3,this)">3</button>
-    <button class="col-btn" onclick="setCols(4,this)">4</button>
+    <button class="col-btn active" onclick="setCols(0,this,'#w-list')">Auto</button>
+    <button class="col-btn" onclick="setCols(2,this,'#w-list')">2</button>
+    <button class="col-btn" onclick="setCols(3,this,'#w-list')">3</button>
+    <button class="col-btn" onclick="setCols(4,this,'#w-list')">4</button>
   </div>
 
   <div class="filter-bar">
@@ -649,6 +649,13 @@
 <div id="collection" class="tab">
   <h2>Collection</h2>
   <div id="col-summary-bar" class="summary-sub"></div>
+  <div class="sort-bar">
+    <span class="col-label">Cols:</span>
+    <button class="col-btn active" onclick="setCols(0,this,'#col-list')">Auto</button>
+    <button class="col-btn" onclick="setCols(2,this,'#col-list')">2</button>
+    <button class="col-btn" onclick="setCols(3,this,'#col-list')">3</button>
+    <button class="col-btn" onclick="setCols(4,this,'#col-list')">4</button>
+  </div>
   <div class="table-wrap">
     <table>
       <thead><tr><th class="col-img">Image</th><th>Name</th><th>Brand</th><th>Category</th><th>Price</th><th>Notes</th><th></th></tr></thead>
@@ -660,6 +667,13 @@
 <!-- archive -->
 <div id="archive" class="tab">
   <h2>Archive</h2>
+  <div class="sort-bar">
+    <span class="col-label">Cols:</span>
+    <button class="col-btn active" onclick="setCols(0,this,'#arc-list')">Auto</button>
+    <button class="col-btn" onclick="setCols(2,this,'#arc-list')">2</button>
+    <button class="col-btn" onclick="setCols(3,this,'#arc-list')">3</button>
+    <button class="col-btn" onclick="setCols(4,this,'#arc-list')">4</button>
+  </div>
   <div class="table-wrap">
     <table>
       <thead><tr><th class="col-img">Image</th><th>Name</th><th>Brand</th><th>Price</th><th>Archived</th><th></th></tr></thead>
@@ -828,10 +842,10 @@ function sortBy(field) {
   renderItems();
 }
 
-function setCols(n, btn) {
-  document.querySelector('#wishlist tbody').style.gridTemplateColumns =
+function setCols(n, btn, tbodySel) {
+  document.querySelector(tbodySel).style.gridTemplateColumns =
     n ? `repeat(${n}, 1fr)` : 'repeat(auto-fill, minmax(240px, 1fr))';
-  document.querySelectorAll('.col-btn').forEach(b => b.classList.remove('active'));
+  btn.closest('.sort-bar').querySelectorAll('.col-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
