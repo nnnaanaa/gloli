@@ -566,7 +566,7 @@
     /* ---- Mascot ---- */
     #mascot-wrap {
       position: fixed;
-      top: 16px;
+      top: 120px;
       right: 16px;
       z-index: 50;
       cursor: grab;
@@ -577,10 +577,8 @@
     #mascot-wrap img { width: 240px; display: block; }
     #mascot-bubble {
       position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-bottom: 10px;
+      right: calc(100% + 12px);
+      top: 16px;
       background: #1a1030;
       border: 1px solid var(--accent);
       border-radius: 12px;
@@ -596,11 +594,11 @@
     #mascot-bubble::after {
       content: '';
       position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 50%;
+      left: 100%;
+      transform: translateY(-50%);
       border: 7px solid transparent;
-      border-top: 7px solid var(--accent);
+      border-left: 7px solid var(--accent);
     }
     #mascot-wrap:hover #mascot-bubble { opacity: 1; }
     @media (max-width: 900px) { #mascot-wrap img { width: 160px; } }
@@ -1313,15 +1311,15 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
   }
 
   function savePos() {
-    localStorage.setItem('mascot-pos', JSON.stringify({ left: el.offsetLeft, top: el.offsetTop }));
+    localStorage.setItem('mascot-pos-v2', JSON.stringify({ left: el.offsetLeft, top: el.offsetTop }));
   }
 
-  // Restore saved position, else default to top-right
-  const saved = JSON.parse(localStorage.getItem('mascot-pos') || 'null');
+  // Restore saved position, else default to right side with room for bubble
+  const saved = JSON.parse(localStorage.getItem('mascot-pos-v2') || 'null');
   if (saved) {
     applyPos(saved.left, saved.top);
   } else {
-    el.style.top = '16px'; el.style.right = '16px';
+    el.style.top = '120px'; el.style.right = '16px';
   }
 
   // Hover messages
