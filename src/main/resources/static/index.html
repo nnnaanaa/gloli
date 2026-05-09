@@ -523,7 +523,7 @@
     /* ---- Mascot ---- */
     #mascot {
       position: fixed;
-      bottom: 0;
+      top: 16px;
       right: 16px;
       width: 240px;
       z-index: 50;
@@ -1226,7 +1226,7 @@ loadItems(); loadBrands(); loadCategories();
   if (saved) {
     applyPos(saved.left, saved.top);
   } else {
-    el.style.bottom = '0'; el.style.right = '16px';
+    el.style.top = '16px'; el.style.right = '16px';
   }
 
   el.addEventListener('mousedown', e => {
