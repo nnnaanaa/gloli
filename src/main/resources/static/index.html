@@ -601,7 +601,6 @@
       border: 7px solid transparent;
       border-top: 7px solid var(--accent);
     }
-    #mascot-wrap:hover #mascot-bubble { opacity: 1; }
     @media (max-width: 900px) { #mascot-wrap img { width: 160px; } }
     @media (max-width: 600px) { #mascot-wrap img { width: 96px; } }
   </style>
@@ -1333,7 +1332,7 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
     applyPos(c.x, c.y);
   }
 
-  // Hover messages
+  // Messages
   const _msgs = [
     '何を買おうか悩んでるの？',
     'またウィッシュリストが増えてる…',
@@ -1344,10 +1343,25 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
   ];
   let _mi = 0;
   const _bubble = document.getElementById('mascot-bubble');
-  el.addEventListener('mouseenter', () => {
+  let _bubbleTimer = null;
+
+  function showBubble() {
     _bubble.textContent = _msgs[_mi % _msgs.length];
     _mi++;
-  });
+    _bubble.style.opacity = '1';
+    clearTimeout(_bubbleTimer);
+    _bubbleTimer = setTimeout(() => { _bubble.style.opacity = ''; }, 3500);
+  }
+
+  // Hover
+  el.addEventListener('mouseenter', showBubble);
+
+  // Random auto-speak: every 8–20 seconds
+  function scheduleSpeak() {
+    const delay = 8000 + Math.random() * 12000;
+    setTimeout(() => { showBubble(); scheduleSpeak(); }, delay);
+  }
+  scheduleSpeak();
 
   el.addEventListener('mousedown', e => {
     active = true;
