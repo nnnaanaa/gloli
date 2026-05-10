@@ -6,7 +6,7 @@
   <title>mortlace</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#7c3faa">
+  <meta name="theme-color" content="#3a1660">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="mortlace">
@@ -18,7 +18,7 @@
     :root {
       --bg:        #07050e;
       --card:      #0e0b18;
-      --accent:    #7c3faa;
+      --accent:    #3a1660;
       --accent-lt: #a865d4;
       --border:    #2a1648;
       --thead-bg:  #07050e;
@@ -31,7 +31,8 @@
 
     *, *::before, *::after { box-sizing: border-box; }
 
-    html, body { background: var(--bg); }
+    html { background-color: var(--bg); background-image: radial-gradient(circle, rgba(168,101,212,0.12) 1px, transparent 1px); background-size: 24px 24px; }
+    body { background: transparent; }
 
     body {
       font-family: var(--font-body);
@@ -401,21 +402,33 @@
       position: fixed;
       bottom: 28px;
       left: 50%;
-      transform: translateX(-50%) translateY(16px);
+      transform: translateX(-50%) translateY(32px);
       background: #1e1430;
       border: 1px solid var(--accent);
       color: var(--accent-lt);
-      padding: 9px 22px;
+      padding: 9px 20px 9px 14px;
       border-radius: 20px;
       font-size: 0.88rem;
       letter-spacing: 0.04em;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.2s, transform 0.2s;
+      transition: opacity 0.22s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
       z-index: 300;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast .t-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='10 10 80 80'%3E%3Cpath fill='%23a865d4' d='M 10,30 A 20,20,0,0,1,50,30 A 20,20,0,0,1,90,30 Q 90,60,50,90 Q 10,60,10,30 Z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
 
     /* ---- Summary bar ---- */
     #summary-bar {
@@ -536,6 +549,37 @@
       #wishlist tbody, #archive tbody, #collection tbody { grid-template-columns: 1fr; }
     }
 
+    /* ---- Empty state ---- */
+    .empty-state {
+      text-align: center;
+      padding: 56px 20px 48px;
+      color: var(--muted);
+    }
+    .empty-state .empty-icon {
+      width: 58px; height: 58px;
+      margin: 0 auto 20px;
+      opacity: 0.22;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 46'%3E%3Cpath d='M25,41 C24,40 3,27 3,15 C3,8 8,4 15,6 C19,7 22,10 25,14 C28,10 31,7 35,6 C42,4 47,8 47,15 C47,27 26,40 25,41 Z' fill='%23a865d4'/%3E%3C/svg%3E");
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+    }
+    .empty-state .empty-msg { font-size: 0.95rem; margin: 0 0 8px; }
+    .empty-state .empty-sub { font-size: 0.82rem; opacity: 0.65; margin: 0; }
+
+    /* ---- Scroll to top ---- */
+    #scroll-top {
+      position: fixed; bottom: 76px; right: 22px;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--accent-lt); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.22s ease, transform 0.22s ease, background 0.15s ease;
+      z-index: 150; padding: 0;
+    }
+    #scroll-top.visible { opacity: 1; transform: translateY(0); }
+    #scroll-top:hover { background: var(--accent); }
+    #scroll-top svg { width: 16px; height: 16px; pointer-events: none; }
+
     /* ---- Page frame ---- */
     #page-frame {
       position: fixed;
@@ -543,13 +587,13 @@
       pointer-events: none;
       z-index: 41;
       border-radius: 10px;
-      box-shadow: 0 0 0 10px #7c3faa;
+      box-shadow: 0 0 0 10px #3a1660;
     }
     #page-frame::before, #page-frame::after,
     body::before, body::after {
       content: '';
       position: fixed;
-      background: #7c3faa;
+      background: #3a1660;
       pointer-events: none;
       z-index: 40;
     }
@@ -557,19 +601,6 @@
     #page-frame::after  { bottom: 0; left: 0; right: 0; height: 10px; }
     body::before { top: 0; left: 0; bottom: 0; width: 10px; }
     body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
-    #page-frame span {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='10 10 80 80'%3E%3Cpath fill='%237c3faa' d='M 10,30 A 20,20,0,0,1,50,30 A 20,20,0,0,1,90,30 Q 90,60,50,90 Q 10,60,10,30 Z'/%3E%3C/svg%3E");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-    #page-frame span:nth-child(1) { top:    5px; left:  5px; transform: rotate(-45deg); }
-    #page-frame span:nth-child(2) { top:    5px; right: 5px; transform: rotate(45deg); }
-    #page-frame span:nth-child(3) { bottom: 5px; left:  5px; transform: rotate(-135deg); }
-    #page-frame span:nth-child(4) { bottom: 5px; right: 5px; transform: rotate(135deg); }
 
     /* ---- Card fade-in ---- */
     @keyframes card-fadein {
@@ -612,7 +643,7 @@
       height: 0.65em;
       margin-right: 0.38em;
       vertical-align: middle;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='10 10 80 80'%3E%3Cpath fill='%237c3faa' d='M 10,30 A 20,20,0,0,1,50,30 A 20,20,0,0,1,90,30 Q 90,60,50,90 Q 10,60,10,30 Z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='10 10 80 80'%3E%3Cpath fill='%233a1660' d='M 10,30 A 20,20,0,0,1,50,30 A 20,20,0,0,1,90,30 Q 90,60,50,90 Q 10,60,10,30 Z'/%3E%3C/svg%3E");
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -704,6 +735,15 @@
       #mascot-wrap img { width: 130px; }
       #mascot-bubble { font-size: 0.72rem; padding: 6px 11px; }
     }
+    @keyframes mascot-bounce {
+      0%   { transform: translateY(0); }
+      28%  { transform: translateY(-14px); }
+      55%  { transform: translateY(-5px); }
+      72%  { transform: translateY(-10px); }
+      88%  { transform: translateY(-2px); }
+      100% { transform: translateY(0); }
+    }
+    #mascot-wrap img.mascot-bounce { animation: mascot-bounce 0.55s ease both; }
   </style>
 </head>
 <body>
@@ -712,7 +752,10 @@
   <img src="/gloli.png" alt="">
   <div class="loading-title">mortlace</div>
 </div>
-<div id="page-frame"><span></span><span></span><span></span><span></span></div>
+<button id="scroll-top" aria-label="Scroll to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+<div id="page-frame"></div>
 <div id="toast"></div>
 <h1>mortlace</h1>
 
@@ -791,6 +834,11 @@
       <tbody id="w-list"></tbody>
     </table>
   </div>
+  <div id="w-empty" class="empty-state" style="display:none">
+    <div class="empty-icon"></div>
+    <p class="empty-msg">まだ何も登録されていないわ</p>
+    <p class="empty-sub">上のフォームから追加してみて</p>
+  </div>
 </div>
 
 <!-- edit modal -->
@@ -831,6 +879,17 @@
   </div>
 </div>
 
+<!-- confirm modal -->
+<div id="confirm-modal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="max-width:360px">
+    <p id="confirm-msg" style="margin:0 0 22px;line-height:1.6;font-size:0.95rem"></p>
+    <div class="modal-footer">
+      <button id="confirm-cancel">キャンセル</button>
+      <button id="confirm-ok" class="del">削除</button>
+    </div>
+  </div>
+</div>
+
 <!-- image viewer -->
 <div id="img-modal" style="display:none;position:fixed;inset:0;background:rgba(4,4,4,0.90);z-index:200;cursor:pointer" onclick="this.style.display='none'">
   <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #a8a4b8">
@@ -853,6 +912,11 @@
       <tbody id="col-list"></tbody>
     </table>
   </div>
+  <div id="col-empty" class="empty-state" style="display:none">
+    <div class="empty-icon"></div>
+    <p class="empty-msg">コレクションはまだ空よ</p>
+    <p class="empty-sub">アイテムを「Owned」にすると追加されるわ</p>
+  </div>
 </div>
 
 <!-- archive -->
@@ -870,6 +934,10 @@
       <thead><tr><th class="col-img">Image</th><th>Name</th><th>Brand</th><th>Price</th><th>Archived</th><th></th></tr></thead>
       <tbody id="arc-list"></tbody>
     </table>
+  </div>
+  <div id="arc-empty" class="empty-state" style="display:none">
+    <p class="empty-msg">アーカイブは空よ</p>
+    <p class="empty-sub">アイテムを「Archive」するとここに来るわ</p>
   </div>
 </div>
 
@@ -915,7 +983,7 @@
 let _toastTimer;
 function showToast(msg) {
   const el = get('toast');
-  el.textContent = msg;
+  el.innerHTML = `<span class="t-icon"></span><span>${esc(msg)}</span>`;
   el.classList.add('show');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
@@ -928,9 +996,29 @@ function show(id, btn) {
   btn.classList.add('active');
   if (id === 'archive') loadArchive();
   if (id === 'collection') loadCollection();
+  const _tabMsgs = {
+    wishlist:   ['ほしいものリスト、また増えた？', 'どれが一番ほしいの？', 'チェックしに来たの？'],
+    collection: ['コレクション眺めてるの？', 'お気に入りが増えてきたね！', 'いいもの持ってるじゃない'],
+    archive:    ['昔ほしかったものね…', 'アーカイブを掘り返してるの？', 'また気になってきた？'],
+    brands:     ['ブランド整理してるの？マメね', 'お気に入りブランドはどこ？'],
+    categories: ['カテゴリの管理ね', 'きちんと分類してるのね'],
+  };
+  const _tm = _tabMsgs[id];
+  if (_tm && window.mascotSay) window.mascotSay(_tm[Math.floor(Math.random() * _tm.length)]);
 }
 
 const get = id => document.getElementById(id);
+
+function showConfirm(msg, onOk) {
+  get('confirm-msg').textContent = msg;
+  const modal = get('confirm-modal');
+  modal.style.display = 'flex';
+  const ok  = get('confirm-ok');
+  const cancel = get('confirm-cancel');
+  const close = () => { modal.style.display = 'none'; ok.onclick = null; cancel.onclick = null; };
+  ok.onclick     = () => { close(); onOk(); };
+  cancel.onclick = () => close();
+}
 const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 async function api(path, opt) {
@@ -1015,6 +1103,7 @@ function renderItems() {
     });
   }
   renderSummary(isFiltered ? items : null, isFiltered ? _items.length : null);
+  get('w-empty').style.display = items.length ? 'none' : '';
   get('w-list').innerHTML = items.length ? items.map((i, idx) => `<tr class="card-anim${i.priority === 'GRAIL' ? ' grail' : ''}" style="animation-delay:${idx*0.12}s">
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
     <td data-label="URL" title="${esc(i.url)}"><span class="url-value"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a></span></td>
@@ -1071,6 +1160,15 @@ async function addItem() {
   get('w-brand').value = get('w-category').value = '';
   showToast('Item added.');
   loadItems();
+  if (window.mascotSay) {
+    const _n = name.length > 10 ? name.slice(0, 10) + '…' : name;
+    if (body.priority === 'GRAIL') {
+      window.mascotSay(_n ? `「${_n}」がグレイル！？本気なの…` : 'グレイルを登録したの…本命ね');
+    } else {
+      const _ms = ['また増やしたの！', '物欲が止まらないのね…', 'ほしいものリストが育ってる…', 'どんどん増えてくじゃない'];
+      window.mascotSay(_ms[Math.floor(Math.random() * _ms.length)]);
+    }
+  }
 }
 
 function statusOptions(current) {
@@ -1085,7 +1183,11 @@ async function updateStatus(id, sel) {
   await api('/wishlist/'+id+'/status?status='+status, {method:'PATCH'});
   if (status === 'OWNED') {
     showToast('Moved to Collection.');
+    if (window.mascotSay) window.mascotSay('やった！ゲットしたのね！おめでとう！');
     loadItems();
+  } else if (status === 'ORDERED' && window.mascotSay) {
+    const _ms = ['注文したの！楽しみね！', 'もうすぐ届くね！わくわく！', '早く届くといいね！'];
+    window.mascotSay(_ms[Math.floor(Math.random() * _ms.length)]);
   }
 }
 
@@ -1101,6 +1203,7 @@ async function loadCollection() {
   } else {
     bar.innerHTML = '';
   }
+  get('col-empty').style.display = items.length ? 'none' : '';
   get('col-list').innerHTML = items.length ? items.map((i, idx) => `<tr class="card-anim${i.priority === 'GRAIL' ? ' grail' : ''}" style="animation-delay:${idx*0.12}s">
     ${i.imageUrl ? `<td class="col-img" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
     <td data-label="Name"><a href="${esc(i.url)}" target="_blank">${esc(i.name || i.url)}</a></td>
@@ -1121,6 +1224,10 @@ async function moveToWanted(id) {
 async function archiveItem(id) {
   await api('/wishlist/'+id, {method:'DELETE'});
   showToast('Item archived.');
+  if (window.mascotSay) {
+    const _ms = ['諦めたの…？', 'また気が変わったら戻せるわよ', 'ま、縁がなかったのね…'];
+    window.mascotSay(_ms[Math.floor(Math.random() * _ms.length)]);
+  }
   loadItems();
 }
 
@@ -1131,15 +1238,16 @@ async function restoreItem(id) {
 }
 
 async function delItemPermanent(id) {
-  if (confirm('Permanently delete? This cannot be undone.')) {
+  showConfirm('完全に削除しますか？この操作は元に戻せません。', async () => {
     await api('/wishlist/'+id+'/permanent', {method:'DELETE'});
     showToast('Item deleted.');
     loadArchive();
-  }
+  });
 }
 
 async function loadArchive() {
   const items = await (await api('/wishlist/deleted')).json();
+  get('arc-empty').style.display = items.length ? 'none' : '';
   get('arc-list').innerHTML = items.length ? items.map((i, idx) => `<tr class="card-anim${i.priority === 'GRAIL' ? ' grail' : ''}" style="animation-delay:${idx*0.12}s">
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : '<td class="col-img" data-label=""></td>'}
     <td data-label="Name"><a href="${esc(i.url)}" target="_blank">${esc(i.name || i.url)}</a></td>
@@ -1235,9 +1343,14 @@ async function saveItem() {
     fd.append('file', imgFile);
     await api('/wishlist/'+id+'/image', { method:'POST', body:fd });
   }
+  const _savedPriority = body.priority;
   closeEdit();
   showToast('Item saved.');
   loadItems();
+  if (window.mascotSay) {
+    if (_savedPriority === 'GRAIL') window.mascotSay('グレイルに格上げしたの！？気合い入ってるね…');
+    else { const _ms = ['ちゃんと更新したのね', '保存完了よ', '直したの？えらいえらい']; window.mascotSay(_ms[Math.floor(Math.random() * _ms.length)]); }
+  }
 }
 
 // ---- Brands ----
@@ -1270,7 +1383,7 @@ async function addBrand() {
 }
 
 async function delBrand(id) {
-  if (confirm('Delete this brand?')) { await api('/brands/'+id, {method:'DELETE'}); loadBrands(); }
+  showConfirm('このブランドを削除しますか？', async () => { await api('/brands/'+id, {method:'DELETE'}); loadBrands(); });
 }
 
 function editBrand(id, name, url) {
@@ -1323,7 +1436,7 @@ async function addCategory() {
 }
 
 async function delCategory(id) {
-  if (confirm('Delete this category?')) { await api('/categories/'+id, {method:'DELETE'}); loadCategories(); }
+  showConfirm('このカテゴリを削除しますか？', async () => { await api('/categories/'+id, {method:'DELETE'}); loadCategories(); });
 }
 
 function editCategory(id, name) {
@@ -1402,6 +1515,12 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
         el.style.animation = '';
         el.style.animationDelay = (idx * 0.07) + 's';
       });
+      setTimeout(() => {
+        if (window.mascotSay) {
+          const _gs = ['いらっしゃい！今日もチェックしに来たの？', 'おかえり！ほしいものは増えてる？', 'こんにちは！何か気になるものある？', 'また来たの？うれしい！'];
+          window.mascotSay(_gs[Math.floor(Math.random() * _gs.length)]);
+        }
+      }, 600);
     }, 550);
   }, wait);
 });
@@ -1486,15 +1605,23 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  function showBubble() {
-    _bubble.textContent = _pickMsg();
+  window.mascotSay = function(msg, duration) {
+    _bubble.textContent = msg;
     _bubble.style.opacity = '1';
     clearTimeout(_bubbleTimer);
-    _bubbleTimer = setTimeout(() => { _bubble.style.opacity = ''; }, 3500);
-  }
+    _bubbleTimer = setTimeout(() => { _bubble.style.opacity = ''; }, duration || 4000);
+  };
 
-  // Hover
-  el.addEventListener('mouseenter', showBubble);
+  function showBubble() { window.mascotSay(_pickMsg()); }
+
+  // Hover: bounce animation
+  const _img = el.querySelector('img');
+  _img.addEventListener('mouseenter', () => {
+    _img.classList.remove('mascot-bounce');
+    void _img.offsetWidth;
+    _img.classList.add('mascot-bounce');
+  });
+  _img.addEventListener('animationend', () => _img.classList.remove('mascot-bounce'));
 
   // Random auto-speak: every 8–20 seconds
   function scheduleSpeak() {
@@ -1503,31 +1630,49 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
   }
   scheduleSpeak();
 
+  // Drag + click detection
+  let _dragMoved = false, _startX = 0, _startY = 0;
   el.addEventListener('mousedown', e => {
-    active = true;
+    active = true; _dragMoved = false;
+    _startX = e.clientX; _startY = e.clientY;
     const r = el.getBoundingClientRect();
     ox = e.clientX - r.left; oy = e.clientY - r.top;
     e.preventDefault();
   });
   document.addEventListener('mousemove', e => {
     if (!active) return;
+    if (!_dragMoved && Math.abs(e.clientX - _startX) + Math.abs(e.clientY - _startY) > 5) _dragMoved = true;
     applyPos(e.clientX - ox, e.clientY - oy);
   });
-  document.addEventListener('mouseup', () => { if (active) { active = false; savePos(); } });
+  document.addEventListener('mouseup', () => {
+    if (active) { active = false; if (!_dragMoved) showBubble(); else savePos(); }
+  });
 
+  // Touch drag + tap detection
+  let _touchMoved = false;
   el.addEventListener('touchstart', e => {
-    active = true;
+    active = true; _touchMoved = false;
     const t = e.touches[0], r = el.getBoundingClientRect();
     ox = t.clientX - r.left; oy = t.clientY - r.top;
     e.preventDefault();
   }, { passive: false });
   document.addEventListener('touchmove', e => {
     if (!active) return;
+    _touchMoved = true;
     const t = e.touches[0];
     applyPos(t.clientX - ox, t.clientY - oy);
     e.preventDefault();
   }, { passive: false });
-  document.addEventListener('touchend', () => { if (active) { active = false; savePos(); } });
+  document.addEventListener('touchend', () => {
+    if (active) { active = false; if (!_touchMoved) showBubble(); else savePos(); }
+  });
+})();
+
+// ---- Scroll to top ----
+(function() {
+  const btn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => btn.classList.toggle('visible', window.scrollY > 220), { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 })();
 
 if ('serviceWorker' in navigator) {
