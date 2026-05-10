@@ -705,7 +705,8 @@
       user-select: none;
       pointer-events: none;
     }
-    #mascot-wrap img { width: 320px; display: block; pointer-events: auto; cursor: pointer; }
+    #mascot-wrap img { width: 320px; display: block; pointer-events: auto; cursor: grab; }
+    #mascot-wrap img:active { cursor: grabbing; }
     #mascot-bubble {
       position: absolute;
       bottom: calc(100% + 12px);
@@ -1596,13 +1597,61 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
     _img.classList.add('mascot-bounce');
   });
   _img.addEventListener('animationend', () => _img.classList.remove('mascot-bounce'));
-  _img.addEventListener('click', showBubble);
 
   function scheduleSpeak() {
     const delay = 8000 + Math.random() * 12000;
     setTimeout(() => { showBubble(); scheduleSpeak(); }, delay);
   }
   scheduleSpeak();
+
+  // Drag
+  let ox = 0, oy = 0, active = false, _dragMoved = false, _startX = 0, _startY = 0;
+
+  function applyPos(x, y) {
+    x = Math.max(0, Math.min(x, window.innerWidth  - el.offsetWidth));
+    y = Math.max(0, Math.min(y, window.innerHeight - el.offsetHeight));
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.style.right = 'auto'; el.style.bottom = 'auto';
+  }
+  function savePos() {
+    localStorage.setItem('mascot-pos-v3', JSON.stringify({ left: el.offsetLeft, top: el.offsetTop }));
+  }
+
+  const _saved = JSON.parse(localStorage.getItem('mascot-pos-v3') || 'null');
+  if (_saved) applyPos(_saved.left, _saved.top);
+
+  _img.addEventListener('mousedown', e => {
+    active = true; _dragMoved = false;
+    _startX = e.clientX; _startY = e.clientY;
+    const r = el.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!active) return;
+    if (!_dragMoved && Math.abs(e.clientX - _startX) + Math.abs(e.clientY - _startY) > 5) _dragMoved = true;
+    applyPos(e.clientX - ox, e.clientY - oy);
+  });
+  document.addEventListener('mouseup', () => {
+    if (active) { active = false; if (!_dragMoved) showBubble(); else savePos(); }
+  });
+
+  let _touchMoved = false;
+  _img.addEventListener('touchstart', e => {
+    active = true; _touchMoved = false;
+    const t = e.touches[0], r = el.getBoundingClientRect();
+    ox = t.clientX - r.left; oy = t.clientY - r.top;
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchmove', e => {
+    if (!active) return;
+    _touchMoved = true;
+    applyPos(e.touches[0].clientX - ox, e.touches[0].clientY - oy);
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchend', () => {
+    if (active) { active = false; if (!_touchMoved) showBubble(); else savePos(); }
+  });
 })();
 
 // ---- Scroll to top ----
