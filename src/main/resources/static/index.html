@@ -79,6 +79,8 @@
       font-size: 0.9rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+    input, select { height: 36px; }
+    textarea { height: auto; }
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--accent);
@@ -470,43 +472,51 @@
       #w-brand, #w-category { flex: 1 1 120px; }
     }
 
+    /* ---- 480px: 中間サイズ ---- */
+    @media (max-width: 480px) {
+      #wishlist tbody, #archive tbody, #collection tbody {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* ---- 600px: モバイル ---- */
     @media (max-width: 600px) {
-      body { padding: 12px 10px; border-left: none; border-right: none; }
+      /* フレーム(10px) + 余白(10px) = 20px サイドパディング */
+      body { padding: 16px 20px; border-left: none; border-right: none; }
 
-      /* タブ: 2行折り返し、サイズは縮めない */
+      /* タブ */
       .tabs { flex-wrap: wrap; gap: 3px; }
-      .tabs button { padding: 7px 12px; font-size: 0.85rem; letter-spacing: 0; }
+      .tabs button { padding: 7px 10px; font-size: 0.82rem; letter-spacing: 0; }
 
-      /* Add form: 入力を100%、ボタンも100% */
+      /* Add form */
       .form-row input, .form-row select, .form-row button { flex: 1 1 100%; }
       #w-url, #w-name, #w-brand, #w-category,
       #w-price, #w-priority, #w-notes, #w-image-url { flex: 1 1 100%; }
 
-      /* フィルターバー: 2カラムグリッドに */
-      .filter-bar {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-      }
+      /* フィルターバー */
+      .filter-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
       #f-search { grid-column: 1 / -1; }
       #f-clear  { grid-column: 1 / -1; }
 
-      /* ソートバー: スペーサーのみ非表示、Colsボタンは表示 */
+      /* ソートバー */
       .sort-sep { display: none; }
+      .sort-label, .col-label { display: none; }
+      .sort-bar { gap: 4px; }
+      .sort-bar button { padding: 3px 8px; font-size: 0.76rem; }
 
       /* カード: 1カラム */
       #wishlist tbody, #archive tbody, #collection tbody { grid-template-columns: 1fr; }
-      #wishlist td.col-img, #collection td.col-img { height: 200px; }
-      #archive td.col-img { height: 150px; }
+      #wishlist td.col-img, #collection td.col-img { height: 180px; }
+      #archive td.col-img { height: 140px; }
       #wishlist td::before, #archive td::before, #collection td::before { min-width: 52px; font-size: 0.75rem; }
 
-      /* カードのボタン: 小さめに */
+      /* カードのボタン */
       #wishlist td.col-actions button,
       #archive td.col-actions button,
       #collection td.col-actions button { font-size: 0.78rem; padding: 4px 10px; }
 
-      /* モーダル */
-      .modal-box { margin: 8px; padding: 16px; max-height: calc(100vh - 16px); }
+      /* モーダル: フレーム(10px×2) + 余白を考慮 */
+      .modal-box { margin: 12px; padding: 16px; max-height: calc(100vh - 44px); }
 
       /* ブランド・カテゴリーテーブル */
       #brands table, #categories table { font-size: 0.8rem; }
@@ -514,10 +524,98 @@
 
       /* サマリーバー */
       #summary-bar { font-size: 0.78rem; padding: 6px 10px; gap: 4px 8px; }
+
+      /* ローディング */
+      #loading-screen img { width: 160px; }
     }
 
+    /* ---- 400px: 極小 ---- */
     @media (max-width: 400px) {
-      h1 { font-size: 1.3rem; margin-bottom: 18px; }
+      body { padding: 12px 16px; }
+      h1 { font-size: 1.3rem; margin-bottom: 16px; }
+      #wishlist tbody, #archive tbody, #collection tbody { grid-template-columns: 1fr; }
+    }
+
+    /* ---- Page frame ---- */
+    #page-frame {
+      position: fixed;
+      inset: 10px;
+      pointer-events: none;
+      z-index: 41;
+      border-radius: 10px;
+      box-shadow: 0 0 0 10px #7c3faa;
+    }
+    #page-frame::before, #page-frame::after,
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      background: #7c3faa;
+      pointer-events: none;
+      z-index: 40;
+    }
+    #page-frame::before { top: 0; left: 0; right: 0; height: 10px; }
+    #page-frame::after  { bottom: 0; left: 0; right: 0; height: 10px; }
+    body::before { top: 0; left: 0; bottom: 0; width: 10px; }
+    body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
+    #page-frame span {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='10 10 80 80'%3E%3Cpath fill='%237c3faa' d='M 10,30 A 20,20,0,0,1,50,30 A 20,20,0,0,1,90,30 Q 90,60,50,90 Q 10,60,10,30 Z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    #page-frame span:nth-child(1) { top:    5px; left:  5px; transform: rotate(-45deg); }
+    #page-frame span:nth-child(2) { top:    5px; right: 5px; transform: rotate(45deg); }
+    #page-frame span:nth-child(3) { bottom: 5px; left:  5px; transform: rotate(-135deg); }
+    #page-frame span:nth-child(4) { bottom: 5px; right: 5px; transform: rotate(135deg); }
+
+    /* ---- Card fade-in ---- */
+    @keyframes card-fadein {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-anim { animation: card-fadein 0.4s ease-out both; }
+
+    /* ---- Grail card ---- */
+    #wishlist tr.grail,
+    #collection tr.grail,
+    #archive tr.grail {
+      border: 2px solid transparent;
+      background: linear-gradient(var(--card), var(--card)) padding-box,
+                  linear-gradient(135deg, #8b6010, #d4a020, #f8e060, #fffaaa, #f8e060, #d4a020, #8b6010) border-box;
+      box-shadow: 0 0 16px rgba(210, 160, 30, 0.18);
+    }
+    #wishlist tr.grail:hover,
+    #collection tr.grail:hover {
+      box-shadow: 0 0 24px rgba(230, 180, 40, 0.32);
+    }
+
+    /* ---- Heart decorations ---- */
+    h1::before, h1::after {
+      content: '';
+      display: inline-block;
+      width: 0.55em;
+      height: 0.55em;
+      margin: 0 0.45em;
+      vertical-align: middle;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='10 10 80 80'%3E%3Cpath fill='none' stroke='%237a658e' stroke-width='8' d='M 10,30 A 20,20,0,0,1,50,30 A 20,20,0,0,1,90,30 Q 90,60,50,90 Q 10,60,10,30 Z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 0.65em;
+      height: 0.65em;
+      margin-right: 0.38em;
+      vertical-align: middle;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='10 10 80 80'%3E%3Cpath fill='%237c3faa' d='M 10,30 A 20,20,0,0,1,50,30 A 20,20,0,0,1,90,30 Q 90,60,50,90 Q 10,60,10,30 Z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
     }
 
     /* ---- Loading screen ---- */
@@ -614,6 +712,7 @@
   <img src="/gloli.png" alt="">
   <div class="loading-title">mortlace</div>
 </div>
+<div id="page-frame"><span></span><span></span><span></span><span></span></div>
 <div id="toast"></div>
 <h1>mortlace</h1>
 
@@ -916,7 +1015,7 @@ function renderItems() {
     });
   }
   renderSummary(isFiltered ? items : null, isFiltered ? _items.length : null);
-  get('w-list').innerHTML = items.length ? items.map(i => `<tr>
+  get('w-list').innerHTML = items.length ? items.map((i, idx) => `<tr class="card-anim${i.priority === 'GRAIL' ? ' grail' : ''}" style="animation-delay:${idx*0.12}s">
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
     <td data-label="URL" title="${esc(i.url)}"><span class="url-value"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a></span></td>
     <td data-label="Name" title="${esc(i.name)}">${esc(i.name)}</td>
@@ -1002,7 +1101,7 @@ async function loadCollection() {
   } else {
     bar.innerHTML = '';
   }
-  get('col-list').innerHTML = items.length ? items.map(i => `<tr>
+  get('col-list').innerHTML = items.length ? items.map((i, idx) => `<tr class="card-anim${i.priority === 'GRAIL' ? ' grail' : ''}" style="animation-delay:${idx*0.12}s">
     ${i.imageUrl ? `<td class="col-img" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
     <td data-label="Name"><a href="${esc(i.url)}" target="_blank">${esc(i.name || i.url)}</a></td>
     <td data-label="Brand">${esc(i.brand?.name)}</td>
@@ -1041,7 +1140,7 @@ async function delItemPermanent(id) {
 
 async function loadArchive() {
   const items = await (await api('/wishlist/deleted')).json();
-  get('arc-list').innerHTML = items.length ? items.map(i => `<tr>
+  get('arc-list').innerHTML = items.length ? items.map((i, idx) => `<tr class="card-anim${i.priority === 'GRAIL' ? ' grail' : ''}" style="animation-delay:${idx*0.12}s">
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : '<td class="col-img" data-label=""></td>'}
     <td data-label="Name"><a href="${esc(i.url)}" target="_blank">${esc(i.name || i.url)}</a></td>
     <td data-label="Brand">${esc(i.brand?.name)}</td>
@@ -1295,7 +1394,15 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
   setTimeout(() => {
     const ls = document.getElementById('loading-screen');
     ls.classList.add('fade-out');
-    setTimeout(() => ls.remove(), 550);
+    setTimeout(() => {
+      ls.remove();
+      document.querySelectorAll('.card-anim').forEach((el, idx) => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+        el.style.animationDelay = (idx * 0.07) + 's';
+      });
+    }, 550);
   }, wait);
 });
 
@@ -1344,13 +1451,43 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
     '気になるなら、すぐ追加したほうがいいわよ',
     'ちゃんと予算は大丈夫？',
   ];
-  let _mi = 0;
   const _bubble = document.getElementById('mascot-bubble');
   let _bubbleTimer = null;
 
+  function _trunc(n, max) {
+    return n && n.length > max ? n.slice(0, max) + '…' : (n || '???');
+  }
+
+  function _pickMsg() {
+    if (!_items.length) return _msgs[Math.floor(Math.random() * _msgs.length)];
+    const MAX = 10;
+    const dyn = [];
+    dyn.push(`${_items.length}個も登録してるの…`);
+    const priced = _items.filter(i => i.price != null);
+    if (priced.length) {
+      const total = priced.reduce((s, i) => s + Number(i.price), 0);
+      dyn.push(`合計¥${total.toLocaleString()}…大丈夫？`);
+      const top = priced.reduce((a, b) => Number(a.price) >= Number(b.price) ? a : b);
+      if (top.name) dyn.push(`¥${Number(top.price).toLocaleString()}は高いわね…`);
+    }
+    const grails = _items.filter(i => i.priority === 'GRAIL');
+    if (grails.length) {
+      const g = grails[Math.floor(Math.random() * grails.length)];
+      if (g.name) dyn.push(`「${_trunc(g.name, MAX)}」がグレイルなの？`);
+    }
+    const ordered = _items.filter(i => i.status === 'ORDERED');
+    if (ordered.length) dyn.push(`${ordered.length}個注文中ね。楽しみ！`);
+    const named = _items.filter(i => i.name);
+    if (named.length) {
+      const r = named[Math.floor(Math.random() * named.length)];
+      dyn.push(`「${_trunc(r.name, MAX)}」はもう手に入れた？`);
+    }
+    const pool = [..._msgs, ...dyn];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
   function showBubble() {
-    _bubble.textContent = _msgs[_mi % _msgs.length];
-    _mi++;
+    _bubble.textContent = _pickMsg();
     _bubble.style.opacity = '1';
     clearTimeout(_bubbleTimer);
     _bubbleTimer = setTimeout(() => { _bubble.style.opacity = ''; }, 3500);
@@ -1396,6 +1533,7 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
+
 
 </script>
 </body>
