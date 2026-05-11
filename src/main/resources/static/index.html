@@ -301,6 +301,7 @@
     #wishlist td[data-label="URL"] .url-value {
       display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0;
     }
+    .favicon { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; }
     #wishlist td[data-label="URL"] a {
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       min-width: 0; flex: 1;
@@ -1169,7 +1170,7 @@ function renderItems() {
   get('w-empty').style.display = items.length ? 'none' : '';
   get('w-list').innerHTML = items.length ? items.map((i, idx) => `<tr class="card-anim${i.priority === 'GRAIL' ? ' grail' : ''}" style="animation-delay:${idx*0.12}s">
     ${i.imageUrl ? `<td class="col-img" data-label="" onclick="viewImg('${esc(i.imageUrl)}')"><img src="${esc(i.imageUrl)}" alt="image"></td>` : ''}
-    <td data-label="URL" title="${esc(i.url)}"><span class="url-value"><a href="${esc(i.url)}" target="_blank">${esc((() => { try { return new URL(i.url).hostname; } catch(e) { return i.url; } })())}</a></span></td>
+    ${(() => { try { const h = new URL(i.url).hostname; return `<td data-label="URL" title="${esc(i.url)}"><span class="url-value"><img class="favicon" src="https://www.google.com/s2/favicons?domain=${h}&sz=16" onerror="this.style.display='none'" alt=""><a href="${esc(i.url)}" target="_blank">${esc(h)}</a></span></td>`; } catch(e) { return `<td data-label="URL" title="${esc(i.url)}"><span class="url-value"><a href="${esc(i.url)}" target="_blank">${esc(i.url)}</a></span></td>`; } })()}
     <td data-label="Name" title="${esc(i.name)}">${esc(i.name)}</td>
     <td data-label="Brand" title="${esc(i.brand?.name)}">${esc(i.brand?.name)}</td>
     <td data-label="Category" title="${esc(i.category?.name)}">${esc(i.category?.name)}</td>
