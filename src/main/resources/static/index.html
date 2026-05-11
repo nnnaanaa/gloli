@@ -392,7 +392,7 @@
 
     #w-url                     { flex: 1 1 260px; }
     #w-name                    { flex: 2 1 160px; }
-    #w-brand, #w-category      { flex: 1 1 110px; }
+    #w-brand, .sel-add-wrap { flex: 1 1 110px; }
     #w-priority                { flex: 0 1 100px; }
     #w-price                   { flex: 0 0 90px; }
     #w-notes, #w-image-url     { flex: 2 1 160px; }
@@ -432,6 +432,13 @@
     .modal-box h3 { margin: 0 0 18px; }
     .modal-grid { display: grid; gap: 8px; }
     .modal-grid input, .modal-grid select { width: 100%; }
+    .sel-add-wrap { display: flex; gap: 4px; }
+    .sel-add-wrap select { flex: 1; min-width: 0; width: auto !important; }
+    .sel-add-wrap .add-btn { flex-shrink: 0; padding: 4px 10px; font-size: 1rem; line-height: 1; }
+    .inline-cat { display: none; margin-top: 4px; }
+    .inline-cat.open { display: flex; gap: 4px; }
+    .inline-cat input { flex: 1; min-width: 0; }
+    .inline-cat button { flex-shrink: 0; }
     .modal-footer { margin-top: 18px; display: flex; gap: 8px; justify-content: flex-end; }
     .modal-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 2px; display: block; }
     .img-preview { width: 100%; max-height: 200px; object-fit: contain; border: 1px solid var(--border); margin-top: 6px; display: none; }
@@ -541,7 +548,7 @@
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
       #w-name { flex: 1 1 100%; }
-      #w-brand, #w-category { flex: 1 1 120px; }
+      #w-brand, .sel-add-wrap { flex: 1 1 120px; }
     }
 
     /* ---- Add form collapse (mobile only) ---- */
@@ -564,8 +571,9 @@
 
 
       .form-row input, .form-row select, .form-row button { flex: 1 1 100%; }
-      #w-url, #w-name, #w-brand, #w-category,
+      #w-url, #w-name, #w-brand, .sel-add-wrap,
       #w-price, #w-priority, #w-notes, #w-image-url { flex: 1 1 100%; }
+      .inline-cat.open { flex: 1 1 100%; }
 
       .filter-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
       #f-search { grid-column: 1 / -1; }
@@ -867,7 +875,15 @@
     <div class="form-row">
       <input id="w-name" placeholder="Name">
       <select id="w-brand"><option value="">Brand</option></select>
-      <select id="w-category"><option value="">Category</option></select>
+      <div class="sel-add-wrap" style="flex:1 1 110px">
+        <select id="w-category"><option value="">Category</option></select>
+        <button type="button" class="add-btn" onclick="openInlineCat('w-category')" title="カテゴリを追加">＋</button>
+      </div>
+      <div id="w-category-new" class="inline-cat">
+        <input id="w-cat-input" placeholder="新しいカテゴリ名">
+        <button onclick="confirmInlineCat('w-category')">OK</button>
+        <button onclick="closeInlineCat('w-category')">✕</button>
+      </div>
     </div>
     <div class="form-row">
       <input id="w-price" type="number" placeholder="Price">
@@ -940,7 +956,15 @@
       <button onclick="fetchInfo(this,'edit')" style="width:100%;margin:2px 0">Fetch</button>
       <input id="edit-name" placeholder="Name">
       <select id="edit-brand"><option value="">Brand</option></select>
-      <select id="edit-category"><option value="">Category</option></select>
+      <div class="sel-add-wrap">
+        <select id="edit-category"><option value="">Category</option></select>
+        <button type="button" class="add-btn" onclick="openInlineCat('edit-category')" title="カテゴリを追加">＋</button>
+      </div>
+      <div id="edit-category-new" class="inline-cat">
+        <input id="edit-cat-input" placeholder="新しいカテゴリ名">
+        <button onclick="confirmInlineCat('edit-category')">OK</button>
+        <button onclick="closeInlineCat('edit-category')">✕</button>
+      </div>
       <input id="edit-price" type="number" placeholder="Price">
       <select id="edit-priority">
         <option value="LOW">Low</option>
@@ -1543,11 +1567,40 @@ async function saveBrand(id) {
   loadBrands();
 }
 
+// ---- Inline category creation ----
+function openInlineCat(selId) {
+  const wrap = get(selId + '-new');
+  wrap.classList.add('open');
+  const inp = get(selId === 'w-category' ? 'w-cat-input' : 'edit-cat-input');
+  inp.value = '';
+  inp.focus();
+  inp.onkeydown = e => { if (e.key === 'Enter') confirmInlineCat(selId); if (e.key === 'Escape') closeInlineCat(selId); };
+}
+function closeInlineCat(selId) {
+  get(selId + '-new').classList.remove('open');
+}
+async function confirmInlineCat(selId) {
+  const inp = get(selId === 'w-category' ? 'w-cat-input' : 'edit-cat-input');
+  const name = inp.value.trim();
+  if (!name) return;
+  try {
+    const res = await api('/categories', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) });
+    const created = await res.json();
+    await loadCategories();
+    get(selId).value = created.id;
+    closeInlineCat(selId);
+    showToast(`カテゴリ「${esc(name)}」を追加しました`);
+  } catch(s) {
+    if (s === 409) showToast('このカテゴリはすでに存在します');
+  }
+}
+
 // ---- Categories ----
 async function loadCategories() {
   const cats = await (await api('/categories')).json();
-  ['w-category'].forEach(sid => {
+  ['w-category', 'edit-category'].forEach(sid => {
     const sel = get(sid);
+    if (!sel) return;
     const cur = sel.value;
     sel.innerHTML = '<option value="">Category</option>' + cats.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
     sel.value = cur;
