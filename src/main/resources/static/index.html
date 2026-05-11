@@ -306,31 +306,77 @@
       min-width: 0; flex: 1;
     }
 
-    .tabs {
+    /* ---- Hamburger + Drawer ---- */
+    .site-header {
+      position: relative;
       display: flex;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 3px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
     }
-    .tabs button {
+    .site-header h1 { margin-bottom: 0; }
+    #menu-btn {
+      position: absolute;
+      right: 0;
       background: transparent;
-      color: var(--muted);
       border: 1px solid var(--border);
-      border-bottom: none;
-      border-radius: 6px 6px 0 0;
-      padding: 7px 16px;
-      margin-bottom: -1px;
-      white-space: nowrap;
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
-    .tabs button.active {
+    .hbg-bar {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--accent-lt);
+      border-radius: 2px;
+      transition: transform 0.22s ease, opacity 0.22s ease;
+    }
+    #menu-btn.open .hbg-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    #menu-btn.open .hbg-bar:nth-child(2) { opacity: 0; }
+    #menu-btn.open .hbg-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    #drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 200;
+    }
+    #drawer-backdrop.open { display: block; }
+
+    #drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 220px;
       background: var(--card);
-      color: var(--accent-lt);
-      border-bottom: 1px solid var(--card);
-      font-weight: 600;
+      border-right: 1px solid var(--border);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 12px 24px;
+      gap: 4px;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .tabs button:hover:not(.active) { background: rgba(168,164,184,0.08); opacity: 1; }
+    #drawer.open { transform: translateX(0); }
+    .drawer-item {
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: left;
+      color: var(--muted);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      font-family: var(--font-body);
+    }
+    .drawer-item:hover:not(.active) { background: rgba(168,164,184,0.08); color: var(--text); }
+    .drawer-item.active { background: rgba(168,101,212,0.18); color: var(--accent-lt); font-weight: 600; }
 
     @keyframes tab-fadein {
       from { opacity: 0; transform: translateY(8px); }
@@ -503,7 +549,6 @@
       body::before, body::after { display: none; }
       #page-frame { display: none; }
 
-      .tabs button { padding: 7px 10px; font-size: 0.82rem; letter-spacing: 0; }
 
       .form-row input, .form-row select, .form-row button { flex: 1 1 100%; }
       #w-url, #w-name, #w-brand, #w-category,
@@ -543,7 +588,6 @@
     @media (max-width: 400px) {
       body { padding: 12px 14px; }
       h1 { font-size: 1.3rem; margin-bottom: 16px; }
-      .tabs button { padding: 6px 8px; font-size: 0.78rem; }
     }
 
     /* ---- Empty state ---- */
@@ -754,15 +798,23 @@
 </button>
 <div id="page-frame"></div>
 <div id="toast"></div>
-<h1>mortlace</h1>
-
-<div class="tabs">
-  <button class="active" onclick="show('wishlist',this)">Items</button>
-  <button onclick="show('collection',this)">Collection</button>
-  <button onclick="show('archive',this)">Archive</button>
-  <button onclick="show('brands',this)">Brands</button>
-  <button onclick="show('categories',this)">Categories</button>
+<div class="site-header">
+  <h1>mortlace</h1>
+  <button id="menu-btn" onclick="toggleDrawer()" aria-label="メニュー">
+    <span class="hbg-bar"></span>
+    <span class="hbg-bar"></span>
+    <span class="hbg-bar"></span>
+  </button>
 </div>
+
+<div id="drawer-backdrop" onclick="closeDrawer()"></div>
+<nav id="drawer">
+  <button class="drawer-item active" data-target="wishlist" onclick="navTo('wishlist',this)">Items</button>
+  <button class="drawer-item" data-target="collection" onclick="navTo('collection',this)">Collection</button>
+  <button class="drawer-item" data-target="archive" onclick="navTo('archive',this)">Archive</button>
+  <button class="drawer-item" data-target="brands" onclick="navTo('brands',this)">Brands</button>
+  <button class="drawer-item" data-target="categories" onclick="navTo('categories',this)">Categories</button>
+</nav>
 
 <!-- wishlist -->
 <div id="wishlist" class="tab active">
@@ -986,11 +1038,11 @@ function showToast(msg) {
   _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
-function show(id, btn) {
+function show(id) {
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tabs button').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
+  document.querySelector(`.drawer-item[data-target="${id}"]`)?.classList.add('active');
   if (id === 'archive') loadArchive();
   if (id === 'collection') loadCollection();
   const _tabMsgs = {
@@ -1002,6 +1054,20 @@ function show(id, btn) {
   };
   const _tm = _tabMsgs[id];
   if (_tm && window.mascotSay) window.mascotSay(_tm[Math.floor(Math.random() * _tm.length)]);
+}
+function navTo(id, btn) {
+  show(id);
+  closeDrawer();
+}
+function toggleDrawer() {
+  const open = document.getElementById('drawer').classList.toggle('open');
+  document.getElementById('drawer-backdrop').classList.toggle('open', open);
+  document.getElementById('menu-btn').classList.toggle('open', open);
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+  document.getElementById('menu-btn').classList.remove('open');
 }
 
 const get = id => document.getElementById(id);
