@@ -837,7 +837,7 @@
 </head>
 <body>
 <div id="loading-screen">
-  <div class="loading-bubble" id="loading-bubble">少々お待ちを…</div>
+  <div class="loading-bubble" id="loading-bubble">Loading…</div>
   <img src="/gloli.png" alt="">
   <div class="loading-title">mortlace</div>
 </div>
@@ -848,7 +848,7 @@
 <div id="toast"></div>
 <div class="site-header">
   <h1>mortlace</h1>
-  <button id="menu-btn" onclick="toggleDrawer()" aria-label="メニュー">
+  <button id="menu-btn" onclick="toggleDrawer()" aria-label="Menu">
     <span class="hbg-bar"></span>
     <span class="hbg-bar"></span>
     <span class="hbg-bar"></span>
@@ -876,19 +876,19 @@
       <input id="w-name" placeholder="Name">
       <div class="sel-add-wrap">
         <select id="w-brand"><option value="">Brand</option></select>
-        <button type="button" class="add-btn" onclick="openInlineBrand('w-brand')" title="ブランドを追加">＋</button>
+        <button type="button" class="add-btn" onclick="openInlineBrand('w-brand')" title="Add brand">＋</button>
       </div>
       <div id="w-brand-new" class="inline-cat">
-        <input id="w-brand-input" placeholder="新しいブランド名">
+        <input id="w-brand-input" placeholder="New brand name">
         <button onclick="confirmInlineBrand('w-brand')">OK</button>
         <button onclick="closeInlineBrand('w-brand')">✕</button>
       </div>
       <div class="sel-add-wrap">
         <select id="w-category"><option value="">Category</option></select>
-        <button type="button" class="add-btn" onclick="openInlineCat('w-category')" title="カテゴリを追加">＋</button>
+        <button type="button" class="add-btn" onclick="openInlineCat('w-category')" title="Add category">＋</button>
       </div>
       <div id="w-category-new" class="inline-cat">
-        <input id="w-cat-input" placeholder="新しいカテゴリ名">
+        <input id="w-cat-input" placeholder="New category name">
         <button onclick="confirmInlineCat('w-category')">OK</button>
         <button onclick="closeInlineCat('w-category')">✕</button>
       </div>
@@ -937,7 +937,7 @@
   <div id="summary-bar"></div>
   <div id="budget-bar">
     <label for="budget-input">Budget</label>
-    <input id="budget-input" type="number" placeholder="未設定" oninput="onBudgetInput()">
+    <input id="budget-input" type="number" placeholder="No limit" oninput="onBudgetInput()">
     <span id="budget-diff"></span>
   </div>
 
@@ -949,8 +949,8 @@
   </div>
   <div id="w-empty" class="empty-state" style="display:none">
     <div class="empty-icon"></div>
-    <p class="empty-msg">まだ何も登録されていないわ</p>
-    <p class="empty-sub">上のフォームから追加してみて</p>
+    <p class="empty-msg">Nothing here yet</p>
+    <p class="empty-sub">Add items with the form above</p>
   </div>
 </div>
 
@@ -965,19 +965,19 @@
       <input id="edit-name" placeholder="Name">
       <div class="sel-add-wrap">
         <select id="edit-brand"><option value="">Brand</option></select>
-        <button type="button" class="add-btn" onclick="openInlineBrand('edit-brand')" title="ブランドを追加">＋</button>
+        <button type="button" class="add-btn" onclick="openInlineBrand('edit-brand')" title="Add brand">＋</button>
       </div>
       <div id="edit-brand-new" class="inline-cat">
-        <input id="edit-brand-input" placeholder="新しいブランド名">
+        <input id="edit-brand-input" placeholder="New brand name">
         <button onclick="confirmInlineBrand('edit-brand')">OK</button>
         <button onclick="closeInlineBrand('edit-brand')">✕</button>
       </div>
       <div class="sel-add-wrap">
         <select id="edit-category"><option value="">Category</option></select>
-        <button type="button" class="add-btn" onclick="openInlineCat('edit-category')" title="カテゴリを追加">＋</button>
+        <button type="button" class="add-btn" onclick="openInlineCat('edit-category')" title="Add category">＋</button>
       </div>
       <div id="edit-category-new" class="inline-cat">
-        <input id="edit-cat-input" placeholder="新しいカテゴリ名">
+        <input id="edit-cat-input" placeholder="New category name">
         <button onclick="confirmInlineCat('edit-category')">OK</button>
         <button onclick="closeInlineCat('edit-category')">✕</button>
       </div>
@@ -1013,8 +1013,8 @@
   <div class="modal-box" style="max-width:360px">
     <p id="confirm-msg" style="margin:0 0 22px;line-height:1.6;font-size:0.95rem"></p>
     <div class="modal-footer">
-      <button id="confirm-cancel">キャンセル</button>
-      <button id="confirm-ok" class="del">削除</button>
+      <button id="confirm-cancel">Cancel</button>
+      <button id="confirm-ok" class="del">Delete</button>
     </div>
   </div>
 </div>
@@ -1043,8 +1043,8 @@
   </div>
   <div id="col-empty" class="empty-state" style="display:none">
     <div class="empty-icon"></div>
-    <p class="empty-msg">コレクションはまだ空よ</p>
-    <p class="empty-sub">アイテムを「Owned」にすると追加されるわ</p>
+    <p class="empty-msg">Your collection is empty</p>
+    <p class="empty-sub">Mark an item as Owned to add it here</p>
   </div>
 </div>
 
@@ -1065,8 +1065,8 @@
     </table>
   </div>
   <div id="arc-empty" class="empty-state" style="display:none">
-    <p class="empty-msg">アーカイブは空よ</p>
-    <p class="empty-sub">アイテムを「Archive」するとここに来るわ</p>
+    <p class="empty-msg">Archive is empty</p>
+    <p class="empty-sub">Archived items will appear here</p>
   </div>
 </div>
 
@@ -1191,7 +1191,7 @@ function updateBudgetDiff(totalPrice) {
   if (!_budget) { el.textContent = ''; el.className = ''; return; }
   const total = totalPrice ?? _items.filter(i => i.price != null).reduce((s,i) => s+Number(i.price), 0);
   const diff = _budget - total;
-  el.textContent = diff >= 0 ? `残り ¥${diff.toLocaleString()}` : `¥${Math.abs(diff).toLocaleString()} オーバー`;
+  el.textContent = diff >= 0 ? `¥${diff.toLocaleString()} remaining` : `¥${Math.abs(diff).toLocaleString()} over budget`;
   el.className = diff >= 0 ? 'under' : 'over';
 }
 
@@ -1312,7 +1312,7 @@ async function loadItems() {
 async function addItem() {
   const url = get('w-url').value.trim();
   if (!url) return alert('URL is required.');
-  if (_items.some(i => i.url === url)) { showToast('このURLはすでに登録されています'); return; }
+  if (_items.some(i => i.url === url)) { showToast('This URL is already in your list'); return; }
   const body = { url, priority: get('w-priority').value };
   const name = get('w-name').value.trim();
   const brandId = get('w-brand').value;
@@ -1410,7 +1410,7 @@ async function restoreItem(id) {
 }
 
 async function delItemPermanent(id) {
-  showConfirm('完全に削除しますか？この操作は元に戻せません。', async () => {
+  showConfirm('Permanently delete this item? This cannot be undone.', async () => {
     await api('/wishlist/'+id+'/permanent', {method:'DELETE'});
     showToast('Item deleted.');
     loadArchive();
@@ -1559,7 +1559,7 @@ async function addBrand() {
 }
 
 async function delBrand(id) {
-  showConfirm('このブランドを削除しますか？', async () => { await api('/brands/'+id, {method:'DELETE'}); loadBrands(); });
+  showConfirm('Delete this brand?', async () => { await api('/brands/'+id, {method:'DELETE'}); loadBrands(); });
 }
 
 function editBrand(id, name, url) {
@@ -1606,9 +1606,9 @@ async function confirmInlineBrand(selId) {
     await loadBrands();
     get(selId).value = created.id;
     closeInlineBrand(selId);
-    showToast(`ブランド「${esc(name)}」を追加しました`);
+    showToast(`Brand "${esc(name)}" added`);
   } catch(s) {
-    if (s === 409) showToast('このブランドはすでに存在します');
+    if (s === 409) showToast('This brand already exists');
   }
 }
 
@@ -1634,9 +1634,9 @@ async function confirmInlineCat(selId) {
     await loadCategories();
     get(selId).value = created.id;
     closeInlineCat(selId);
-    showToast(`カテゴリ「${esc(name)}」を追加しました`);
+    showToast(`Category "${esc(name)}" added`);
   } catch(s) {
-    if (s === 409) showToast('このカテゴリはすでに存在します');
+    if (s === 409) showToast('This category already exists');
   }
 }
 
@@ -1669,7 +1669,7 @@ async function addCategory() {
 }
 
 async function delCategory(id) {
-  showConfirm('このカテゴリを削除しますか？', async () => { await api('/categories/'+id, {method:'DELETE'}); loadCategories(); });
+  showConfirm('Delete this category?', async () => { await api('/categories/'+id, {method:'DELETE'}); loadCategories(); });
 }
 
 function editCategory(id, name) {
