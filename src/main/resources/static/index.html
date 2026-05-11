@@ -571,7 +571,7 @@
 
 
       .form-row input, .form-row select, .form-row button { flex: 1 1 100%; }
-      #w-url, #w-name, #w-brand, .sel-add-wrap,
+      #w-url, #w-name, #w-brand, .sel-add-wrap, #w-brand-new, #w-category-new,
       #w-price, #w-priority, #w-notes, #w-image-url { flex: 1 1 100%; }
       .inline-cat.open { flex: 1 1 100%; }
 
@@ -874,7 +874,15 @@
     </div>
     <div class="form-row">
       <input id="w-name" placeholder="Name">
-      <select id="w-brand"><option value="">Brand</option></select>
+      <div class="sel-add-wrap" style="flex:1 1 110px">
+        <select id="w-brand"><option value="">Brand</option></select>
+        <button type="button" class="add-btn" onclick="openInlineBrand('w-brand')" title="ブランドを追加">＋</button>
+      </div>
+      <div id="w-brand-new" class="inline-cat">
+        <input id="w-brand-input" placeholder="新しいブランド名">
+        <button onclick="confirmInlineBrand('w-brand')">OK</button>
+        <button onclick="closeInlineBrand('w-brand')">✕</button>
+      </div>
       <div class="sel-add-wrap" style="flex:1 1 110px">
         <select id="w-category"><option value="">Category</option></select>
         <button type="button" class="add-btn" onclick="openInlineCat('w-category')" title="カテゴリを追加">＋</button>
@@ -955,7 +963,15 @@
       <input id="edit-url" placeholder="URL (required)">
       <button onclick="fetchInfo(this,'edit')" style="width:100%;margin:2px 0">Fetch</button>
       <input id="edit-name" placeholder="Name">
-      <select id="edit-brand"><option value="">Brand</option></select>
+      <div class="sel-add-wrap">
+        <select id="edit-brand"><option value="">Brand</option></select>
+        <button type="button" class="add-btn" onclick="openInlineBrand('edit-brand')" title="ブランドを追加">＋</button>
+      </div>
+      <div id="edit-brand-new" class="inline-cat">
+        <input id="edit-brand-input" placeholder="新しいブランド名">
+        <button onclick="confirmInlineBrand('edit-brand')">OK</button>
+        <button onclick="closeInlineBrand('edit-brand')">✕</button>
+      </div>
       <div class="sel-add-wrap">
         <select id="edit-category"><option value="">Category</option></select>
         <button type="button" class="add-btn" onclick="openInlineCat('edit-category')" title="カテゴリを追加">＋</button>
@@ -1515,8 +1531,9 @@ async function saveItem() {
 // ---- Brands ----
 async function loadBrands() {
   const brands = await (await api('/brands')).json();
-  ['w-brand'].forEach(sid => {
+  ['w-brand', 'edit-brand'].forEach(sid => {
     const sel = get(sid);
+    if (!sel) return;
     const cur = sel.value;
     sel.innerHTML = '<option value="">Brand</option>' + brands.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
     sel.value = cur;
@@ -1565,6 +1582,34 @@ async function saveBrand(id) {
   await api('/brands/'+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, url:url||null}) })
     .catch(s => s===409 ? alert('Already exists.') : null);
   loadBrands();
+}
+
+// ---- Inline brand creation ----
+function openInlineBrand(selId) {
+  const wrap = get(selId + '-new');
+  wrap.classList.add('open');
+  const inp = get(selId === 'w-brand' ? 'w-brand-input' : 'edit-brand-input');
+  inp.value = '';
+  inp.focus();
+  inp.onkeydown = e => { if (e.key === 'Enter') confirmInlineBrand(selId); if (e.key === 'Escape') closeInlineBrand(selId); };
+}
+function closeInlineBrand(selId) {
+  get(selId + '-new').classList.remove('open');
+}
+async function confirmInlineBrand(selId) {
+  const inp = get(selId === 'w-brand' ? 'w-brand-input' : 'edit-brand-input');
+  const name = inp.value.trim();
+  if (!name) return;
+  try {
+    const res = await api('/brands', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) });
+    const created = await res.json();
+    await loadBrands();
+    get(selId).value = created.id;
+    closeInlineBrand(selId);
+    showToast(`ブランド「${esc(name)}」を追加しました`);
+  } catch(s) {
+    if (s === 409) showToast('このブランドはすでに存在します');
+  }
 }
 
 // ---- Inline category creation ----
