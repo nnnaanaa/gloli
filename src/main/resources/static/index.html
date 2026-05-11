@@ -544,6 +544,18 @@
       #w-brand, #w-category { flex: 1 1 120px; }
     }
 
+    /* ---- Add form collapse (mobile only) ---- */
+    @media (max-width: 600px) {
+      #add-toggle { cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+      #add-toggle-icon { font-size: 1.1rem; color: var(--muted); transition: transform 0.22s ease; }
+      #add-toggle.open #add-toggle-icon { transform: rotate(45deg); }
+      #add-form { display: none; }
+      #add-form.open { display: block; }
+    }
+    @media (min-width: 601px) {
+      #add-toggle-icon { display: none; }
+    }
+
     /* ---- 600px: モバイル ---- */
     @media (max-width: 600px) {
       body { padding: 16px 16px; border-left: none; border-right: none; }
@@ -819,27 +831,29 @@
 
 <!-- wishlist -->
 <div id="wishlist" class="tab active">
-  <h2>Add Item</h2>
-  <div class="form-row">
-    <input id="w-url" placeholder="URL (required)">
-    <button onclick="fetchInfo(this,'w')">Fetch</button>
-  </div>
-  <div class="form-row">
-    <input id="w-name" placeholder="Name">
-    <select id="w-brand"><option value="">Brand</option></select>
-    <select id="w-category"><option value="">Category</option></select>
-  </div>
-  <div class="form-row">
-    <input id="w-price" type="number" placeholder="Price">
-    <select id="w-priority">
-      <option value="MEDIUM">Medium</option>
-      <option value="LOW">Low</option>
-      <option value="HIGH">High</option>
-      <option value="GRAIL">Grail</option>
-    </select>
-    <input id="w-notes" placeholder="Notes">
-    <input id="w-image-url" type="url" placeholder="Image URL">
-    <button onclick="addItem()">Add</button>
+  <h2 id="add-toggle" onclick="toggleAddForm()">Add Item <span id="add-toggle-icon">＋</span></h2>
+  <div id="add-form">
+    <div class="form-row">
+      <input id="w-url" placeholder="URL (required)">
+      <button onclick="fetchInfo(this,'w')">Fetch</button>
+    </div>
+    <div class="form-row">
+      <input id="w-name" placeholder="Name">
+      <select id="w-brand"><option value="">Brand</option></select>
+      <select id="w-category"><option value="">Category</option></select>
+    </div>
+    <div class="form-row">
+      <input id="w-price" type="number" placeholder="Price">
+      <select id="w-priority">
+        <option value="MEDIUM">Medium</option>
+        <option value="LOW">Low</option>
+        <option value="HIGH">High</option>
+        <option value="GRAIL">Grail</option>
+      </select>
+      <input id="w-notes" placeholder="Notes">
+      <input id="w-image-url" type="url" placeholder="Image URL">
+      <button onclick="addItem()">Add</button>
+    </div>
   </div>
 
   <div class="sort-bar">
@@ -1070,6 +1084,16 @@ function closeDrawer() {
   document.getElementById('drawer-backdrop').classList.remove('open');
   document.getElementById('menu-btn').classList.remove('open');
 }
+function toggleAddForm() {
+  if (window.innerWidth > 600) return;
+  const open = get('add-form').classList.toggle('open');
+  get('add-toggle').classList.toggle('open', open);
+}
+function closeAddForm() {
+  if (window.innerWidth > 600) return;
+  get('add-form').classList.remove('open');
+  get('add-toggle').classList.remove('open');
+}
 
 const get = id => document.getElementById(id);
 
@@ -1223,6 +1247,7 @@ async function addItem() {
   get('w-url').value = get('w-name').value = get('w-price').value = get('w-notes').value = get('w-image-url').value = '';
   get('w-brand').value = get('w-category').value = '';
   showToast('Item added.');
+  closeAddForm();
   loadItems();
   if (window.mascotSay) {
     const _n = name.length > 10 ? name.slice(0, 10) + '…' : name;
