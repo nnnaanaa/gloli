@@ -392,7 +392,7 @@
 
     #w-url                     { flex: 1 1 260px; }
     #w-name                    { flex: 2 1 160px; }
-    #w-brand, .sel-add-wrap { flex: 1 1 110px; }
+    .sel-add-wrap { flex: 1 1 110px; }
     #w-priority                { flex: 0 1 100px; }
     #w-price                   { flex: 0 0 90px; }
     #w-notes, #w-image-url     { flex: 2 1 160px; }
@@ -548,7 +548,7 @@
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
       #w-name { flex: 1 1 100%; }
-      #w-brand, .sel-add-wrap { flex: 1 1 120px; }
+      .sel-add-wrap { flex: 1 1 120px; }
     }
 
     /* ---- Add form collapse (mobile only) ---- */
@@ -571,7 +571,7 @@
 
 
       .form-row input, .form-row select, .form-row button { flex: 1 1 100%; }
-      #w-url, #w-name, #w-brand, .sel-add-wrap, #w-brand-new, #w-category-new,
+      #w-url, #w-name, .sel-add-wrap, #w-brand-new, #w-category-new,
       #w-price, #w-priority, #w-notes, #w-image-url { flex: 1 1 100%; }
       .inline-cat.open { flex: 1 1 100%; }
 
@@ -874,7 +874,7 @@
     </div>
     <div class="form-row">
       <input id="w-name" placeholder="Name">
-      <div class="sel-add-wrap" style="flex:1 1 110px">
+      <div class="sel-add-wrap">
         <select id="w-brand"><option value="">Brand</option></select>
         <button type="button" class="add-btn" onclick="openInlineBrand('w-brand')" title="ブランドを追加">＋</button>
       </div>
@@ -883,7 +883,7 @@
         <button onclick="confirmInlineBrand('w-brand')">OK</button>
         <button onclick="closeInlineBrand('w-brand')">✕</button>
       </div>
-      <div class="sel-add-wrap" style="flex:1 1 110px">
+      <div class="sel-add-wrap">
         <select id="w-category"><option value="">Category</option></select>
         <button type="button" class="add-btn" onclick="openInlineCat('w-category')" title="カテゴリを追加">＋</button>
       </div>
