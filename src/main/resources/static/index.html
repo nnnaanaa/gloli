@@ -586,8 +586,9 @@
       .sort-bar button { padding: 3px 8px; font-size: 0.76rem; }
 
       #wishlist tbody, #archive tbody, #collection tbody { grid-template-columns: 1fr; }
-      #wishlist td.col-img, #collection td.col-img { height: 180px; }
-      #archive td.col-img { height: 140px; }
+      #wishlist td.col-img, #collection td.col-img { height: 180px; padding: 0 20px; }
+      #archive td.col-img { height: 140px; padding: 0 20px; }
+      #wishlist td.col-img img, #collection td.col-img img, #archive td.col-img img { border-radius: 10px; }
       #wishlist td::before, #archive td::before, #collection td::before { min-width: 52px; font-size: 0.75rem; }
 
       #wishlist td.col-actions button,
