@@ -6,4 +6,4 @@ pluginManagement {
 }
 
 
-rootProject.name = "mortlace"
+rootProject.name = "gloli"

@@ -5,7 +5,7 @@ COPY build.gradle.kts settings.gradle.kts ./
 # ダミーソースでコンパイルを走らせ、全依存JARをキャッシュ
 # （build.gradle.kts が変わらない限りこのレイヤーは再利用される）
 RUN mkdir -p src/main/kotlin && \
-    echo 'package com.mortlace' > src/main/kotlin/Dummy.kt && \
+    echo 'package com.gloli' > src/main/kotlin/Dummy.kt && \
     gradle --no-daemon compileKotlin && \
     gradle --no-daemon dependencies --configuration runtimeClasspath; \
     rm -rf src

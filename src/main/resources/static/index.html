@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>mortlace</title>
+  <title>gloli</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#3a1660">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="mortlace">
+  <meta name="apple-mobile-web-app-title" content="gloli">
   <link rel="apple-touch-icon" href="/gloli.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -796,7 +796,7 @@
 <div id="loading-screen">
   <div class="loading-bubble" id="loading-bubble">少々お待ちを…</div>
   <img src="/gloli.png" alt="">
-  <div class="loading-title">mortlace</div>
+  <div class="loading-title">gloli</div>
 </div>
 <button id="scroll-top" aria-label="Scroll to top">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
@@ -804,7 +804,7 @@
 <div id="page-frame"></div>
 <div id="toast"></div>
 <div class="site-header">
-  <h1>mortlace</h1>
+  <h1>gloli</h1>
   <button id="menu-btn" onclick="toggleDrawer()" aria-label="Menu">
     <span class="hbg-bar"></span>
     <span class="hbg-bar"></span>
@@ -1137,10 +1137,10 @@ async function api(path, opt) {
 }
 
 // ---- Budget ----
-let _budget = +localStorage.getItem('mortlace_budget') || 0;
+let _budget = +localStorage.getItem('gloli_budget') || 0;
 function onBudgetInput() {
   _budget = +get('budget-input').value || 0;
-  localStorage.setItem('mortlace_budget', _budget);
+  localStorage.setItem('gloli_budget', _budget);
   updateBudgetDiff();
 }
 function updateBudgetDiff(totalPrice) {
