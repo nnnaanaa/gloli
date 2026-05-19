@@ -772,6 +772,21 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
   });
 })();
 
+// ---- Refresh ----
+async function refreshPage() {
+  const btn = get('refresh-btn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  const active = document.querySelector('.tab.active')?.id || 'wishlist';
+  const tasks = [loadItems(), loadBrands(), loadCategories()];
+  if (active === 'collection') tasks.push(loadCollection());
+  if (active === 'archive')    tasks.push(loadArchive());
+  await Promise.all(tasks);
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+  showToast('Updated.');
+}
+
 // ---- Scroll to top ----
 (function() {
   const btn = document.getElementById('scroll-top');

@@ -300,6 +300,23 @@ tr:hover td { background: rgba(168,164,184,0.07); }
   margin-bottom: 28px;
 }
 .site-header h1 { margin-bottom: 0; }
+#refresh-btn {
+  position: absolute;
+  left: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-lt);
+}
+#refresh-btn svg { width: 16px; height: 16px; pointer-events: none; transition: transform 0.5s ease; }
+#refresh-btn.spinning svg { animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 #menu-btn {
   position: absolute;
   right: 0;
