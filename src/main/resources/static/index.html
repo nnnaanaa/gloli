@@ -1663,7 +1663,11 @@ async function fetchInfo(btn, prefix) {
       get(prefix + '-image-url').value = info.imageUrl;
       if (prefix === 'edit') previewImgUrl(get('edit-image-url'));
     }
-    if (info.brand) {
+    if (info.brandId) {
+      const sel = get(prefix + '-brand');
+      const opt = [...sel.options].find(o => Number(o.value) === info.brandId);
+      if (opt) sel.value = opt.value;
+    } else if (info.brand) {
       const sel = get(prefix + '-brand');
       const opt = [...sel.options].find(o => o.text.toLowerCase() === info.brand.toLowerCase());
       if (opt) sel.value = opt.value;

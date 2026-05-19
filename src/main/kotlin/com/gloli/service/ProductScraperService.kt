@@ -2,15 +2,17 @@
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.gloli.dto.ScrapedProductInfo
+import com.gloli.repository.BrandRepository
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
+import java.net.URI
 
 @Service
-class ProductScraperService {
+class ProductScraperService(private val brandRepo: BrandRepository) {
 
     private val objectMapper = ObjectMapper()
     private val breadcrumbSkipNames = setOf("home", "ホーム", "top", "トップ", "トップページ")
@@ -27,15 +29,27 @@ class ProductScraperService {
             throw ResponseStatusException(HttpStatus.BAD_GATEWAY, "Failed to fetch URL: ${e.message}")
         }
 
+        val brandByUrl = findBrandByUrlDomain(url)
         return ScrapedProductInfo(
             name = doc.og("og:title") ?: doc.title().ifBlank { null },
             imageUrl = parseImage(doc, url),
-            brand = parseBrand(doc),
+            brand = brandByUrl?.name ?: parseBrand(doc),
+            brandId = brandByUrl?.id,
             price = parsePrice(doc),
             description = doc.og("og:description"),
             category = parseCategory(doc)
         )
     }
+
+    private fun extractDomain(url: String): String? =
+        try { URI(url).host?.lowercase()?.removePrefix("www.") } catch (_: Exception) { null }
+
+    private fun findBrandByUrlDomain(productUrl: String) =
+        extractDomain(productUrl)?.let { productDomain ->
+            brandRepo.findAll().firstOrNull { brand ->
+                brand.url?.let { extractDomain(it) == productDomain } == true
+            }
+        }
 
     private fun Document.og(property: String): String? =
         select("meta[property=$property]").attr("content").ifBlank { null }
