@@ -15,12 +15,15 @@ import java.net.URI
 class ProductScraperService(private val brandRepo: BrandRepository) {
 
     private val objectMapper = ObjectMapper()
+    // パンくずリストの先頭に現れるナビゲーション用語はカテゴリとして使わない
     private val breadcrumbSkipNames = setOf("home", "ホーム", "top", "トップ", "トップページ")
 
     fun scrape(url: String): ScrapedProductInfo {
         val doc = try {
             Jsoup.connect(url)
+                // ボット検知を回避するため一般的なブラウザ UA を使用
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36")
+                // リファラーなしだとアクセスを拒否するサイトがあるため Google 検索を偽装
                 .referrer("https://www.google.com/")
                 .timeout(10_000)
                 .followRedirects(true)
@@ -44,6 +47,8 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
     private fun extractDomain(url: String): String? =
         try { URI(url).host?.lowercase()?.removePrefix("www.") } catch (_: Exception) { null }
 
+    // 商品URLのドメインと登録済みブランドURLのドメインを照合する
+    // 名前テキストより確実にブランドを特定できるため、名前マッチより優先する
     private fun findBrandByUrlDomain(productUrl: String) =
         extractDomain(productUrl)?.let { productDomain ->
             brandRepo.findAll().firstOrNull { brand ->
@@ -104,7 +109,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
 
     // ---- Brand ----
     private fun parseBrand(doc: Document): String? {
-        // og:site_name
+        // og:site_name はサイト単位で設定されるため商品ブランドと一致しやすい
         doc.og("og:site_name")?.let { return it }
 
         // Schema.org Product JSON-LD
@@ -144,7 +149,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
                 ?.let { return it }
         }
 
-        // Price from DOM elements with "price" in class/id
+        // クラス名・ID に "price" を含む要素を汎用フォールバックとして探す
         val priceSelectors = listOf(
             "[class*=price]", "[id*=price]",
             "dd", "span strong", "p strong"
@@ -161,7 +166,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
     }
 
     private fun extractYenPrice(text: String): BigDecimal? {
-        // Prefer tax-included (税込) price, e.g. "¥16,500(税込)" or "16,500円(税込)"
+        // 税込価格が存在する場合はそちらを優先する（例: "¥16,500(税込)"）
         val taxIncluded = Regex("""¥\s*([\d,]+)\s*\(?税込\)?""")
         taxIncluded.find(text)?.groupValues?.get(1)
             ?.replace(",", "")?.toBigDecimalOrNull()?.let { return it }
@@ -187,6 +192,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
     }
 
     private fun parseBreadcrumb(doc: Document): String? {
+        // BreadcrumbList の末尾は現在の商品名なので、その一つ手前をカテゴリとして返す
         doc.select("script[type=application/ld+json]").forEach { script ->
             try {
                 val json = objectMapper.readTree(script.data())

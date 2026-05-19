@@ -84,6 +84,7 @@ class WishlistItemService(
 
     fun update(id: Long, req: WishlistItemRequest): WishlistItemResponse {
         val item = repo.findById(id).orElseThrow { notFound(id) }
+        // 自分のURLへの変更（変更なし）はチェック対象外
         if (!req.url.isNullOrBlank() && req.url != item.url && repo.existsByUrlAndDeletedAtIsNullAndIdNot(req.url, id)) {
             throw ResponseStatusException(HttpStatus.CONFLICT, "This URL is already in your list")
         }
@@ -105,6 +106,7 @@ class WishlistItemService(
         item.notes = req.notes
         item.priority = req.priority
         item.status = req.status
+        // 外部URLが指定された場合、ローカルファイルを削除して imageUrl に切り替える
         if (req.imageUrl != null) {
             item.imagePath?.let { File("./data/images/$it").absoluteFile.delete() }
             item.imagePath = null
@@ -144,11 +146,16 @@ class WishlistItemService(
         return repo.save(item).toResponse()
     }
 
+    // ファイル名拡張子ではなくマジックバイトで判定することで、拡張子詐称を防ぐ
     private fun detectImageExtension(bytes: ByteArray): String {
         val b = bytes
+        // FF D8 FF
         val isJpeg  = b.size >= 3  && b[0] == 0xFF.toByte() && b[1] == 0xD8.toByte() && b[2] == 0xFF.toByte()
+        // 89 PNG
         val isPng   = b.size >= 4  && b[0] == 0x89.toByte() && b[1] == 0x50.toByte() && b[2] == 0x4E.toByte() && b[3] == 0x47.toByte()
+        // GIF8
         val isGif   = b.size >= 4  && b[0] == 0x47.toByte() && b[1] == 0x49.toByte() && b[2] == 0x46.toByte() && b[3] == 0x38.toByte()
+        // RIFF....WEBP
         val isWebp  = b.size >= 12 && b[0] == 0x52.toByte() && b[1] == 0x49.toByte() && b[2] == 0x46.toByte() && b[3] == 0x46.toByte()
                                    && b[8] == 0x57.toByte() && b[9] == 0x45.toByte() && b[10] == 0x42.toByte() && b[11] == 0x50.toByte()
         return when {
@@ -184,6 +191,7 @@ class WishlistItemService(
         notes = notes,
         priority = priority,
         status = status,
+        // imageUrl（外部URL）を優先し、なければローカル保存画像への API パスを返す
         imageUrl = imageUrl ?: if (imagePath != null) "/api/wishlist/$id/image" else null,
         createdAt = createdAt,
         updatedAt = updatedAt,

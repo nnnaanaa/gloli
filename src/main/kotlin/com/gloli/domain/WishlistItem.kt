@@ -40,8 +40,10 @@ class WishlistItem(
     @Enumerated(EnumType.STRING)
     var status: Status = Status.WANTED,
 
+    // ローカル保存した画像のファイル名（./data/images/ 配下）
     var imagePath: String? = null,
 
+    // 外部画像URL。imagePath と両立しないため、どちらかを設定したらもう一方はクリアする
     @Column(length = 2048)
     var imageUrl: String? = null,
 
@@ -52,5 +54,6 @@ class WishlistItem(
     @UpdateTimestamp
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 
+    // null = アクティブ、non-null = ソフトデリート済み（アーカイブ）
     var deletedAt: LocalDateTime? = null
 )
