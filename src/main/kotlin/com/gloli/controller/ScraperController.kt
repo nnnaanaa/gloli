@@ -1,4 +1,4 @@
-﻿package com.gloli.controller
+package com.gloli.controller
 
 import com.gloli.dto.ScrapedProductInfo
 import com.gloli.service.ProductScraperService
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+/** 商品URLから情報を取得するスクレイパーエンドポイント */
 @RestController
 @RequestMapping("/api/scrape")
 @Tag(name = "Scraper", description = "Fetch product info from URL")

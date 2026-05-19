@@ -1,4 +1,4 @@
-﻿package com.gloli.controller
+package com.gloli.controller
 
 import com.gloli.dto.BrandRequest
 import com.gloli.dto.BrandResponse
@@ -9,6 +9,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
+/** ブランドマスターの CRUD エンドポイント */
 @RestController
 @RequestMapping("/api/brands")
 @Tag(name = "Brands", description = "Brand management API")

@@ -1,4 +1,4 @@
-﻿package com.gloli.controller
+package com.gloli.controller
 
 import com.gloli.dto.CategoryRequest
 import com.gloli.dto.CategoryResponse
@@ -9,6 +9,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
+/** カテゴリマスターの CRUD エンドポイント */
 @RestController
 @RequestMapping("/api/categories")
 @Tag(name = "Categories", description = "Category management API")

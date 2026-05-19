@@ -1,4 +1,4 @@
-﻿package com.gloli.service
+package com.gloli.service
 
 import com.gloli.domain.WishlistItem
 import com.gloli.domain.enums.Priority
@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
 
+/** ウィッシュリストアイテムのビジネスロジック */
 @Service
 @Transactional
 class WishlistItemService(
@@ -25,6 +26,7 @@ class WishlistItemService(
     private val categoryRepo: CategoryRepository
 ) {
 
+    /** OWNED を除くアクティブなアイテムを返す。フィルタ条件はすべて省略可能 */
     @Transactional(readOnly = true)
     fun findAll(priority: Priority?, brandId: Long?, categoryId: Long?): List<WishlistItemResponse> {
         return repo.findAllByDeletedAtIsNull()
@@ -35,12 +37,14 @@ class WishlistItemService(
             .map { it.toResponse() }
     }
 
+    /** OWNED なアイテムのみ返す（コレクション一覧） */
     @Transactional(readOnly = true)
     fun findOwned(): List<WishlistItemResponse> =
         repo.findAllByDeletedAtIsNull()
             .filter { it.status == Status.OWNED }
             .map { it.toResponse() }
 
+    /** ソフトデリート済みのアイテムを返す（アーカイブ一覧） */
     @Transactional(readOnly = true)
     fun findDeleted(): List<WishlistItemResponse> =
         repo.findAllByDeletedAtIsNotNull().map { it.toResponse() }
@@ -115,18 +119,21 @@ class WishlistItemService(
         return repo.save(item).toResponse()
     }
 
+    /** deletedAt をセットするだけでDBからは削除しない（アーカイブへ移動）*/
     fun softDelete(id: Long) {
         val item = repo.findById(id).orElseThrow { notFound(id) }
         item.deletedAt = java.time.LocalDateTime.now()
         repo.save(item)
     }
 
+    /** deletedAt を null に戻してアクティブに復元する */
     fun restore(id: Long): WishlistItemResponse {
         val item = repo.findById(id).orElseThrow { notFound(id) }
         item.deletedAt = null
         return repo.save(item).toResponse()
     }
 
+    /** ローカル画像ファイルがあれば合わせて削除する */
     fun delete(id: Long) {
         val item = repo.findById(id).orElseThrow { notFound(id) }
         item.imagePath?.let { File("./data/images/$it").absoluteFile.delete() }
@@ -139,6 +146,7 @@ class WishlistItemService(
         val ext = detectImageExtension(bytes)
         val dir = File("./data/images").absoluteFile.also { it.mkdirs() }
         item.imagePath?.let { File(dir, it).delete() }
+        // ファイル名はアイテムIDで固定。拡張子はマジックバイトから決定する
         val filename = "$id.$ext"
         File(dir, filename).writeBytes(bytes)
         item.imagePath = filename
@@ -173,10 +181,10 @@ class WishlistItemService(
         val file = File("./data/images/$path").absoluteFile
         if (!file.exists()) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Image file not found")
         val contentType = when (path.substringAfterLast('.').lowercase()) {
-            "png" -> "image/png"
-            "gif" -> "image/gif"
+            "png"  -> "image/png"
+            "gif"  -> "image/gif"
             "webp" -> "image/webp"
-            else -> "image/jpeg"
+            else   -> "image/jpeg"
         }
         return file.readBytes() to contentType
     }

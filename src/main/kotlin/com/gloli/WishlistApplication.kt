@@ -1,8 +1,9 @@
-﻿package com.gloli
+package com.gloli
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
+/** アプリケーションエントリーポイント */
 @SpringBootApplication
 class WishlistApplication
 

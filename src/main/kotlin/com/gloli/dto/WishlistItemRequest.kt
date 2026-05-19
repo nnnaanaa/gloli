@@ -1,4 +1,4 @@
-﻿package com.gloli.dto
+package com.gloli.dto
 
 import com.gloli.domain.enums.Priority
 import com.gloli.domain.enums.Status
@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 
+/** ウィッシュリストアイテム作成・更新リクエスト */
 data class WishlistItemRequest(
     val name: String? = null,
 
@@ -18,6 +19,7 @@ data class WishlistItemRequest(
     val categoryId: Long? = null,
     val notes: String? = null,
     val priority: Priority = Priority.MEDIUM,
+    /** 外部画像URL。指定するとローカル保存画像は削除される */
     val imageUrl: String? = null,
     val status: Status = Status.WANTED
 )

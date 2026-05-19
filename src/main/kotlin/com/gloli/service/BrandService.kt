@@ -1,4 +1,4 @@
-﻿package com.gloli.service
+package com.gloli.service
 
 import com.gloli.domain.Brand
 import com.gloli.dto.BrandRequest
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
+/** ブランドマスターのビジネスロジック */
 @Service
 @Transactional
 class BrandService(private val repo: BrandRepository) {
@@ -28,6 +29,7 @@ class BrandService(private val repo: BrandRepository) {
 
     fun update(id: Long, req: BrandRequest): BrandResponse {
         val brand = repo.findById(id).orElseThrow { notFound(id) }
+        // 自分の名前への変更（変更なし）はチェック対象外
         if (brand.name != req.name && repo.existsByName(req.name)) {
             throw ResponseStatusException(HttpStatus.CONFLICT, "Brand name already exists: ${req.name}")
         }
@@ -41,7 +43,7 @@ class BrandService(private val repo: BrandRepository) {
         repo.deleteById(id)
     }
 
-    fun Brand.toResponse() = BrandResponse(id = id, name = name, url = url)
+    private fun Brand.toResponse() = BrandResponse(id = id, name = name, url = url)
 
     private fun notFound(id: Long) =
         ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found: id=$id")

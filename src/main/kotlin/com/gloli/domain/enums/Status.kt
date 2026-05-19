@@ -1,4 +1,4 @@
-﻿package com.gloli.domain.enums
+package com.gloli.domain.enums
 
 enum class Status {
     WANTED,

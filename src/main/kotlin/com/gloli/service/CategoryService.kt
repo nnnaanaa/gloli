@@ -1,4 +1,4 @@
-﻿package com.gloli.service
+package com.gloli.service
 
 import com.gloli.domain.Category
 import com.gloli.dto.CategoryRequest
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
+/** カテゴリマスターのビジネスロジック */
 @Service
 @Transactional
 class CategoryService(private val repo: CategoryRepository) {
@@ -28,6 +29,7 @@ class CategoryService(private val repo: CategoryRepository) {
 
     fun update(id: Long, req: CategoryRequest): CategoryResponse {
         val category = repo.findById(id).orElseThrow { notFound(id) }
+        // 自分の名前への変更（変更なし）はチェック対象外
         if (category.name != req.name && repo.existsByName(req.name)) {
             throw ResponseStatusException(HttpStatus.CONFLICT, "Category name already exists: ${req.name}")
         }

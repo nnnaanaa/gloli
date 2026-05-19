@@ -1,8 +1,8 @@
-﻿package com.gloli.domain.enums
+package com.gloli.domain.enums
 
 enum class Priority {
     LOW,
     MEDIUM,
     HIGH,
-    GRAIL  // Lolita community term: the ultimate dream item
+    GRAIL  // ロリィタコミュニティ用語：どうしても手に入れたい究極の一着
 }

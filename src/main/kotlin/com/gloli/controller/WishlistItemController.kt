@@ -1,4 +1,4 @@
-﻿package com.gloli.controller
+package com.gloli.controller
 
 import com.gloli.domain.enums.Priority
 import com.gloli.domain.enums.Status
@@ -14,11 +14,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
+/** ウィッシュリストアイテムの CRUD・画像管理エンドポイント */
 @RestController
 @RequestMapping("/api/wishlist")
 @Tag(name = "Wishlist", description = "Wishlist management API")
 class WishlistItemController(private val service: WishlistItemService) {
 
+    /** OWNED 以外のアクティブなアイテム一覧。priority / brandId / categoryId でフィルタ可能 */
     @GetMapping
     @Operation(summary = "List items", description = "Filterable by priority, brand ID, and category ID")
     fun list(
@@ -43,10 +45,12 @@ class WishlistItemController(private val service: WishlistItemService) {
         @Valid @RequestBody req: WishlistItemRequest
     ): WishlistItemResponse = service.update(id, req)
 
+    /** OWNED なアイテム一覧（コレクション画面で使用）*/
     @GetMapping("/owned")
     @Operation(summary = "List owned items")
     fun listOwned(): List<WishlistItemResponse> = service.findOwned()
 
+    /** ソフトデリート済みアイテム一覧（アーカイブ画面で使用）*/
     @GetMapping("/deleted")
     @Operation(summary = "List soft-deleted items")
     fun listDeleted(): List<WishlistItemResponse> = service.findDeleted()
@@ -58,16 +62,19 @@ class WishlistItemController(private val service: WishlistItemService) {
         @RequestParam status: Status
     ): WishlistItemResponse = service.updateStatus(id, status)
 
+    /** アーカイブへ移動（物理削除ではなく deletedAt をセットする）*/
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Soft-delete item")
     fun softDelete(@PathVariable id: Long) = service.softDelete(id)
 
+    /** DB から完全に削除する。ローカル画像ファイルも合わせて削除される */
     @DeleteMapping("/{id}/permanent")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Permanently delete item")
     fun delete(@PathVariable id: Long) = service.delete(id)
 
+    /** アーカイブから復元する（deletedAt を null に戻す）*/
     @PostMapping("/{id}/restore")
     @Operation(summary = "Restore soft-deleted item")
     fun restore(@PathVariable id: Long): WishlistItemResponse = service.restore(id)

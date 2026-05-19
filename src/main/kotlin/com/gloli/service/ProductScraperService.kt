@@ -1,4 +1,4 @@
-﻿package com.gloli.service
+package com.gloli.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.gloli.dto.ScrapedProductInfo
@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
 import java.net.URI
 
+/** 商品URLから名前・画像・ブランド・価格・カテゴリを取得するスクレイパー */
 @Service
 class ProductScraperService(private val brandRepo: BrandRepository) {
 
@@ -32,6 +33,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
             throw ResponseStatusException(HttpStatus.BAD_GATEWAY, "Failed to fetch URL: ${e.message}")
         }
 
+        // ドメインマッチを優先し、失敗した場合はページ内のブランドテキストにフォールバック
         val brandByUrl = findBrandByUrlDomain(url)
         return ScrapedProductInfo(
             name = doc.og("og:title") ?: doc.title().ifBlank { null },
@@ -44,6 +46,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
         )
     }
 
+    /** URL のホスト部分から www. を除いたドメインを返す */
     private fun extractDomain(url: String): String? =
         try { URI(url).host?.lowercase()?.removePrefix("www.") } catch (_: Exception) { null }
 
@@ -56,13 +59,16 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
             }
         }
 
+    /** OGP の property メタタグから値を取得する */
     private fun Document.og(property: String): String? =
         select("meta[property=$property]").attr("content").ifBlank { null }
 
+    /** name メタタグから値を取得する */
     private fun Document.meta(name: String): String? =
         select("meta[name=$name]").attr("content").ifBlank { null }
 
     // ---- Image ----
+    /** 複数の方法で商品画像URLを探す。優先度順に試みる */
     private fun parseImage(doc: Document, baseUrl: String): String? {
         // OGP
         listOf("og:image", "og:image:secure_url").forEach { p ->
@@ -81,7 +87,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
             src?.let { return resolveUrl(baseUrl, it) }
         }
 
-        // Common product image selectors (abs:src resolves relative URLs automatically)
+        // 商品画像によく使われるクラス名・ID パターンを順に試す（abs:src で相対URLを自動解決）
         val selectors = listOf(
             "[class*=product-image] img", "[class*=product-img] img",
             "[class*=main-image] img",    "[class*=main-img] img",
@@ -96,7 +102,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
                 ?.let { return it }
         }
 
-        // Fallback: first large enough img in main content area
+        // 最終フォールバック: メインコンテンツ内の十分な大きさの最初の img
         val mainArea = doc.select("main, article, [role=main], #main, .main, #content, .content").firstOrNull() ?: doc
         mainArea.select("img[src]").firstOrNull { el ->
             val w = el.attr("width").toIntOrNull() ?: 0
@@ -108,6 +114,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
     }
 
     // ---- Brand ----
+    /** ページ内のメタデータからブランド名を推定する */
     private fun parseBrand(doc: Document): String? {
         // og:site_name はサイト単位で設定されるため商品ブランドと一致しやすい
         doc.og("og:site_name")?.let { return it }
@@ -126,6 +133,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
     }
 
     // ---- Price ----
+    /** 複数の方法で価格を取得する。OGP → Schema.org → itemprop → DOM の順に試みる */
     private fun parsePrice(doc: Document): BigDecimal? {
         // OGP price tags
         listOf("og:price:amount", "product:price:amount", "og:price")
@@ -171,12 +179,10 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
         taxIncluded.find(text)?.groupValues?.get(1)
             ?.replace(",", "")?.toBigDecimalOrNull()?.let { return it }
 
-        // Plain ¥ pattern
         val yen = Regex("""¥\s*([\d,]+)""")
         yen.find(text)?.groupValues?.get(1)
             ?.replace(",", "")?.toBigDecimalOrNull()?.let { return it }
 
-        // XX,XXX円 pattern
         val kin = Regex("""([\d,]+)\s*円""")
         kin.find(text)?.groupValues?.get(1)
             ?.replace(",", "")?.toBigDecimalOrNull()?.let { return it }
@@ -209,7 +215,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
             } catch (_: Exception) {}
         }
 
-        // HTML breadcrumb elements
+        // HTML のパンくずリスト要素を探す
         val breadcrumbSelectors = listOf(
             "[class*=breadcrumb] a", "[class*=bread-crumb] a",
             "[aria-label=breadcrumb] a", "nav.breadcrumb a"
@@ -226,6 +232,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
     }
 
     // ---- Schema.org Product JSON-LD ----
+    /** ページ内の JSON-LD から @type=Product のノードを探して返す */
     private fun parseSchemaOrgProduct(doc: Document): com.fasterxml.jackson.databind.JsonNode? {
         doc.select("script[type=application/ld+json]").forEach { script ->
             try {
@@ -239,6 +246,7 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
         return null
     }
 
+    /** 相対URLを絶対URLに解決する。すでに絶対URLの場合はそのまま返す */
     private fun resolveUrl(base: String, target: String): String {
         if (target.startsWith("http://") || target.startsWith("https://")) return target
         val baseUri = try { java.net.URI(base) } catch (_: Exception) { return target }

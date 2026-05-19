@@ -1,4 +1,4 @@
-﻿package com.gloli.domain
+package com.gloli.domain
 
 import com.gloli.domain.enums.Priority
 import com.gloli.domain.enums.Status
@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
+/** ウィッシュリストの1件分のアイテム */
 @Entity
 @Table(name = "wishlist_items")
 class WishlistItem(
@@ -15,9 +16,11 @@ class WishlistItem(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
+    /** 商品名。スクレイパーで自動入力されることが多い */
     @Column(columnDefinition = "TEXT")
     var name: String? = null,
 
+    /** 商品ページURL。一意制約はDBではなくサービス層で担保する */
     @Column(nullable = false, length = 2048)
     var url: String,
 
@@ -37,13 +40,14 @@ class WishlistItem(
     @Enumerated(EnumType.STRING)
     var priority: Priority = Priority.MEDIUM,
 
+    /** OWNED になるとウィッシュリストから除外されコレクションに移動する */
     @Enumerated(EnumType.STRING)
     var status: Status = Status.WANTED,
 
-    // ローカル保存した画像のファイル名（./data/images/ 配下）
+    /** ローカル保存した画像のファイル名（./data/images/ 配下）*/
     var imagePath: String? = null,
 
-    // 外部画像URL。imagePath と両立しないため、どちらかを設定したらもう一方はクリアする
+    /** 外部画像URL。imagePath と両立しないため、どちらかを設定したらもう一方はクリアする */
     @Column(length = 2048)
     var imageUrl: String? = null,
 
@@ -54,6 +58,6 @@ class WishlistItem(
     @UpdateTimestamp
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 
-    // null = アクティブ、non-null = ソフトデリート済み（アーカイブ）
+    /** null = アクティブ、non-null = ソフトデリート済み（アーカイブ）*/
     var deletedAt: LocalDateTime? = null
 )
