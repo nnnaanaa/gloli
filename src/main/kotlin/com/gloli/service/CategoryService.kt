@@ -28,6 +28,9 @@ class CategoryService(private val repo: CategoryRepository) {
 
     fun update(id: Long, req: CategoryRequest): CategoryResponse {
         val category = repo.findById(id).orElseThrow { notFound(id) }
+        if (category.name != req.name && repo.existsByName(req.name)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Category name already exists: ${req.name}")
+        }
         category.name = req.name
         return repo.save(category).toResponse()
     }

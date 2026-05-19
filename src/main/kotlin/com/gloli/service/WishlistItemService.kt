@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 @Service
 @Transactional
@@ -58,6 +56,9 @@ class WishlistItemService(
         repo.findById(id).orElseThrow { notFound(id) }.toResponse()
 
     fun create(req: WishlistItemRequest): WishlistItemResponse {
+        if (!req.url.isNullOrBlank() && repo.existsByUrlAndDeletedAtIsNull(req.url)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "This URL is already in your list")
+        }
         val brand = req.brandId?.let {
             brandRepo.findById(it).orElseThrow {
                 ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found: id=$it")
@@ -83,6 +84,9 @@ class WishlistItemService(
 
     fun update(id: Long, req: WishlistItemRequest): WishlistItemResponse {
         val item = repo.findById(id).orElseThrow { notFound(id) }
+        if (!req.url.isNullOrBlank() && req.url != item.url && repo.existsByUrlAndDeletedAtIsNullAndIdNot(req.url, id)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "This URL is already in your list")
+        }
         val brand = req.brandId?.let {
             brandRepo.findById(it).orElseThrow {
                 ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found: id=$it")
@@ -129,16 +133,31 @@ class WishlistItemService(
 
     fun uploadImage(id: Long, file: MultipartFile): WishlistItemResponse {
         val item = repo.findById(id).orElseThrow { notFound(id) }
+        val bytes = file.bytes
+        val ext = detectImageExtension(bytes)
         val dir = File("./data/images").absoluteFile.also { it.mkdirs() }
-        val ext = file.originalFilename?.substringAfterLast('.', "jpg") ?: "jpg"
         item.imagePath?.let { File(dir, it).delete() }
         val filename = "$id.$ext"
-        file.inputStream.use { input ->
-            Files.copy(input, File(dir, filename).toPath(), StandardCopyOption.REPLACE_EXISTING)
-        }
+        File(dir, filename).writeBytes(bytes)
         item.imagePath = filename
         item.imageUrl = null
         return repo.save(item).toResponse()
+    }
+
+    private fun detectImageExtension(bytes: ByteArray): String {
+        val b = bytes
+        val isJpeg  = b.size >= 3  && b[0] == 0xFF.toByte() && b[1] == 0xD8.toByte() && b[2] == 0xFF.toByte()
+        val isPng   = b.size >= 4  && b[0] == 0x89.toByte() && b[1] == 0x50.toByte() && b[2] == 0x4E.toByte() && b[3] == 0x47.toByte()
+        val isGif   = b.size >= 4  && b[0] == 0x47.toByte() && b[1] == 0x49.toByte() && b[2] == 0x46.toByte() && b[3] == 0x38.toByte()
+        val isWebp  = b.size >= 12 && b[0] == 0x52.toByte() && b[1] == 0x49.toByte() && b[2] == 0x46.toByte() && b[3] == 0x46.toByte()
+                                   && b[8] == 0x57.toByte() && b[9] == 0x45.toByte() && b[10] == 0x42.toByte() && b[11] == 0x50.toByte()
+        return when {
+            isJpeg -> "jpg"
+            isPng  -> "png"
+            isGif  -> "gif"
+            isWebp -> "webp"
+            else   -> throw ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Only JPEG, PNG, GIF, and WebP images are allowed")
+        }
     }
 
     fun getImage(id: Long): Pair<ByteArray, String> {

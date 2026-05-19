@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 interface WishlistItemRepository : JpaRepository<WishlistItem, Long> {
     fun findAllByDeletedAtIsNull(): List<WishlistItem>
     fun findAllByDeletedAtIsNotNull(): List<WishlistItem>
+    fun existsByUrlAndDeletedAtIsNull(url: String): Boolean
+    fun existsByUrlAndDeletedAtIsNullAndIdNot(url: String, id: Long): Boolean
 }

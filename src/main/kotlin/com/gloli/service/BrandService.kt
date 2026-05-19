@@ -28,6 +28,9 @@ class BrandService(private val repo: BrandRepository) {
 
     fun update(id: Long, req: BrandRequest): BrandResponse {
         val brand = repo.findById(id).orElseThrow { notFound(id) }
+        if (brand.name != req.name && repo.existsByName(req.name)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Brand name already exists: ${req.name}")
+        }
         brand.name = req.name
         brand.url = req.url
         return repo.save(brand).toResponse()
