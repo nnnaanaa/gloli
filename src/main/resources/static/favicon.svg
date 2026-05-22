@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="#07050e"/>
-  <!-- left lobe -->
-  <path d="M16,12 C13,5 2,5 2,12 C2,19 13,19 16,12Z" fill="#6a20a0"/>
-  <!-- right lobe -->
-  <path d="M16,12 C19,5 30,5 30,12 C30,19 19,19 16,12Z" fill="#6a20a0"/>
+  <!-- left lobe: inner edge straight (sharp pinch at knot), outer edge rounded -->
+  <path d="M16,12 L5,7 Q2,12 5,17Z" fill="#6a20a0"/>
+  <!-- right lobe: mirror -->
+  <path d="M16,12 L27,7 Q30,12 27,17Z" fill="#6a20a0"/>
   <!-- left tail -->
-  <path d="M13.5,14 L8,28 L12,28 L16,17Z" fill="#6a20a0"/>
+  <path d="M14,14 L8,28 L12,28 L16,17Z" fill="#6a20a0"/>
   <!-- right tail -->
-  <path d="M18.5,14 L24,28 L20,28 L16,17Z" fill="#6a20a0"/>
+  <path d="M18,14 L24,28 L20,28 L16,17Z" fill="#6a20a0"/>
   <!-- center knot -->
-  <circle cx="16" cy="12" r="3.2" fill="#9038c8"/>
+  <circle cx="16" cy="12" r="3" fill="#9038c8"/>
 </svg>
