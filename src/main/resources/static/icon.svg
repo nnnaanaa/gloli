@@ -1,4 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#1a0535"/>
-  <image xlink:href="/gloli.png" x="-25" y="0" width="560" height="560" style="mix-blend-mode:multiply"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#07050e"/>
+  <!-- left lobe -->
+  <path d="M256,192 C208,80 32,80 32,192 C32,304 208,304 256,192Z" fill="#6a20a0"/>
+  <!-- right lobe -->
+  <path d="M256,192 C304,80 480,80 480,192 C480,304 304,304 256,192Z" fill="#6a20a0"/>
+  <!-- left tail -->
+  <path d="M216,224 L128,448 L192,448 L256,272Z" fill="#6a20a0"/>
+  <!-- right tail -->
+  <path d="M296,224 L384,448 L320,448 L256,272Z" fill="#6a20a0"/>
+  <!-- center knot -->
+  <circle cx="256" cy="192" r="51" fill="#9038c8"/>
 </svg>
