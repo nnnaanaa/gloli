@@ -4,6 +4,7 @@ import com.gloli.domain.WishlistItem
 import com.gloli.domain.enums.Priority
 import com.gloli.domain.enums.Status
 import com.gloli.dto.BrandResponse
+import com.gloli.dto.BulkRefreshResult
 import com.gloli.dto.CategoryResponse
 import com.gloli.dto.WishlistItemRequest
 import com.gloli.dto.WishlistItemResponse
@@ -23,7 +24,8 @@ import java.io.File
 class WishlistItemService(
     private val repo: WishlistItemRepository,
     private val brandRepo: BrandRepository,
-    private val categoryRepo: CategoryRepository
+    private val categoryRepo: CategoryRepository,
+    private val scraperService: ProductScraperService
 ) {
 
     /** OWNED を除くアクティブなアイテムを返す。フィルタ条件はすべて省略可能 */
@@ -117,6 +119,32 @@ class WishlistItemService(
         }
         item.imageUrl = req.imageUrl
         return repo.save(item).toResponse()
+    }
+
+    /**
+     * 全アクティブアイテムのURLを再スクレイプし、price と（名前が未設定の場合は）name を更新する。
+     * 1件ごとに失敗してもほかのアイテムの処理は継続する。
+     */
+    fun refreshAll(): BulkRefreshResult {
+        val items = repo.findAllByDeletedAtIsNull()
+        var updated = 0
+        var failed = 0
+        for (item in items) {
+            try {
+                val info = scraperService.scrape(item.url)
+                if (item.name.isNullOrBlank() && !info.name.isNullOrBlank()) item.name = info.name
+                if (info.price != null) item.price = info.price
+                // 画像が未設定の場合のみスクレイプ結果で補完する
+                if (item.imagePath == null && item.imageUrl == null && !info.imageUrl.isNullOrBlank()) {
+                    item.imageUrl = info.imageUrl
+                }
+                repo.save(item)
+                updated++
+            } catch (_: Exception) {
+                failed++
+            }
+        }
+        return BulkRefreshResult(total = items.size, updated = updated, failed = failed)
     }
 
     /** deletedAt をセットするだけでDBからは削除しない（アーカイブへ移動）*/

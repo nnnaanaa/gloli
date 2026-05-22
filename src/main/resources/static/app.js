@@ -772,6 +772,31 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
   });
 })();
 
+// ---- Refresh All ----
+async function refreshAllItems() {
+  const btn = get('refresh-all-btn');
+  const orig = btn.textContent;
+  btn.textContent = '···';
+  btn.disabled = true;
+  try {
+    const result = await (await api('/wishlist/refresh-all', { method: 'POST' })).json();
+    const msg = result.failed > 0
+      ? `Updated ${result.updated} / ${result.total} items (${result.failed} failed)`
+      : `Updated ${result.updated} / ${result.total} items`;
+    showToast(msg);
+    loadItems();
+    if (window.mascotSay) {
+      if (result.failed > 0) window.mascotSay('いくつか取得できなかったの…');
+      else window.mascotSay('全部チェックしたよ！価格が変わってないといいね…');
+    }
+  } catch {
+    showToast('Refresh failed.');
+  } finally {
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
+}
+
 // ---- Refresh ----
 async function refreshPage() {
   const btn = get('refresh-btn');

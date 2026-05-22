@@ -2,6 +2,7 @@ package com.gloli.controller
 
 import com.gloli.domain.enums.Priority
 import com.gloli.domain.enums.Status
+import com.gloli.dto.BulkRefreshResult
 import com.gloli.dto.WishlistItemRequest
 import com.gloli.dto.WishlistItemResponse
 import com.gloli.service.WishlistItemService
@@ -85,6 +86,11 @@ class WishlistItemController(private val service: WishlistItemService) {
         @PathVariable id: Long,
         @RequestParam file: MultipartFile
     ): WishlistItemResponse = service.uploadImage(id, file)
+
+    /** 全アクティブアイテムを再スクレイプして price・name（空欄時）・imageUrl（未設定時）を更新する */
+    @PostMapping("/refresh-all")
+    @Operation(summary = "Bulk refresh all items", description = "Re-scrapes each item's URL and updates price, name (if blank), and imageUrl (if not set)")
+    fun refreshAll(): BulkRefreshResult = service.refreshAll()
 
     @GetMapping("/{id}/image")
     @Operation(summary = "Get image")
