@@ -1,13 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#07050e"/>
-  <!-- left lobe -->
-  <path d="M256,192 L80,112 Q32,192 80,272Z" fill="#6a20a0"/>
-  <!-- right lobe -->
-  <path d="M256,192 L432,112 Q480,192 432,272Z" fill="#6a20a0"/>
-  <!-- left tail -->
-  <path d="M224,224 L128,448 L192,448 L256,272Z" fill="#6a20a0"/>
-  <!-- right tail -->
-  <path d="M288,224 L384,448 L320,448 L256,272Z" fill="#6a20a0"/>
-  <!-- center knot -->
-  <circle cx="256" cy="192" r="48" fill="#9038c8"/>
+  <rect width="512" height="512" rx="96" fill="#2a0d4a"/>
+  <path d="M256,208 C224,112 80,48 16,208 C80,368 224,304 256,208 Z" fill="#c07ff0"/>
+  <path d="M256,208 C288,112 432,48 496,208 C432,368 288,304 256,208 Z" fill="#c07ff0"/>
+  <path d="M192,256 L240,256 L192,464 L112,464 Z" fill="#c07ff0"/>
+  <path d="M272,256 L320,256 L400,464 L320,464 Z" fill="#c07ff0"/>
+  <circle cx="256" cy="208" r="56" fill="#e4b8ff"/>
 </svg>
