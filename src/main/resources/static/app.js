@@ -69,6 +69,32 @@ async function api(path, opt) {
 
 // ---- Budget ----
 let _monthlyBudget = +localStorage.getItem('gloli_monthly_budget') || 0;
+let _monthBudgets = JSON.parse(localStorage.getItem('gloli_month_budgets') || '{}');
+
+function getMonthBudget(month) {
+  return _monthBudgets[month] ?? _monthlyBudget || null;
+}
+
+function editMonthBudget(month, el) {
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.value = _monthBudgets[month] ?? _monthlyBudget ?? '';
+  input.className = 'month-budget-input';
+  input.min = '0';
+  input.step = '1000';
+  input.placeholder = '0';
+  const save = () => {
+    const val = parseInt(input.value) || 0;
+    if (val) _monthBudgets[month] = val;
+    else delete _monthBudgets[month];
+    localStorage.setItem('gloli_month_budgets', JSON.stringify(_monthBudgets));
+    loadStats();
+  };
+  input.onblur = save;
+  input.onkeydown = e => { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') loadStats(); };
+  el.replaceWith(input);
+  input.focus(); input.select();
+}
 function onMonthlyBudgetInput() {
   _monthlyBudget = +get('stats-budget-input').value || 0;
   localStorage.setItem('gloli_monthly_budget', _monthlyBudget);
@@ -392,9 +418,10 @@ async function loadStats() {
   const monthsToAfford = (_monthlyBudget && plannedTotal) ? Math.ceil(plannedTotal / _monthlyBudget) : null;
 
   // This month budget card
+  const thisMonthBudget = getMonthBudget(thisMonth);
   let budgetCardHtml = '';
-  if (_monthlyBudget && thisMonthHasPrice) {
-    const diff = _monthlyBudget - thisMonthTotal;
+  if (thisMonthBudget && thisMonthHasPrice) {
+    const diff = thisMonthBudget - thisMonthTotal;
     const cls  = diff >= 0 ? 'under' : 'over';
     const sign = diff >= 0 ? 'remaining' : 'over budget';
     budgetCardHtml = `<div class="stat-card stat-budget-card ${cls}">
@@ -431,27 +458,30 @@ async function loadStats() {
     if (!_statsMonthItems[key]) _statsMonthItems[key] = [];
     _statsMonthItems[key].push(i);
   }
-  const budgetRef = _monthlyBudget || Math.max(...Object.values(map).map(d => d.total), 1);
-  const maxBar    = Math.max(...Object.values(map).map(d => d.total), budgetRef, 1);
-  const budgetPct = _monthlyBudget ? Math.round(_monthlyBudget / maxBar * 100) : null;
   const keys = Object.keys(map).sort().reverse();
+  const allRowBudgets = keys.map(k => getMonthBudget(k) || 0);
+  const maxBar = Math.max(...Object.values(map).map(d => d.total), ...allRowBudgets, 1);
   const rows = keys.map(k => {
     const [y, m] = k.split('-');
     const d = map[k];
+    const rowBudget = getMonthBudget(k);
     const pct = d.hasPrice ? Math.round(d.total / maxBar * 100) : 0;
-    const over = _monthlyBudget && d.hasPrice && d.total > _monthlyBudget;
+    const over = rowBudget && d.hasPrice && d.total > rowBudget;
+    const rowBudgetPct = rowBudget ? Math.round(rowBudget / maxBar * 100) : null;
     let diffHtml = '';
-    if (_monthlyBudget && d.hasPrice) {
-      const diff = _monthlyBudget - d.total;
+    if (rowBudget && d.hasPrice) {
+      const diff = rowBudget - d.total;
       diffHtml = diff >= 0
         ? `<span class="diff-badge under">+¥${diff.toLocaleString()}</span>`
         : `<span class="diff-badge over">-¥${Math.abs(diff).toLocaleString()}</span>`;
     }
+    const isOverridden = _monthBudgets[k] != null;
+    const budgetChip = `<span class="month-budget-chip${rowBudget ? (isOverridden ? ' overridden' : '') : ' empty'}" onclick="event.stopPropagation();editMonthBudget('${k}',this)">${rowBudget ? '¥'+rowBudget.toLocaleString() : 'budget…'}</span>`;
     return `<tr class="${over ? 'row-over' : ''} month-row" data-month="${k}" onclick="toggleMonthDetail('${k}')">
-      <td class="stat-month">${y}/${parseInt(m)}<span class="month-toggle-arrow">›</span></td>
+      <td class="stat-month"><div>${y}/${parseInt(m)}<span class="month-toggle-arrow">›</span></div>${budgetChip}</td>
       <td class="stat-count">${d.count}</td>
       <td class="stat-bar-cell">
-        ${budgetPct != null ? `<div class="stat-budget-line" style="left:${budgetPct}%"></div>` : ''}
+        ${rowBudgetPct != null ? `<div class="stat-budget-line" style="left:${rowBudgetPct}%"></div>` : ''}
         <div class="stat-bar${over ? ' over' : ''}" style="width:${pct}%"></div>
       </td>
       <td class="stat-total">${d.hasPrice ? '¥'+d.total.toLocaleString() : '-'}</td>
@@ -459,7 +489,7 @@ async function loadStats() {
     </tr>`;
   }).join('');
   get('stats-monthly').innerHTML = `
-    <h3 class="stats-section-title">Monthly Spending${_monthlyBudget ? `&ensp;<span class="budget-ref-label">Budget ¥${_monthlyBudget.toLocaleString()}/mo</span>` : ''}</h3>
+    <h3 class="stats-section-title">Monthly Spending${_monthlyBudget ? `&ensp;<span class="budget-ref-label">Default ¥${_monthlyBudget.toLocaleString()}/mo</span>` : ''}</h3>
     <table class="stats-monthly-table"><tbody>${rows}</tbody></table>`;
 
   // --- planned purchases timeline ---
@@ -482,13 +512,17 @@ async function loadStats() {
     const badge = isPast
       ? `<span class="plan-badge overdue">Overdue</span>`
       : isCurrent ? `<span class="plan-badge current">This month</span>` : '';
+    const planMonthBudget = getMonthBudget(k);
+    const isPlanOver = planMonthBudget && d.hasPrice && d.total > planMonthBudget;
     let diffHtml = '';
-    if (_monthlyBudget && d.hasPrice) {
-      const diff = _monthlyBudget - d.total;
+    if (planMonthBudget && d.hasPrice) {
+      const diff = planMonthBudget - d.total;
       diffHtml = diff >= 0
         ? `<span class="diff-badge under">+¥${diff.toLocaleString()}</span>`
         : `<span class="diff-badge over">-¥${Math.abs(diff).toLocaleString()}</span>`;
     }
+    const planBudgetIsOverridden = _monthBudgets[k] != null;
+    const planBudgetChip = `<span class="month-budget-chip plan-budget-chip${planMonthBudget ? (planBudgetIsOverridden ? ' overridden' : '') : ' empty'}" onclick="editMonthBudget('${k}',this)">${planMonthBudget ? '¥'+planMonthBudget.toLocaleString() : 'budget…'}</span>`;
     const itemRows = d.items.map(i => {
       const pClass = (i.priority || 'medium').toLowerCase();
       const pLabel = i.priority ? i.priority[0] + i.priority.slice(1).toLowerCase() : 'Medium';
@@ -504,10 +538,11 @@ async function loadStats() {
         </div>
       </div>`;
     }).join('');
-    return `<div class="plan-month-block${isPast ? ' plan-past' : isCurrent ? ' plan-current' : ''}">
+    return `<div class="plan-month-block${isPast ? ' plan-past' : isCurrent ? ' plan-current' : (isPlanOver ? ' plan-over' : '')}">
       <div class="plan-month-header">
         <span class="plan-month-label">${y}/${parseInt(m)}${badge}</span>
         <span class="plan-month-count">${d.items.length} items</span>
+        ${planBudgetChip}
         ${d.hasPrice ? `<span class="plan-month-total">¥${d.total.toLocaleString()}</span>` : ''}
         ${diffHtml}
       </div>

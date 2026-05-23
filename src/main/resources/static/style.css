@@ -970,6 +970,25 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 .month-row.month-expanded .month-toggle-arrow { transform: rotate(90deg); }
 .month-detail-cell { padding: 0 !important; border-top: none !important; }
 .stats-monthly-table tr.month-detail:hover td { background: transparent; }
+.stat-month { white-space: normal !important; }
+.month-budget-chip {
+  display: inline-block; margin-top: 3px;
+  font-size: 0.72rem; color: var(--muted);
+  border: 1px dashed rgba(122,101,142,0.35);
+  border-radius: 5px; padding: 1px 6px;
+  cursor: pointer; transition: color 0.12s, border-color 0.12s;
+}
+.month-budget-chip:hover { color: var(--accent-lt); border-color: var(--accent); }
+.month-budget-chip.overridden { color: var(--accent-lt); border-color: var(--accent); border-style: solid; }
+.month-budget-chip.empty { color: rgba(122,101,142,0.4); }
+.month-budget-input {
+  width: 90px; padding: 2px 6px; font-size: 0.78rem; height: auto;
+  border: 1px solid var(--accent); border-radius: 4px;
+  background: var(--card); color: var(--text); font-family: var(--font-body);
+  margin-top: 2px;
+}
+.plan-budget-chip { margin-top: 0; }
+.plan-month-block.plan-over { border-color: #7e3030; }
 
 /* ---- Planned purchases timeline ---- */
 .plan-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; margin-bottom: 28px; }
