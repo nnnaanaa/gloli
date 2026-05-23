@@ -669,12 +669,12 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 #archive tr.grail {
   border: 2px solid transparent;
   background: linear-gradient(var(--card), var(--card)) padding-box,
-              linear-gradient(135deg, #8b6010, #d4a020, #f8e060, #fffaaa, #f8e060, #d4a020, #8b6010) border-box;
-  box-shadow: 0 0 16px rgba(210, 160, 30, 0.18);
+              linear-gradient(135deg, #2a0850, #7a30c0, #d090f8, #f0d8ff, #d090f8, #7a30c0, #2a0850) border-box;
+  box-shadow: 0 0 18px rgba(168, 101, 212, 0.22);
 }
 #wishlist tr.grail:hover,
 #collection tr.grail:hover {
-  box-shadow: 0 0 24px rgba(230, 180, 40, 0.32);
+  box-shadow: 0 0 28px rgba(168, 101, 212, 0.42);
 }
 
 /* ---- Loading screen ---- */

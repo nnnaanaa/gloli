@@ -334,7 +334,10 @@ async function loadStats() {
     api('/wishlist/owned').then(r => r.json()),
     api('/wishlist').then(r => r.json()),
   ]);
-  const hasData = ownedItems.some(i => i.purchasedAt);
+  // ORDERED で purchasedAt が設定されているものも購入済みとして扱う
+  const orderedPurchased = wishlistItems.filter(i => i.status === 'ORDERED' && i.purchasedAt);
+  const purchasedItems = [...ownedItems, ...orderedPurchased];
+  const hasData = purchasedItems.some(i => i.purchasedAt);
   get('stats-empty').style.display = (hasData || wishlistItems.length) ? 'none' : '';
   if (!hasData && !wishlistItems.length) {
     get('stats-summary').innerHTML = '';
@@ -345,14 +348,14 @@ async function loadStats() {
   if (_monthlyBudget) get('stats-budget-input').value = _monthlyBudget;
 
   // --- summary cards ---
-  const spent = ownedItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
+  const spent = purchasedItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
   const thisMonth = new Date().toISOString().slice(0, 7);
-  const thisMonthItems = ownedItems.filter(i => i.purchasedAt?.startsWith(thisMonth));
+  const thisMonthItems = purchasedItems.filter(i => i.purchasedAt?.startsWith(thisMonth));
   const thisMonthHasPrice = thisMonthItems.some(i => i.price != null);
   const thisMonthTotal = thisMonthItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
 
-  // Planned spending (購入予定日が設定されていて price もあるアイテムのみ)
-  const plannedItems = wishlistItems.filter(i => i.price != null && i.plannedAt != null);
+  // Planned spending (WANTED かつ plannedAt と price が設定されているアイテムのみ。ORDERED は purchasedItems で計上済み)
+  const plannedItems = wishlistItems.filter(i => i.status === 'WANTED' && i.price != null && i.plannedAt != null);
   const plannedTotal = plannedItems.reduce((s, i) => s + Number(i.price), 0);
   const monthsToAfford = (_monthlyBudget && plannedTotal) ? Math.ceil(plannedTotal / _monthlyBudget) : null;
 
@@ -376,8 +379,8 @@ async function loadStats() {
     </div>` : '';
 
   get('stats-summary').innerHTML = `
-    <div class="stat-card"><div class="stat-val">${ownedItems.length}</div><div class="stat-label">Total owned</div></div>
-    <div class="stat-card"><div class="stat-val">${ownedItems.filter(i=>i.price!=null).length ? '¥'+spent.toLocaleString() : '-'}</div><div class="stat-label">Total spent</div></div>
+    <div class="stat-card"><div class="stat-val">${purchasedItems.length}</div><div class="stat-label">Total purchased</div></div>
+    <div class="stat-card"><div class="stat-val">${purchasedItems.filter(i=>i.price!=null).length ? '¥'+spent.toLocaleString() : '-'}</div><div class="stat-label">Total spent</div></div>
     <div class="stat-card"><div class="stat-val">${thisMonthItems.length}</div><div class="stat-label">This month's items</div></div>
     <div class="stat-card"><div class="stat-val">${thisMonthHasPrice ? '¥'+thisMonthTotal.toLocaleString() : '-'}</div><div class="stat-label">This month's spending</div></div>
     ${budgetCardHtml}
@@ -386,7 +389,7 @@ async function loadStats() {
   // --- monthly table ---
   if (!hasData) { get('stats-monthly').innerHTML = ''; return; }
   const map = {};
-  for (const i of ownedItems) {
+  for (const i of purchasedItems) {
     if (!i.purchasedAt) continue;
     const key = i.purchasedAt.slice(0, 7);
     if (!map[key]) map[key] = { count: 0, total: 0, hasPrice: false };

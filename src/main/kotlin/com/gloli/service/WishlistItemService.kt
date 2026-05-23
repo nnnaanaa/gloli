@@ -55,7 +55,8 @@ class WishlistItemService(
     fun updateStatus(id: Long, status: Status): WishlistItemResponse {
         val item = repo.findById(id).orElseThrow { notFound(id) }
         item.status = status
-        if (status == Status.OWNED && item.purchasedAt == null) item.purchasedAt = LocalDate.now()
+        if ((status == Status.OWNED || status == Status.ORDERED) && item.purchasedAt == null) item.purchasedAt = LocalDate.now()
+        if (status == Status.WANTED) item.purchasedAt = null
         return repo.save(item).toResponse()
     }
 
@@ -90,7 +91,7 @@ class WishlistItemService(
             purchasedAt = req.purchasedAt,
             plannedAt = req.plannedAt
         )
-        if (item.status == Status.OWNED && item.purchasedAt == null) item.purchasedAt = LocalDate.now()
+        if ((item.status == Status.OWNED || item.status == Status.ORDERED) && item.purchasedAt == null) item.purchasedAt = LocalDate.now()
         return repo.save(item).toResponse()
     }
 
@@ -124,7 +125,7 @@ class WishlistItemService(
             item.imagePath = null
         }
         item.imageUrl = req.imageUrl
-        item.purchasedAt = req.purchasedAt ?: if (req.status == Status.OWNED) item.purchasedAt ?: LocalDate.now() else null
+        item.purchasedAt = req.purchasedAt ?: if (req.status == Status.OWNED || req.status == Status.ORDERED) item.purchasedAt ?: LocalDate.now() else null
         item.plannedAt = req.plannedAt
         return repo.save(item).toResponse()
     }
