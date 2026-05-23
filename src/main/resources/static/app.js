@@ -488,7 +488,7 @@ async function loadStats() {
     const itemRows = d.items.map(i => {
       const pClass = (i.priority || 'medium').toLowerCase();
       const pLabel = i.priority ? i.priority[0] + i.priority.slice(1).toLowerCase() : 'Medium';
-      return `<div class="plan-item${i.priority === 'GRAIL' ? ' grail' : ''}">
+      return `<div class="plan-item${i.priority === 'GRAIL' ? ' grail' : ''}" onclick="openEdit(${i.id},'stats')">
         ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" class="plan-thumb" alt="">` : '<div class="plan-thumb plan-thumb-empty"></div>'}
         <div class="plan-item-info">
           <span class="plan-item-name">${esc(i.name || i.url)}</span>
@@ -610,6 +610,7 @@ async function saveItem() {
   showToast('Item saved.');
   if (_editContext === 'collection') loadCollection();
   else if (_editContext === 'archive') loadArchive();
+  else if (_editContext === 'stats') { loadItems(); loadStats(); }
   else loadItems();
   if (window.mascotSay) {
     const _ms = ['ちゃんと更新したのね', '保存完了よ', '直したの？えらいえらい'];

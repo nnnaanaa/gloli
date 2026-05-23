@@ -987,9 +987,12 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 .plan-item {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer; transition: background 0.12s;
 }
+.plan-item:hover { background: rgba(168,101,212,0.08); }
 .plan-item:last-child { border-bottom: none; }
 .plan-item.grail { background: rgba(74,42,106,0.12); }
+.plan-item.grail:hover { background: rgba(74,42,106,0.22); }
 .plan-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; flex-shrink: 0; }
 .plan-thumb-empty {
   width: 40px; height: 40px; flex-shrink: 0; border-radius: 5px;
