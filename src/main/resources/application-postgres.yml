@@ -4,6 +4,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: ${DB_USER:wishlist}
     password: ${DB_PASS:changeme}
+  h2:
+    console:
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: update

@@ -901,7 +901,7 @@ const _lmTimer = setInterval(() => { _lb.textContent = _loadMsgs[++_lmi % _loadM
 
 if (_budget) get('budget-input').value = _budget;
 const _loadStart = Date.now();
-Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
+function _dismissLoading() {
   clearInterval(_lmTimer);
   const elapsed = Date.now() - _loadStart;
   const wait = Math.max(0, 2000 - elapsed);
@@ -924,7 +924,10 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
       }, 600);
     }, 550);
   }, wait);
-});
+}
+Promise.all([loadItems(), loadBrands(), loadCategories()])
+  .then(_dismissLoading)
+  .catch(err => { _dismissLoading(); showToast('Failed to load data. Check the server.'); console.error('Initial load failed:', err); });
 
 // ---- Mascot ----
 (function() {
