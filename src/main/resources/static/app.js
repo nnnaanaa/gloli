@@ -470,7 +470,6 @@ async function openEdit(id, context) {
   get('edit-planned-at').value = i.plannedAt ?? '';
   get('edit-purchased-at').value = i.purchasedAt ?? '';
   get('edit-notes').value = i.notes ?? '';
-  get('edit-priority').value = i.priority ?? 'MEDIUM';
   // sync select options then restore value
   const bSel = get('edit-brand');
   bSel.innerHTML = get('w-brand').innerHTML;
@@ -526,7 +525,7 @@ async function saveItem() {
   const url = get('edit-url').value.trim();
   if (!url) return alert('URL is required.');
   const id = get('edit-id').value;
-  const body = { url, priority: get('edit-priority').value, status: _editItem?.status ?? 'WANTED' };
+  const body = { url, priority: _editItem?.priority ?? 'MEDIUM', status: _editItem?.status ?? 'WANTED' };
   const name = get('edit-name').value.trim();
   const brandId = get('edit-brand').value;
   const categoryId = get('edit-category').value;
@@ -550,15 +549,14 @@ async function saveItem() {
     fd.append('file', imgFile);
     await api('/wishlist/'+id+'/image', { method:'POST', body:fd });
   }
-  const _savedPriority = body.priority;
   closeEdit();
   showToast('Item saved.');
   if (_editContext === 'collection') loadCollection();
   else if (_editContext === 'archive') loadArchive();
   else loadItems();
   if (window.mascotSay) {
-    if (_savedPriority === 'GRAIL') window.mascotSay('グレイルに格上げしたの！？気合い入ってるね…');
-    else { const _ms = ['ちゃんと更新したのね', '保存完了よ', '直したの？えらいえらい']; window.mascotSay(_ms[Math.floor(Math.random() * _ms.length)]); }
+    const _ms = ['ちゃんと更新したのね', '保存完了よ', '直したの？えらいえらい'];
+    window.mascotSay(_ms[Math.floor(Math.random() * _ms.length)]);
   }
 }
 
