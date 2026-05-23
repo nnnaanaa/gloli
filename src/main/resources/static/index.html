@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@
 </head>
 <body>
 <div id="loading-screen">
-  <div class="loading-bubble" id="loading-bubble">少々お待ちを…</div>
+  <div class="loading-bubble" id="loading-bubble">Loading…</div>
   <img src="/gloli.png" alt="">
   <div class="loading-title">gloli</div>
 </div>
@@ -44,6 +44,7 @@
   <button class="drawer-item active" data-target="wishlist" onclick="navTo('wishlist',this)">Items</button>
   <button class="drawer-item" data-target="collection" onclick="navTo('collection',this)">Collection</button>
   <button class="drawer-item" data-target="archive" onclick="navTo('archive',this)">Archive</button>
+  <button class="drawer-item" data-target="stats" onclick="navTo('stats',this)">Stats</button>
   <button class="drawer-item" data-target="brands" onclick="navTo('brands',this)">Brands</button>
   <button class="drawer-item" data-target="categories" onclick="navTo('categories',this)">Categories</button>
 </nav>
@@ -167,6 +168,14 @@
         <button onclick="closeInlineCat('edit-category')">✕</button>
       </div>
       <input id="edit-price" type="number" placeholder="Price">
+      <div>
+        <label class="modal-label">Planned date</label>
+        <input id="edit-planned-at" type="date">
+      </div>
+      <div>
+        <label class="modal-label">Purchase date</label>
+        <input id="edit-purchased-at" type="date">
+      </div>
       <select id="edit-priority">
         <option value="LOW">Low</option>
         <option value="MEDIUM">Medium</option>
@@ -222,7 +231,7 @@
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th class="col-img">Image</th><th>Name</th><th>Brand</th><th>Category</th><th>Price</th><th>Notes</th><th></th></tr></thead>
+      <thead><tr><th class="col-img">Image</th><th>Name</th><th>Brand</th><th>Category</th><th>Price</th><th>Purchased</th><th>Notes</th><th></th></tr></thead>
       <tbody id="col-list"></tbody>
     </table>
   </div>
@@ -252,6 +261,23 @@
   <div id="arc-empty" class="empty-state" style="display:none">
     <p class="empty-msg">Archive is empty</p>
     <p class="empty-sub">Archived items will appear here</p>
+  </div>
+</div>
+
+<!-- stats -->
+<div id="stats" class="tab">
+  <h2>Stats</h2>
+  <div id="stats-budget-bar">
+    <label for="stats-budget-input">Monthly Budget</label>
+    <span class="budget-yen">¥</span>
+    <input id="stats-budget-input" type="number" placeholder="Not set" oninput="onMonthlyBudgetInput()">
+    <span id="stats-budget-hint" class="budget-hint"></span>
+  </div>
+  <div id="stats-summary" class="stats-summary"></div>
+  <div id="stats-monthly"></div>
+  <div id="stats-empty" class="empty-state" style="display:none">
+    <p class="empty-msg">No data yet</p>
+    <p class="empty-sub">Mark items as Owned to start tracking</p>
   </div>
 </div>
 

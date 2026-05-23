@@ -6,6 +6,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /** ウィッシュリストの1件分のアイテム */
@@ -59,5 +60,11 @@ class WishlistItem(
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 
     /** null = アクティブ、non-null = ソフトデリート済み（アーカイブ）*/
-    var deletedAt: LocalDateTime? = null
+    var deletedAt: LocalDateTime? = null,
+
+    /** ステータスが OWNED になった日（購入日）。OWNED 設定時に自動セット */
+    var purchasedAt: LocalDate? = null,
+
+    /** 購入予定日。ウィッシュリスト段階で設定し、Stats の月別計画に使われる */
+    var plannedAt: LocalDate? = null
 )

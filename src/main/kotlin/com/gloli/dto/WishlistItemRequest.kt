@@ -5,6 +5,7 @@ import com.gloli.domain.enums.Status
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
+import java.time.LocalDate
 
 /** ウィッシュリストアイテム作成・更新リクエスト */
 data class WishlistItemRequest(
@@ -21,5 +22,7 @@ data class WishlistItemRequest(
     val priority: Priority = Priority.MEDIUM,
     /** 外部画像URL。指定するとローカル保存画像は削除される */
     val imageUrl: String? = null,
-    val status: Status = Status.WANTED
+    val status: Status = Status.WANTED,
+    val purchasedAt: LocalDate? = null,
+    val plannedAt: LocalDate? = null
 )

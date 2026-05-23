@@ -14,12 +14,14 @@ function show(id) {
   document.querySelector(`.drawer-item[data-target="${id}"]`)?.classList.add('active');
   if (id === 'archive') loadArchive();
   if (id === 'collection') loadCollection();
+  if (id === 'stats') loadStats();
   const _tabMsgs = {
     wishlist:   ['ほしいものリスト、また増えた？', 'どれが一番ほしいの？', 'チェックしに来たの？'],
     collection: ['コレクション眺めてるの？', 'お気に入りが増えてきたね！', 'いいもの持ってるじゃない'],
     archive:    ['昔ほしかったものね…', 'アーカイブを掘り返してるの？', 'また気になってきた？'],
     brands:     ['ブランド整理してるの？マメね', 'お気に入りブランドはどこ？'],
     categories: ['カテゴリの管理ね', 'きちんと分類してるのね'],
+    stats:      ['お財布の状況チェック？', '買いすぎてない…？', 'ちゃんと管理してるのね'],
   };
   const _tm = _tabMsgs[id];
   if (_tm && window.mascotSay) window.mascotSay(_tm[Math.floor(Math.random() * _tm.length)]);
@@ -69,6 +71,13 @@ async function api(path, opt) {
 }
 
 // ---- Budget ----
+let _monthlyBudget = +localStorage.getItem('gloli_monthly_budget') || 0;
+function onMonthlyBudgetInput() {
+  _monthlyBudget = +get('stats-budget-input').value || 0;
+  localStorage.setItem('gloli_monthly_budget', _monthlyBudget);
+  loadStats();
+}
+
 let _budget = +localStorage.getItem('gloli_budget') || 0;
 function onBudgetInput() {
   _budget = +get('budget-input').value || 0;
@@ -271,9 +280,10 @@ async function loadCollection() {
     <td data-label="Brand"><span class="v">${esc(i.brand?.name)}</span></td>
     <td data-label="Category"><span class="v">${esc(i.category?.name)}</span></td>
     <td data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
+    <td data-label="Purchased" style="font-size:0.82rem;color:var(--muted)">${i.purchasedAt ?? ''}</td>
     <td data-label="Notes"><span class="v">${esc(i.notes)}</span></td>
     <td class="col-actions"><button class="edit" onclick="openEdit(${i.id},'collection')">Edit</button> <button class="edit" onclick="moveToWanted(${i.id})">↩ Wanted</button></td>
-  </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted)">No items in collection yet</td></tr>';
+  </tr>`).join('') : '<tr><td colspan="8" style="color:var(--muted)">No items in collection yet</td></tr>';
 }
 
 async function moveToWanted(id) {
@@ -314,9 +324,105 @@ async function loadArchive() {
     <td data-label="Name"><span class="v"><a href="${esc(i.url)}" target="_blank">${esc(i.name || i.url)}</a></span></td>
     <td data-label="Brand"><span class="v">${esc(i.brand?.name)}</span></td>
     <td data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
-    <td data-label="Archived" style="font-size:0.82rem;color:var(--muted)">${i.deletedAt ? new Date(i.deletedAt).toLocaleDateString('ja-JP') : ''}</td>
+    <td data-label="Archived" style="font-size:0.82rem;color:var(--muted)">${i.deletedAt ? i.deletedAt.slice(0,10) : ''}</td>
     <td class="col-actions" data-label=""><button class="edit" onclick="openEdit(${i.id},'archive')">Edit</button> <button class="edit" onclick="restoreItem(${i.id})">Restore</button> <button class="del" onclick="delItemPermanent(${i.id})">Delete</button></td>
   </tr>`).join('') : '<tr><td colspan="6">No archived items</td></tr>';
+}
+
+async function loadStats() {
+  const [ownedItems, wishlistItems] = await Promise.all([
+    api('/wishlist/owned').then(r => r.json()),
+    api('/wishlist').then(r => r.json()),
+  ]);
+  const hasData = ownedItems.some(i => i.purchasedAt);
+  get('stats-empty').style.display = (hasData || wishlistItems.length) ? 'none' : '';
+  if (!hasData && !wishlistItems.length) {
+    get('stats-summary').innerHTML = '';
+    get('stats-monthly').innerHTML = '';
+    return;
+  }
+
+  if (_monthlyBudget) get('stats-budget-input').value = _monthlyBudget;
+
+  // --- summary cards ---
+  const spent = ownedItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
+  const thisMonth = new Date().toISOString().slice(0, 7);
+  const thisMonthItems = ownedItems.filter(i => i.purchasedAt?.startsWith(thisMonth));
+  const thisMonthHasPrice = thisMonthItems.some(i => i.price != null);
+  const thisMonthTotal = thisMonthItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
+
+  // Planned spending (購入予定日が設定されていて price もあるアイテムのみ)
+  const plannedItems = wishlistItems.filter(i => i.price != null && i.plannedAt != null);
+  const plannedTotal = plannedItems.reduce((s, i) => s + Number(i.price), 0);
+  const monthsToAfford = (_monthlyBudget && plannedTotal) ? Math.ceil(plannedTotal / _monthlyBudget) : null;
+
+  // This month budget card
+  let budgetCardHtml = '';
+  if (_monthlyBudget && thisMonthHasPrice) {
+    const diff = _monthlyBudget - thisMonthTotal;
+    const cls  = diff >= 0 ? 'under' : 'over';
+    const sign = diff >= 0 ? 'remaining' : 'over budget';
+    budgetCardHtml = `<div class="stat-card stat-budget-card ${cls}">
+      <div class="stat-val">¥${Math.abs(diff).toLocaleString()}</div>
+      <div class="stat-label">This month ${sign}</div>
+    </div>`;
+  }
+
+  // Planned spending card
+  const plannedCardHtml = plannedItems.length ? `
+    <div class="stat-card">
+      <div class="stat-val">¥${plannedTotal.toLocaleString()}</div>
+      <div class="stat-label">Planned spending${monthsToAfford ? ` <span class="stat-months">(~${monthsToAfford}mo)</span>` : ''}</div>
+    </div>` : '';
+
+  get('stats-summary').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${ownedItems.length}</div><div class="stat-label">Total owned</div></div>
+    <div class="stat-card"><div class="stat-val">${ownedItems.filter(i=>i.price!=null).length ? '¥'+spent.toLocaleString() : '-'}</div><div class="stat-label">Total spent</div></div>
+    <div class="stat-card"><div class="stat-val">${thisMonthItems.length}</div><div class="stat-label">This month's items</div></div>
+    <div class="stat-card"><div class="stat-val">${thisMonthHasPrice ? '¥'+thisMonthTotal.toLocaleString() : '-'}</div><div class="stat-label">This month's spending</div></div>
+    ${budgetCardHtml}
+    ${plannedCardHtml}`;
+
+  // --- monthly table ---
+  if (!hasData) { get('stats-monthly').innerHTML = ''; return; }
+  const map = {};
+  for (const i of ownedItems) {
+    if (!i.purchasedAt) continue;
+    const key = i.purchasedAt.slice(0, 7);
+    if (!map[key]) map[key] = { count: 0, total: 0, hasPrice: false };
+    map[key].count++;
+    if (i.price != null) { map[key].total += Number(i.price); map[key].hasPrice = true; }
+  }
+  const budgetRef = _monthlyBudget || Math.max(...Object.values(map).map(d => d.total), 1);
+  const maxBar    = Math.max(...Object.values(map).map(d => d.total), budgetRef, 1);
+  const budgetPct = _monthlyBudget ? Math.round(_monthlyBudget / maxBar * 100) : null;
+  const keys = Object.keys(map).sort().reverse();
+  const rows = keys.map(k => {
+    const [y, m] = k.split('-');
+    const d = map[k];
+    const pct = d.hasPrice ? Math.round(d.total / maxBar * 100) : 0;
+    const over = _monthlyBudget && d.hasPrice && d.total > _monthlyBudget;
+    let diffHtml = '';
+    if (_monthlyBudget && d.hasPrice) {
+      const diff = _monthlyBudget - d.total;
+      diffHtml = diff >= 0
+        ? `<span class="diff-badge under">+¥${diff.toLocaleString()}</span>`
+        : `<span class="diff-badge over">-¥${Math.abs(diff).toLocaleString()}</span>`;
+    }
+    return `<tr class="${over ? 'row-over' : ''}">
+      <td class="stat-month">${y}/${parseInt(m)}</td>
+      <td class="stat-count">${d.count}</td>
+      <td class="stat-bar-cell">
+        ${budgetPct != null ? `<div class="stat-budget-line" style="left:${budgetPct}%"></div>` : ''}
+        <div class="stat-bar${over ? ' over' : ''}" style="width:${pct}%"></div>
+      </td>
+      <td class="stat-total">${d.hasPrice ? '¥'+d.total.toLocaleString() : '-'}</td>
+      <td class="stat-diff">${diffHtml}</td>
+    </tr>`;
+  }).join('');
+  get('stats-monthly').innerHTML = `
+    <h3 class="stats-section-title">Monthly Spending${_monthlyBudget ? `&ensp;<span class="budget-ref-label">Budget ¥${_monthlyBudget.toLocaleString()}/mo</span>` : ''}</h3>
+    <table class="stats-monthly-table"><tbody>${rows}</tbody></table>`;
 }
 
 let _editItem = null, _editContext = 'wishlist';
@@ -328,6 +434,8 @@ async function openEdit(id, context) {
   get('edit-url').value = i.url ?? '';
   get('edit-name').value = i.name ?? '';
   get('edit-price').value = i.price ?? '';
+  get('edit-planned-at').value = i.plannedAt ?? '';
+  get('edit-purchased-at').value = i.purchasedAt ?? '';
   get('edit-notes').value = i.notes ?? '';
   get('edit-priority').value = i.priority ?? 'MEDIUM';
   // sync select options then restore value
@@ -385,17 +493,21 @@ async function saveItem() {
   const url = get('edit-url').value.trim();
   if (!url) return alert('URL is required.');
   const id = get('edit-id').value;
-  const body = { url, priority: get('edit-priority').value };
+  const body = { url, priority: get('edit-priority').value, status: _editItem?.status ?? 'WANTED' };
   const name = get('edit-name').value.trim();
   const brandId = get('edit-brand').value;
   const categoryId = get('edit-category').value;
   const price = get('edit-price').value;
   const notes = get('edit-notes').value.trim();
+  const plannedAt   = get('edit-planned-at').value;
+  const purchasedAt = get('edit-purchased-at').value;
   if (name) body.name = name;
   if (brandId) body.brandId = +brandId;
   if (categoryId) body.categoryId = +categoryId;
   if (price) body.price = +price;
   if (notes) body.notes = notes;
+  if (plannedAt)   body.plannedAt   = plannedAt;
+  if (purchasedAt) body.purchasedAt = purchasedAt;
   const imgFile = get('edit-image-file').files[0];
   const imgUrl = get('edit-image-url').value.trim();
   if (!imgFile && imgUrl) body.imageUrl = imgUrl;
@@ -620,7 +732,7 @@ async function fetchInfo(btn, prefix) {
 }
 
 // ---- Loading messages ----
-const _loadMsgs = ['少々お待ちを…', 'データを読み込んでいるの…', 'もうすぐよ…'];
+const _loadMsgs = ['Just a moment…', 'Fetching data…', 'Almost there…'];
 let _lmi = 0;
 const _lb = document.getElementById('loading-bubble');
 const _lmTimer = setInterval(() => { _lb.textContent = _loadMsgs[++_lmi % _loadMsgs.length]; }, 1000);
@@ -806,6 +918,7 @@ async function refreshPage() {
   const tasks = [loadItems(), loadBrands(), loadCategories()];
   if (active === 'collection') tasks.push(loadCollection());
   if (active === 'archive')    tasks.push(loadArchive());
+  if (active === 'stats')      tasks.push(loadStats());
   await Promise.all(tasks);
   btn.classList.remove('spinning');
   btn.disabled = false;

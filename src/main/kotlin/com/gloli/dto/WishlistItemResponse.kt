@@ -3,6 +3,7 @@ package com.gloli.dto
 import com.gloli.domain.enums.Priority
 import com.gloli.domain.enums.Status
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /** ウィッシュリストアイテム取得レスポンス */
@@ -21,5 +22,7 @@ data class WishlistItemResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     /** null = アクティブ、non-null = アーカイブ済み */
-    val deletedAt: LocalDateTime?
+    val deletedAt: LocalDateTime?,
+    val purchasedAt: LocalDate?,
+    val plannedAt: LocalDate?
 )

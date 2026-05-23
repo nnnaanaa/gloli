@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
+import java.time.LocalDate
 
 /** ウィッシュリストアイテムのビジネスロジック */
 @Service
@@ -54,6 +55,7 @@ class WishlistItemService(
     fun updateStatus(id: Long, status: Status): WishlistItemResponse {
         val item = repo.findById(id).orElseThrow { notFound(id) }
         item.status = status
+        if (status == Status.OWNED && item.purchasedAt == null) item.purchasedAt = LocalDate.now()
         return repo.save(item).toResponse()
     }
 
@@ -83,8 +85,12 @@ class WishlistItemService(
             category = category,
             notes = req.notes,
             priority = req.priority,
-            imageUrl = req.imageUrl
+            status = req.status,
+            imageUrl = req.imageUrl,
+            purchasedAt = req.purchasedAt,
+            plannedAt = req.plannedAt
         )
+        if (item.status == Status.OWNED && item.purchasedAt == null) item.purchasedAt = LocalDate.now()
         return repo.save(item).toResponse()
     }
 
@@ -118,6 +124,8 @@ class WishlistItemService(
             item.imagePath = null
         }
         item.imageUrl = req.imageUrl
+        item.purchasedAt = req.purchasedAt ?: if (req.status == Status.OWNED) item.purchasedAt ?: LocalDate.now() else null
+        item.plannedAt = req.plannedAt
         return repo.save(item).toResponse()
     }
 
@@ -231,7 +239,9 @@ class WishlistItemService(
         imageUrl = imageUrl ?: if (imagePath != null) "/api/wishlist/$id/image" else null,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        deletedAt = deletedAt
+        deletedAt = deletedAt,
+        purchasedAt = purchasedAt,
+        plannedAt = plannedAt
     )
 
     private fun notFound(id: Long) =
