@@ -63,6 +63,13 @@ class WishlistItemController(private val service: WishlistItemService) {
         @RequestParam status: Status
     ): WishlistItemResponse = service.updateStatus(id, status)
 
+    @PatchMapping("/{id}/priority")
+    @Operation(summary = "Update item priority")
+    fun updatePriority(
+        @PathVariable id: Long,
+        @RequestParam priority: Priority
+    ): WishlistItemResponse = service.updatePriority(id, priority)
+
     /** アーカイブへ移動（物理削除ではなく deletedAt をセットする）*/
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -579,8 +579,8 @@ button.spinning svg { animation: spin 0.8s linear infinite; }
 .s-chip.high   { border-color: #3a2a2a; color: #be8e7e; }
 .s-chip.grail  { border-color: #3a1f4a; color: var(--accent-lt); }
 
-/* ---- Status select ---- */
-.status-sel {
+/* ---- Status / Priority inline selects ---- */
+.status-sel, .priority-sel {
   padding: 2px 8px;
   font-size: 0.78rem;
   border-radius: 10px;
@@ -591,6 +591,10 @@ button.spinning svg { animation: spin 0.8s linear infinite; }
 .status-sel.wanted  { border-color: var(--border); color: var(--muted); background: transparent; }
 .status-sel.ordered { border-color: #6a5010; color: #c8a040; background: #1a1408; }
 .status-sel.owned   { border-color: #1a4a2a; color: #60b878; background: #0a1810; }
+.priority-sel.low    { border-color: #2a3a2a; color: #7eb87e; background: transparent; }
+.priority-sel.medium { border-color: #2a2a3a; color: #7e8ebe; background: transparent; }
+.priority-sel.high   { border-color: #3a2a2a; color: #be8e7e; background: #110a0a; }
+.priority-sel.grail  { border-color: #4a2a6a; color: var(--accent-lt); background: #180a28; }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }

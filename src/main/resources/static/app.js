@@ -189,7 +189,7 @@ function renderItems() {
     <td data-label="Brand" title="${esc(i.brand?.name)}"><span class="v">${esc(i.brand?.name)}</span></td>
     <td data-label="Category" title="${esc(i.category?.name)}"><span class="v">${esc(i.category?.name)}</span></td>
     <td class="col-price" data-label="Price">${i.price != null ? '¥'+Number(i.price).toLocaleString() : ''}</td>
-    <td class="col-priority" data-label="Priority">${esc(i.priority)}</td>
+    <td class="col-priority" data-label="Priority"><select class="priority-sel ${(i.priority||'MEDIUM').toLowerCase()}" onchange="updatePriority(${i.id},this)">${priorityOptions(i.priority)}</select></td>
     <td data-label="Notes" title="${esc(i.notes)}"><span class="v">${esc(i.notes)}</span></td>
     <td data-label="Status"><select class="status-sel ${(i.status||'WANTED').toLowerCase()}" onchange="updateStatus(${i.id},this)">${statusOptions(i.status)}</select></td>
     <td class="col-actions" data-label=""><button class="edit" onclick="openEdit(${i.id})">Edit</button> <button class="del" onclick="archiveItem(${i.id})">Archive</button></td>
@@ -255,6 +255,26 @@ function statusOptions(current) {
   return ['WANTED','ORDERED','OWNED'].map(s =>
     `<option value="${s}" ${current===s?'selected':''}>${s[0]+s.slice(1).toLowerCase()}</option>`
   ).join('');
+}
+
+function priorityOptions(current) {
+  return ['LOW','MEDIUM','HIGH','GRAIL'].map(p =>
+    `<option value="${p}" ${current===p?'selected':''}>${p[0]+p.slice(1).toLowerCase()}</option>`
+  ).join('');
+}
+
+async function updatePriority(id, sel) {
+  const priority = sel.value;
+  sel.className = 'priority-sel ' + priority.toLowerCase();
+  const tr = sel.closest('tr');
+  if (tr) tr.className = 'card-anim' + (priority === 'GRAIL' ? ' grail' : '');
+  await api('/wishlist/'+id+'/priority?priority='+priority, {method:'PATCH'});
+  const item = _items.find(i => i.id === id);
+  if (item) { item.priority = priority; renderSummary(); }
+  if (window.mascotSay) {
+    if (priority === 'GRAIL') window.mascotSay('グレイルに格上げ！？本気なの…');
+    else { const _ms = ['優先度変えたの', '整理してるのね', 'ちゃんと考えてるのね']; window.mascotSay(_ms[Math.floor(Math.random() * _ms.length)]); }
+  }
 }
 
 async function updateStatus(id, sel) {

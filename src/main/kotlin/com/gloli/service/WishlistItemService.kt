@@ -60,6 +60,12 @@ class WishlistItemService(
         return repo.save(item).toResponse()
     }
 
+    fun updatePriority(id: Long, priority: Priority): WishlistItemResponse {
+        val item = repo.findById(id).orElseThrow { notFound(id) }
+        item.priority = priority
+        return repo.save(item).toResponse()
+    }
+
     @Transactional(readOnly = true)
     fun findById(id: Long): WishlistItemResponse =
         repo.findById(id).orElseThrow { notFound(id) }.toResponse()
