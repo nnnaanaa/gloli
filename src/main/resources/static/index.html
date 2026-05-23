@@ -51,45 +51,12 @@
 
 <!-- wishlist -->
 <div id="wishlist" class="tab active">
-  <h2 id="add-toggle" onclick="toggleAddForm()">Add Item <span id="add-toggle-icon">＋</span></h2>
-  <div id="add-form">
-    <div class="form-row">
-      <input id="w-url" placeholder="URL (required)">
-      <button onclick="fetchInfo(this,'w')">Fetch</button>
-    </div>
-    <div class="form-row">
-      <input id="w-name" placeholder="Name">
-      <div class="sel-add-wrap">
-        <select id="w-brand"><option value="">Brand</option></select>
-        <button type="button" class="add-btn" onclick="openInlineBrand('w-brand')" title="Add brand">＋</button>
-      </div>
-      <div id="w-brand-new" class="inline-cat">
-        <input id="w-brand-input" placeholder="New brand name">
-        <button onclick="confirmInlineBrand('w-brand')">OK</button>
-        <button onclick="closeInlineBrand('w-brand')">✕</button>
-      </div>
-      <div class="sel-add-wrap">
-        <select id="w-category"><option value="">Category</option></select>
-        <button type="button" class="add-btn" onclick="openInlineCat('w-category')" title="Add category">＋</button>
-      </div>
-      <div id="w-category-new" class="inline-cat">
-        <input id="w-cat-input" placeholder="New category name">
-        <button onclick="confirmInlineCat('w-category')">OK</button>
-        <button onclick="closeInlineCat('w-category')">✕</button>
-      </div>
-    </div>
-    <div class="form-row">
-      <input id="w-price" type="number" placeholder="Price">
-      <select id="w-priority">
-        <option value="MEDIUM">Medium</option>
-        <option value="LOW">Low</option>
-        <option value="HIGH">High</option>
-        <option value="GRAIL">Grail</option>
-      </select>
-      <input id="w-notes" placeholder="Notes">
-      <input id="w-image-url" type="url" placeholder="Image URL">
-      <button onclick="addItem()">Add</button>
-    </div>
+  <div class="wishlist-top">
+    <h2>Items</h2>
+    <button id="open-add-btn" onclick="openAddModal()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+      Add Item
+    </button>
   </div>
 
   <div class="sort-bar">
@@ -102,6 +69,18 @@
 
   <div class="filter-bar">
     <input id="f-search" placeholder="Search…" oninput="applyFilter()" autocomplete="off">
+    <div class="filter-actions">
+      <button id="f-toggle-btn" class="filter-toggle" onclick="toggleFilterPanel()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="6" y1="12" x2="10" y2="12"/></svg>
+        Filters<span id="f-count" class="filter-count" style="display:none"></span>
+      </button>
+      <button id="f-clear" style="display:none" onclick="clearFilter()" title="Clear filters">✕</button>
+      <button id="refresh-all-btn" onclick="refreshAllItems()" title="Re-scrape all items">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v4h-4"/><path d="M2 14v-4h4"/><path d="M3.5 6A6 6 0 0 1 12 4l2 2"/><path d="M12.5 10A6 6 0 0 1 4 12l-2-2"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="f-panel" class="filter-panel">
     <select id="f-brand"    onchange="applyFilter()"><option value="">All brands</option></select>
     <select id="f-category" onchange="applyFilter()"><option value="">All categories</option></select>
     <select id="f-status"   onchange="applyFilter()">
@@ -116,8 +95,6 @@
       <option value="HIGH">High</option>
       <option value="GRAIL">Grail</option>
     </select>
-    <button id="f-clear" style="display:none" onclick="clearFilter()">✕ Clear</button>
-    <button id="refresh-all-btn" onclick="refreshAllItems()" title="Re-scrape all items to update prices">↻ Refresh All</button>
   </div>
 
   <div id="summary-bar"></div>
@@ -209,6 +186,53 @@
     <div class="modal-footer">
       <button id="confirm-cancel">Cancel</button>
       <button id="confirm-ok" class="del">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- add modal -->
+<div id="add-modal" class="modal-overlay" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal-box">
+    <h3>Add Item</h3>
+    <div class="modal-grid">
+      <div class="add-url-row">
+        <input id="w-url" placeholder="URL (required)">
+        <button onclick="fetchInfo(this,'w')">Fetch</button>
+      </div>
+      <input id="w-name" placeholder="Name">
+      <div class="sel-add-wrap">
+        <select id="w-brand"><option value="">Brand</option></select>
+        <button type="button" class="add-btn" onclick="openInlineBrand('w-brand')" title="Add brand">＋</button>
+      </div>
+      <div id="w-brand-new" class="inline-cat">
+        <input id="w-brand-input" placeholder="New brand name">
+        <button onclick="confirmInlineBrand('w-brand')">OK</button>
+        <button onclick="closeInlineBrand('w-brand')">✕</button>
+      </div>
+      <div class="sel-add-wrap">
+        <select id="w-category"><option value="">Category</option></select>
+        <button type="button" class="add-btn" onclick="openInlineCat('w-category')" title="Add category">＋</button>
+      </div>
+      <div id="w-category-new" class="inline-cat">
+        <input id="w-cat-input" placeholder="New category name">
+        <button onclick="confirmInlineCat('w-category')">OK</button>
+        <button onclick="closeInlineCat('w-category')">✕</button>
+      </div>
+      <div class="add-row-2">
+        <input id="w-price" type="number" placeholder="Price">
+        <select id="w-priority">
+          <option value="MEDIUM">Medium</option>
+          <option value="LOW">Low</option>
+          <option value="HIGH">High</option>
+          <option value="GRAIL">Grail</option>
+        </select>
+      </div>
+      <input id="w-notes" placeholder="Notes">
+      <input id="w-image-url" type="url" placeholder="Image URL">
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeAddModal()">Cancel</button>
+      <button class="save" onclick="addItem()">Add</button>
     </div>
   </div>
 </div>

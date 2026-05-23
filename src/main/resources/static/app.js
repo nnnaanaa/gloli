@@ -40,15 +40,12 @@ function closeDrawer() {
   document.getElementById('drawer-backdrop').classList.remove('open');
   document.getElementById('menu-btn').classList.remove('open');
 }
-function toggleAddForm() {
-  if (window.innerWidth > 600) return;
-  const open = get('add-form').classList.toggle('open');
-  get('add-toggle').classList.toggle('open', open);
+function openAddModal() {
+  get('add-modal').style.display = 'block';
+  setTimeout(() => get('w-url').focus(), 50);
 }
-function closeAddForm() {
-  if (window.innerWidth > 600) return;
-  get('add-form').classList.remove('open');
-  get('add-toggle').classList.remove('open');
+function closeAddModal() {
+  get('add-modal').style.display = 'none';
 }
 
 const get = id => document.getElementById(id);
@@ -104,6 +101,11 @@ function applyFilter() {
   _filter.categoryId = get('f-category').value;
   _filter.status     = get('f-status').value;
   _filter.priority   = get('f-priority').value;
+  const n = [_filter.brandId, _filter.categoryId, _filter.status, _filter.priority].filter(Boolean).length;
+  const badge = get('f-count');
+  badge.textContent = n || '';
+  badge.style.display = n ? '' : 'none';
+  get('f-toggle-btn').classList.toggle('has-filter', n > 0);
   renderItems();
 }
 
@@ -111,7 +113,15 @@ function clearFilter() {
   get('f-search').value = '';
   get('f-brand').value = get('f-category').value = get('f-status').value = get('f-priority').value = '';
   _filter = { q: '', brandId: '', categoryId: '', status: '', priority: '' };
+  get('f-count').textContent = '';
+  get('f-count').style.display = 'none';
+  get('f-toggle-btn').classList.remove('has-filter');
   renderItems();
+}
+
+function toggleFilterPanel() {
+  const open = get('f-panel').classList.toggle('open');
+  get('f-toggle-btn').classList.toggle('open', open);
 }
 
 function renderSummary(items, totalOverride) {
@@ -228,7 +238,7 @@ async function addItem() {
   get('w-url').value = get('w-name').value = get('w-price').value = get('w-notes').value = get('w-image-url').value = '';
   get('w-brand').value = get('w-category').value = '';
   showToast('Item added.');
-  closeAddForm();
+  closeAddModal();
   loadItems();
   if (window.mascotSay) {
     const _n = name.length > 10 ? name.slice(0, 10) + '…' : name;
@@ -890,9 +900,8 @@ Promise.all([loadItems(), loadBrands(), loadCategories()]).then(() => {
 // ---- Refresh All ----
 async function refreshAllItems() {
   const btn = get('refresh-all-btn');
-  const orig = btn.textContent;
-  btn.textContent = '···';
   btn.disabled = true;
+  btn.classList.add('spinning');
   try {
     const result = await (await api('/wishlist/refresh-all', { method: 'POST' })).json();
     const msg = result.failed > 0
@@ -907,8 +916,8 @@ async function refreshAllItems() {
   } catch {
     showToast('Refresh failed.');
   } finally {
-    btn.textContent = orig;
     btn.disabled = false;
+    btn.classList.remove('spinning');
   }
 }
 

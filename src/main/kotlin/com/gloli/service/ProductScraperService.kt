@@ -157,9 +157,25 @@ class ProductScraperService(private val brandRepo: BrandRepository) {
                 ?.let { return it }
         }
 
-        // クラス名・ID に "price" を含む要素を汎用フォールバックとして探す
+        // 関連商品の価格より前に商品詳細エリアを優先して探す
+        // "detail" を含むコンテナ内の price 要素は高い精度で商品本体の価格を示す
+        val detailSelectors = listOf(
+            "[class*=detail_price]", "[class*=detail-price]",
+            "[class*=product-price]", "[class*=item-price]",
+            "[id*=price]",
+        )
+        for (sel in detailSelectors) {
+            doc.select(sel).firstOrNull { el ->
+                el.text().contains("¥") || el.text().contains("円")
+            }?.text()?.let { text ->
+                extractYenPrice(text)?.let { return it }
+            }
+        }
+
+        // 最終フォールバック：ページ全体から price を含む要素を探す
+        // ただし関連商品カード等が先にマッチしうるため優先度は低い
         val priceSelectors = listOf(
-            "[class*=price]", "[id*=price]",
+            "[class*=price]",
             "dd", "span strong", "p strong"
         )
         for (sel in priceSelectors) {
