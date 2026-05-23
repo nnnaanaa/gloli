@@ -372,6 +372,7 @@ async function loadStats() {
   if (!hasData && !wishlistItems.length) {
     get('stats-summary').innerHTML = '';
     get('stats-monthly').innerHTML = '';
+    get('stats-planned').innerHTML = '';
     return;
   }
 
@@ -417,7 +418,7 @@ async function loadStats() {
     ${plannedCardHtml}`;
 
   // --- monthly table ---
-  if (!hasData) { get('stats-monthly').innerHTML = ''; return; }
+  if (!hasData) { get('stats-monthly').innerHTML = ''; get('stats-planned').innerHTML = ''; return; }
   const map = {};
   for (const i of purchasedItems) {
     if (!i.purchasedAt) continue;
@@ -456,6 +457,62 @@ async function loadStats() {
   get('stats-monthly').innerHTML = `
     <h3 class="stats-section-title">Monthly Spending${_monthlyBudget ? `&ensp;<span class="budget-ref-label">Budget ¥${_monthlyBudget.toLocaleString()}/mo</span>` : ''}</h3>
     <table class="stats-monthly-table"><tbody>${rows}</tbody></table>`;
+
+  // --- planned purchases timeline ---
+  const plannedWanted = wishlistItems.filter(i => i.status === 'WANTED' && i.plannedAt);
+  const planMap = {};
+  for (const i of plannedWanted) {
+    const key = i.plannedAt.slice(0, 7);
+    if (!planMap[key]) planMap[key] = { items: [], total: 0, hasPrice: false };
+    planMap[key].items.push(i);
+    if (i.price != null) { planMap[key].total += Number(i.price); planMap[key].hasPrice = true; }
+  }
+  const planKeys = Object.keys(planMap).sort();
+  if (!planKeys.length) { get('stats-planned').innerHTML = ''; return; }
+
+  const planBlocks = planKeys.map(k => {
+    const [y, m] = k.split('-');
+    const d = planMap[k];
+    const isPast = k < thisMonth;
+    const isCurrent = k === thisMonth;
+    const badge = isPast
+      ? `<span class="plan-badge overdue">Overdue</span>`
+      : isCurrent ? `<span class="plan-badge current">This month</span>` : '';
+    let diffHtml = '';
+    if (_monthlyBudget && d.hasPrice) {
+      const diff = _monthlyBudget - d.total;
+      diffHtml = diff >= 0
+        ? `<span class="diff-badge under">+¥${diff.toLocaleString()}</span>`
+        : `<span class="diff-badge over">-¥${Math.abs(diff).toLocaleString()}</span>`;
+    }
+    const itemRows = d.items.map(i => {
+      const pClass = (i.priority || 'medium').toLowerCase();
+      const pLabel = i.priority ? i.priority[0] + i.priority.slice(1).toLowerCase() : 'Medium';
+      return `<div class="plan-item${i.priority === 'GRAIL' ? ' grail' : ''}">
+        ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" class="plan-thumb" alt="">` : '<div class="plan-thumb plan-thumb-empty"></div>'}
+        <div class="plan-item-info">
+          <span class="plan-item-name">${esc(i.name || i.url)}</span>
+          ${i.brand ? `<span class="plan-item-brand">${esc(i.brand.name)}</span>` : ''}
+        </div>
+        <div class="plan-item-right">
+          ${i.price != null ? `<span class="plan-item-price">¥${Number(i.price).toLocaleString()}</span>` : ''}
+          <span class="plan-priority ${pClass}">${pLabel}</span>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="plan-month-block${isPast ? ' plan-past' : isCurrent ? ' plan-current' : ''}">
+      <div class="plan-month-header">
+        <span class="plan-month-label">${y}/${parseInt(m)}${badge}</span>
+        <span class="plan-month-count">${d.items.length} items</span>
+        ${d.hasPrice ? `<span class="plan-month-total">¥${d.total.toLocaleString()}</span>` : ''}
+        ${diffHtml}
+      </div>
+      <div class="plan-items">${itemRows}</div>
+    </div>`;
+  }).join('');
+  get('stats-planned').innerHTML = `
+    <h3 class="stats-section-title" style="margin-top:28px">Planned Purchases</h3>
+    <div class="plan-timeline">${planBlocks}</div>`;
 }
 
 let _editItem = null, _editContext = 'wishlist';
