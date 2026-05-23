@@ -958,6 +958,19 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 .stat-diff { width: 100px; }
 .stat-months { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
 
+/* ---- Monthly detail expand ---- */
+.stats-monthly-table tr.month-row { cursor: pointer; user-select: none; }
+.stats-monthly-table tr.month-row:hover td { background: rgba(168,101,212,0.06); }
+.stats-monthly-table tr.month-row.month-expanded td { background: rgba(168,101,212,0.05); }
+.month-toggle-arrow {
+  display: inline-block; font-size: 0.8rem; color: var(--muted);
+  margin-left: 5px; vertical-align: middle;
+  transition: transform 0.15s; line-height: 1;
+}
+.month-row.month-expanded .month-toggle-arrow { transform: rotate(90deg); }
+.month-detail-cell { padding: 0 !important; border-top: none !important; }
+.stats-monthly-table tr.month-detail:hover td { background: transparent; }
+
 /* ---- Planned purchases timeline ---- */
 .plan-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; margin-bottom: 28px; }
 .plan-month-block {
