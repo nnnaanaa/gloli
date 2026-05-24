@@ -68,17 +68,16 @@ async function api(path, opt) {
 }
 
 // ---- Budget ----
-let _monthlyBudget = +localStorage.getItem('gloli_monthly_budget') || 0;
 let _monthBudgets = JSON.parse(localStorage.getItem('gloli_month_budgets') || '{}');
 
 function getMonthBudget(month) {
-  return (_monthBudgets[month] ?? _monthlyBudget) || null;
+  return _monthBudgets[month] || null;
 }
 
 function editMonthBudget(month, el) {
   const input = document.createElement('input');
   input.type = 'number';
-  input.value = _monthBudgets[month] ?? _monthlyBudget ?? '';
+  input.value = _monthBudgets[month] ?? '';
   input.className = 'month-budget-input';
   input.min = '0';
   input.step = '1000';
@@ -94,11 +93,6 @@ function editMonthBudget(month, el) {
   input.onkeydown = e => { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') loadStats(); };
   el.replaceWith(input);
   input.focus(); input.select();
-}
-function onMonthlyBudgetInput() {
-  _monthlyBudget = +get('stats-budget-input').value || 0;
-  localStorage.setItem('gloli_monthly_budget', _monthlyBudget);
-  loadStats();
 }
 
 let _budget = +localStorage.getItem('gloli_budget') || 0;
@@ -403,8 +397,6 @@ async function loadStats() {
     return;
   }
 
-  if (_monthlyBudget) get('stats-budget-input').value = _monthlyBudget;
-
   // --- summary cards ---
   const spent = purchasedItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
   const thisMonth = new Date().toISOString().slice(0, 7);
@@ -415,7 +407,6 @@ async function loadStats() {
   // Planned spending (WANTED かつ plannedAt と price が設定されているアイテムのみ。ORDERED は purchasedItems で計上済み)
   const plannedItems = wishlistItems.filter(i => i.status === 'WANTED' && i.price != null && i.plannedAt != null);
   const plannedTotal = plannedItems.reduce((s, i) => s + Number(i.price), 0);
-  const monthsToAfford = (_monthlyBudget && plannedTotal) ? Math.ceil(plannedTotal / _monthlyBudget) : null;
 
   // This month budget card
   const thisMonthBudget = getMonthBudget(thisMonth);
@@ -434,7 +425,7 @@ async function loadStats() {
   const plannedCardHtml = plannedItems.length ? `
     <div class="stat-card">
       <div class="stat-val">¥${plannedTotal.toLocaleString()}</div>
-      <div class="stat-label">Planned spending${monthsToAfford ? ` <span class="stat-months">(~${monthsToAfford}mo)</span>` : ''}</div>
+      <div class="stat-label">Planned spending</div>
     </div>` : '';
 
   get('stats-summary').innerHTML = `
@@ -489,7 +480,7 @@ async function loadStats() {
     </tr>`;
   }).join('');
   get('stats-monthly').innerHTML = `
-    <h3 class="stats-section-title">Monthly Spending${_monthlyBudget ? `&ensp;<span class="budget-ref-label">Default ¥${_monthlyBudget.toLocaleString()}/mo</span>` : ''}</h3>
+    <h3 class="stats-section-title">Monthly Spending</h3>
     <table class="stats-monthly-table"><tbody>${rows}</tbody></table>`;
 
   // --- planned purchases timeline ---

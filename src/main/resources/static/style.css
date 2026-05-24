@@ -625,7 +625,6 @@ button.spinning svg { animation: spin 0.8s linear infinite; }
   .stat-count { width: 30px; font-size: 0.78rem; }
   .stat-total { width: 88px; font-size: 0.82rem; }
   .stat-diff  { width: 72px; }
-  #stats-budget-bar { flex-wrap: wrap; gap: 6px; }
 
   body { padding: 16px 16px; border-left: none; border-right: none; }
   body::before, body::after { display: none; }
@@ -916,20 +915,6 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 }
 .stat-total { font-size: 0.9rem; color: var(--accent-lt); font-weight: 600; white-space: nowrap; text-align: right; width: 110px; }
 
-/* ---- Monthly budget bar (Stats tab) ---- */
-#stats-budget-bar {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.82rem; color: var(--muted);
-  padding: 0 2px 18px;
-}
-#stats-budget-bar label { flex-shrink: 0; font-weight: 600; color: var(--text); }
-.budget-yen { color: var(--muted); }
-#stats-budget-input {
-  width: 130px; padding: 4px 10px; font-size: 0.88rem;
-  border: 1px solid var(--border); border-radius: 6px;
-  background: var(--card); color: var(--text); font-family: var(--font-body);
-}
-.budget-hint { font-size: 0.78rem; }
 
 /* ---- Budget diff badges ---- */
 .diff-badge {
