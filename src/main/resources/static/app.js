@@ -453,13 +453,14 @@ async function loadStats() {
   const keys = Object.keys(map).sort().reverse();
   const allRowBudgets = keys.map(k => getMonthBudget(k) || 0);
   const maxBar = Math.max(...Object.values(map).map(d => d.total), ...allRowBudgets, 1);
-  const rows = keys.map(k => {
+  const monthBlocks = keys.map(k => {
     const [y, m] = k.split('-');
     const d = map[k];
     const rowBudget = getMonthBudget(k);
     const pct = d.hasPrice ? Math.round(d.total / maxBar * 100) : 0;
     const over = rowBudget && d.hasPrice && d.total > rowBudget;
     const rowBudgetPct = rowBudget ? Math.round(rowBudget / maxBar * 100) : null;
+    const isOverridden = _monthBudgets[k] != null;
     let diffHtml = '';
     if (rowBudget && d.hasPrice) {
       const diff = rowBudget - d.total;
@@ -467,22 +468,41 @@ async function loadStats() {
         ? `<span class="diff-badge under">+¥${diff.toLocaleString()}</span>`
         : `<span class="diff-badge over">-¥${Math.abs(diff).toLocaleString()}</span>`;
     }
-    const isOverridden = _monthBudgets[k] != null;
     const budgetChip = `<span class="month-budget-chip${rowBudget ? (isOverridden ? ' overridden' : '') : ' empty'}" onclick="editMonthBudget(event,'${k}',this)">${rowBudget ? '¥'+rowBudget.toLocaleString() : '¥—'}</span>`;
-    return `<tr class="${over ? 'row-over' : ''} month-row" data-month="${k}" onclick="toggleMonthDetail('${k}')">
-      <td class="stat-month"><div>${y}/${parseInt(m)}<span class="month-toggle-arrow">›</span></div>${budgetChip}</td>
-      <td class="stat-count">${d.count}</td>
-      <td class="stat-bar-cell">
+    const items = _statsMonthItems[k] || [];
+    const itemRows = items.map(i => {
+      const pClass = (i.priority || 'medium').toLowerCase();
+      const pLabel = i.priority ? i.priority[0] + i.priority.slice(1).toLowerCase() : 'Medium';
+      return `<div class="plan-item${i.priority === 'GRAIL' ? ' grail' : ''}" data-url="${esc(i.url)}" onclick="const u=this.dataset.url;if(u)window.open(u,'_blank')">
+        ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" class="plan-thumb" alt="">` : '<div class="plan-thumb plan-thumb-empty"></div>'}
+        <div class="plan-item-info">
+          <span class="plan-item-name">${esc(i.name || i.url)}</span>
+          ${i.brand ? `<span class="plan-item-brand">${esc(i.brand.name)}</span>` : ''}
+        </div>
+        <div class="plan-item-right">
+          ${i.price != null ? `<span class="plan-item-price">¥${Number(i.price).toLocaleString()}</span>` : ''}
+          <span class="plan-priority ${pClass}">${pLabel}</span>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="plan-month-block${over ? ' plan-over' : ''}">
+      <div class="plan-month-header">
+        <span class="plan-month-label">${y}/${parseInt(m)}</span>
+        <span class="plan-month-count">${d.count} items</span>
+        ${budgetChip}
+        ${d.hasPrice ? `<span class="plan-month-total">¥${d.total.toLocaleString()}</span>` : ''}
+        ${diffHtml}
+      </div>
+      ${d.hasPrice ? `<div class="month-bar-wrap">
         ${rowBudgetPct != null ? `<div class="stat-budget-line" style="left:${rowBudgetPct}%"></div>` : ''}
         <div class="stat-bar${over ? ' over' : ''}" style="width:${pct}%"></div>
-      </td>
-      <td class="stat-total">${d.hasPrice ? '¥'+d.total.toLocaleString() : '-'}</td>
-      <td class="stat-diff">${diffHtml}</td>
-    </tr>`;
+      </div>` : ''}
+      <div class="plan-items">${itemRows}</div>
+    </div>`;
   }).join('');
   get('stats-monthly').innerHTML = `
     <h3 class="stats-section-title">Monthly Spending</h3>
-    <table class="stats-monthly-table"><tbody>${rows}</tbody></table>`;
+    <div class="plan-timeline">${monthBlocks}</div>`;
 
   // --- planned purchases timeline ---
   const plannedWanted = wishlistItems.filter(i => i.status === 'WANTED' && i.plannedAt);
@@ -544,41 +564,6 @@ async function loadStats() {
   get('stats-planned').innerHTML = `
     <h3 class="stats-section-title" style="margin-top:28px">Planned Purchases</h3>
     <div class="plan-timeline">${planBlocks}</div>`;
-}
-
-function toggleMonthDetail(month) {
-  const tbody = document.querySelector('.stats-monthly-table tbody');
-  if (!tbody) return;
-  const monthRow = tbody.querySelector(`tr[data-month="${month}"]`);
-  if (!monthRow) return;
-  const existing = tbody.querySelector(`tr.month-detail[data-month="${month}"]`);
-  if (existing) {
-    existing.remove();
-    monthRow.classList.remove('month-expanded');
-    return;
-  }
-  monthRow.classList.add('month-expanded');
-  const items = _statsMonthItems[month] || [];
-  const itemsHtml = items.map(i => {
-    const pClass = (i.priority || 'medium').toLowerCase();
-    const pLabel = i.priority ? i.priority[0] + i.priority.slice(1).toLowerCase() : 'Medium';
-    return `<div class="plan-item${i.priority === 'GRAIL' ? ' grail' : ''}" data-url="${esc(i.url)}" onclick="const u=this.dataset.url;if(u)window.open(u,'_blank')">
-      ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" class="plan-thumb" alt="">` : '<div class="plan-thumb plan-thumb-empty"></div>'}
-      <div class="plan-item-info">
-        <span class="plan-item-name">${esc(i.name || i.url)}</span>
-        ${i.brand ? `<span class="plan-item-brand">${esc(i.brand.name)}</span>` : ''}
-      </div>
-      <div class="plan-item-right">
-        ${i.price != null ? `<span class="plan-item-price">¥${Number(i.price).toLocaleString()}</span>` : ''}
-        <span class="plan-priority ${pClass}">${pLabel}</span>
-      </div>
-    </div>`;
-  }).join('');
-  const detailTr = document.createElement('tr');
-  detailTr.className = 'month-detail';
-  detailTr.dataset.month = month;
-  detailTr.innerHTML = `<td colspan="5" class="month-detail-cell">${itemsHtml}</td>`;
-  monthRow.insertAdjacentElement('afterend', detailTr);
 }
 
 let _editItem = null, _editContext = 'wishlist';
