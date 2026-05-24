@@ -14,8 +14,9 @@
 | 一括更新 | 全アイテムのURLを再スクレイプして価格・名前を最新化 |
 | 画像管理 | 外部URL・ファイルアップロードに両対応 |
 | Stats | 月別支出ダッシュボード・予算管理・先月比・今後の購入予定を可視化 |
-| 月別予算 | 月ごとに支出上限を設定（デフォルト ¥30,000）|
+| 月別予算 | 月ごとに支出上限を設定（デフォルト ¥30,000）・DB 保存で端末間同期 |
 | CSV エクスポート | 全アイテム（Wishlist・Collection・Archive）を CSV でダウンロード |
+| テーマ | 5種のカラーテーマを切替（ドロワー下部のスウォッチから選択） |
 | PWA | インストール可能・Service Worker によるオフライン対応 |
 
 ## 技術スタック
@@ -79,3 +80,5 @@ Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 | `PUT/DELETE` | `/api/brands/{id}` | ブランド更新・削除 |
 | `GET/POST` | `/api/categories` | カテゴリー一覧・追加 |
 | `PUT/DELETE` | `/api/categories/{id}` | カテゴリー更新・削除 |
+| `GET` | `/api/settings/{key}` | 設定値取得 |
+| `PUT` | `/api/settings/{key}` | 設定値保存 |
