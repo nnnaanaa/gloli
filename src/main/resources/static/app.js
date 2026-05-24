@@ -425,9 +425,9 @@ async function loadStats() {
     const diff = thisMonthTotal - lastMonthTotal;
     const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
     const cls   = diff > 0 ? 'vs-up' : diff < 0 ? 'vs-down' : 'vs-neutral';
-    const diffTxt = diff !== 0 ? `¥${Math.abs(diff).toLocaleString()}` : '変化なし';
+    const diffTxt = diff !== 0 ? `¥${Math.abs(diff).toLocaleString()}` : 'No change';
     vsHtml = `<div class="stats-hero-vs">
-      vs 先月
+      vs Last month
       <span class="${cls}">${arrow} ${diffTxt}</span>
       <span class="stats-hero-vs-counts">${lastMonthItems.length} → ${thisMonthItems.length} items</span>
     </div>`;
