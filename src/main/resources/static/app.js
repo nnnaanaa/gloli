@@ -72,7 +72,7 @@ let _monthlyBudget = +localStorage.getItem('gloli_monthly_budget') || 0;
 let _monthBudgets = JSON.parse(localStorage.getItem('gloli_month_budgets') || '{}');
 
 function getMonthBudget(month) {
-  return _monthBudgets[month] ?? _monthlyBudget || null;
+  return (_monthBudgets[month] ?? _monthlyBudget) || null;
 }
 
 function editMonthBudget(month, el) {
