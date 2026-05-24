@@ -576,7 +576,7 @@ async function loadStats() {
           <div class="plan-item-right">
             <span class="plan-item-price">¥${Number(i.price).toLocaleString()}</span>
             <span class="plan-priority ${pClass}">${pLabel}</span>
-            <span class="rec-after">残 ¥${afterBuy.toLocaleString()}</span>
+            <span class="rec-after">¥${afterBuy.toLocaleString()} left</span>
           </div>
         </div>`;
       }).join('');
