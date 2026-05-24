@@ -476,7 +476,7 @@ async function loadStats() {
         : `<span class="diff-badge over">-¥${Math.abs(diff).toLocaleString()}</span>`;
     }
     const isOverridden = _monthBudgets[k] != null;
-    const budgetChip = `<span class="month-budget-chip${rowBudget ? (isOverridden ? ' overridden' : '') : ' empty'}" onclick="event.stopPropagation();editMonthBudget('${k}',this)">${rowBudget ? '¥'+rowBudget.toLocaleString() : 'budget…'}</span>`;
+    const budgetChip = `<span class="month-budget-chip${rowBudget ? (isOverridden ? ' overridden' : '') : ' empty'}" onclick="event.stopPropagation();editMonthBudget('${k}',this)">${rowBudget ? '¥'+rowBudget.toLocaleString() : '¥—'}</span>`;
     return `<tr class="${over ? 'row-over' : ''} month-row" data-month="${k}" onclick="toggleMonthDetail('${k}')">
       <td class="stat-month"><div>${y}/${parseInt(m)}<span class="month-toggle-arrow">›</span></div>${budgetChip}</td>
       <td class="stat-count">${d.count}</td>
@@ -522,7 +522,7 @@ async function loadStats() {
         : `<span class="diff-badge over">-¥${Math.abs(diff).toLocaleString()}</span>`;
     }
     const planBudgetIsOverridden = _monthBudgets[k] != null;
-    const planBudgetChip = `<span class="month-budget-chip plan-budget-chip${planMonthBudget ? (planBudgetIsOverridden ? ' overridden' : '') : ' empty'}" onclick="editMonthBudget('${k}',this)">${planMonthBudget ? '¥'+planMonthBudget.toLocaleString() : 'budget…'}</span>`;
+    const planBudgetChip = `<span class="month-budget-chip plan-budget-chip${planMonthBudget ? (planBudgetIsOverridden ? ' overridden' : '') : ' empty'}" onclick="editMonthBudget('${k}',this)">${planMonthBudget ? '¥'+planMonthBudget.toLocaleString() : '¥—'}</span>`;
     const itemRows = d.items.map(i => {
       const pClass = (i.priority || 'medium').toLowerCase();
       const pLabel = i.priority ? i.priority[0] + i.priority.slice(1).toLowerCase() : 'Medium';

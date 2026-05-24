@@ -665,6 +665,8 @@ button.spinning svg { animation: spin 0.8s linear infinite; }
   .plan-item { padding: 8px 12px; gap: 8px; }
   .plan-month-header { padding: 8px 12px; }
   .plan-item-price { font-size: 0.82rem; }
+  .plan-month-total { margin-left: 0; }
+  .plan-month-header .diff-badge { margin-left: auto; }
   #scroll-top { bottom: 20px; left: 16px; right: auto; }
   #toast { bottom: 14px; }
 }
@@ -1008,7 +1010,7 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 }
 .plan-month-block.plan-current .plan-month-label { color: var(--accent-lt); }
 .plan-month-count { color: var(--muted); font-size: 0.82rem; }
-.plan-month-total { margin-left: auto; color: #c8a4d8; font-weight: 600; font-size: 0.9rem; }
+.plan-month-total { margin-left: auto; color: #c8a4d8; font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
 .plan-badge {
   font-size: 0.68rem; font-weight: 600; padding: 1px 7px;
   border-radius: 8px; border: 1px solid; letter-spacing: 0.03em;
