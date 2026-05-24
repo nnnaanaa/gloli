@@ -1,84 +1,84 @@
 # gloli
 
-ウィッシュリスト管理 PWA。アイテムの記録・コレクション管理・購入統計・予算管理をサポートします。
+A wishlist management PWA for Lolita fashion. Track items you want, manage your collection, monitor spending statistics, and set monthly budgets.
 
-## 機能
+## Features
 
-| 機能 | 説明 |
+| Feature | Description |
 |---|---|
-| Items | URL・名前・ブランド・カテゴリ・価格・優先度・ノート・予定購入日を記録 |
-| Collection | `Owned` にしたアイテムをギャラリー表示で管理 |
-| Archive | 削除したアイテムを保持（復元・完全削除可能） |
-| Brands / Categories | ブランド・カテゴリのタグ管理 |
-| Scraper | URLから商品名・価格・画像を自動取得 (Jsoup) |
-| 一括更新 | 全アイテムのURLを再スクレイプして価格・名前を最新化 |
-| 画像管理 | 外部URL・ファイルアップロードに両対応 |
-| Stats | 月別支出ダッシュボード・予算管理・先月比・今後の購入予定を可視化 |
-| 月別予算 | 月ごとに支出上限を設定（デフォルト ¥30,000）・DB 保存で端末間同期 |
-| CSV エクスポート | 全アイテム（Wishlist・Collection・Archive）を CSV でダウンロード |
-| テーマ | 5種のカラーテーマを切替（ドロワー下部のスウォッチから選択） |
-| PWA | インストール可能・Service Worker によるオフライン対応 |
+| Items | Record URL, name, brand, category, price, priority, notes, and planned purchase date |
+| Collection | Gallery view of items marked as `Owned` |
+| Archive | Holds deleted items (restore or permanently delete) |
+| Brands / Categories | Tag management for brands and categories |
+| Scraper | Automatically fetches product name, price, and image from a URL (Jsoup) |
+| Bulk Refresh | Re-scrapes all item URLs to update prices and names |
+| Image Management | Supports both external URLs and file uploads |
+| Stats | Monthly spending dashboard with budget tracking, month-over-month comparison, and upcoming purchases |
+| Monthly Budget | Set a spending limit per month (default ¥30,000), synced across devices via DB |
+| CSV Export | Download all items (Wishlist, Collection, Archive) as CSV |
+| Themes | Switch between 5 color themes via swatches at the bottom of the drawer |
+| PWA | Installable with offline support via Service Worker |
 
-## 技術スタック
+## Tech Stack
 
-| レイヤー | 技術 |
+| Layer | Technology |
 |---|---|
-| バックエンド | Kotlin 2.2 / Spring Boot 3 / Spring Data JPA |
-| DB | PostgreSQL 16（本番） / H2 file（開発） |
-| スクレイピング | Jsoup |
-| フロントエンド | Vanilla JS / HTML / CSS（フレームワークなし） |
-| ビルド | Gradle 9 |
-| インフラ | Docker / Docker Compose |
+| Backend | Kotlin 2.2 / Spring Boot 3 / Spring Data JPA |
+| Database | PostgreSQL 16 (production) / H2 file (development) |
+| Scraping | Jsoup |
+| Frontend | Vanilla JS / HTML / CSS (no framework) |
+| Build | Gradle 9 |
+| Infrastructure | Docker / Docker Compose |
 
-## 環境変数
+## Environment Variables
 
-| 変数 | デフォルト | 説明 |
+| Variable | Default | Description |
 |---|---|---|
-| `DB_USER` | `wishlist` | PostgreSQL ユーザー名 |
-| `DB_PASS` | `changeme` | PostgreSQL パスワード |
-| `SERVER_PORT` | `8080` | リッスンポート |
+| `DB_USER` | `wishlist` | PostgreSQL username |
+| `DB_PASS` | `changeme` | PostgreSQL password |
+| `SERVER_PORT` | `8080` | Listening port |
 
-## 起動方法
+## Running the App
 
-### Docker Compose（推奨）
+### Docker Compose (recommended)
 
 ```bash
 docker compose up --build
 ```
 
-`http://localhost:8080` でアクセスできます。PostgreSQL 16 が同時に起動します。
+Access the app at `http://localhost:8080`. PostgreSQL 16 starts alongside the app.
 
-### ローカル開発（H2）
+### Local Development (H2)
 
 ```bash
 ./gradlew bootRun
 ```
 
-H2 file DB で起動します。`./data/wishlistdb` にデータが永続化されます。
+Runs with an H2 file database. Data is persisted at `./data/wishlistdb`.
 
 ## API
 
 Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 
-| メソッド | パス | 説明 |
+| Method | Path | Description |
 |---|---|---|
-| `GET` | `/api/wishlist` | Items 一覧（priority / brandId / categoryId でフィルタ可） |
-| `POST` | `/api/wishlist` | Item 追加 |
-| `PUT` | `/api/wishlist/{id}` | Item 更新 |
-| `PATCH` | `/api/wishlist/{id}/status` | ステータス変更 |
-| `PATCH` | `/api/wishlist/{id}/priority` | 優先度変更 |
-| `DELETE` | `/api/wishlist/{id}` | アーカイブ（ソフトデリート） |
-| `DELETE` | `/api/wishlist/{id}/permanent` | 完全削除 |
-| `POST` | `/api/wishlist/{id}/restore` | アーカイブから復元 |
-| `POST` | `/api/wishlist/{id}/image` | 画像アップロード |
-| `GET` | `/api/wishlist/{id}/image` | 画像取得 |
-| `GET` | `/api/wishlist/owned` | Collection（Owned アイテム）一覧 |
-| `GET` | `/api/wishlist/deleted` | Archive（削除済みアイテム）一覧 |
-| `POST` | `/api/wishlist/refresh-all` | 全アイテムを再スクレイプして価格・名前を更新 |
-| `GET` | `/api/scrape?url=` | URL から商品情報を取得 |
-| `GET/POST` | `/api/brands` | ブランド一覧・追加 |
-| `PUT/DELETE` | `/api/brands/{id}` | ブランド更新・削除 |
-| `GET/POST` | `/api/categories` | カテゴリー一覧・追加 |
-| `PUT/DELETE` | `/api/categories/{id}` | カテゴリー更新・削除 |
-| `GET` | `/api/settings/{key}` | 設定値取得 |
-| `PUT` | `/api/settings/{key}` | 設定値保存 |
+| `GET` | `/api/wishlist` | List items (filterable by priority / brandId / categoryId) |
+| `POST` | `/api/wishlist` | Add item |
+| `PUT` | `/api/wishlist/{id}` | Update item |
+| `PATCH` | `/api/wishlist/{id}/status` | Change status |
+| `PATCH` | `/api/wishlist/{id}/priority` | Change priority |
+| `DELETE` | `/api/wishlist/{id}` | Archive (soft delete) |
+| `DELETE` | `/api/wishlist/{id}/permanent` | Permanently delete |
+| `POST` | `/api/wishlist/{id}/restore` | Restore from archive |
+| `POST` | `/api/wishlist/{id}/image` | Upload image |
+| `GET` | `/api/wishlist/{id}/image` | Get image |
+| `GET` | `/api/wishlist/owned` | List Collection (owned items) |
+| `GET` | `/api/wishlist/deleted` | List Archive (deleted items) |
+| `POST` | `/api/wishlist/refresh-all` | Re-scrape all items to update prices and names |
+| `GET` | `/api/scrape?url=` | Fetch product info from URL |
+| `GET/POST` | `/api/brands` | List / add brands |
+| `PUT/DELETE` | `/api/brands/{id}` | Update / delete brand |
+| `GET/POST` | `/api/categories` | List / add categories |
+| `PUT/DELETE` | `/api/categories/{id}` | Update / delete category |
+| `GET` | `/api/settings/{key}` | Get setting value |
+| `PUT` | `/api/settings/{key}` | Save setting value |
