@@ -67,6 +67,28 @@ async function api(path, opt) {
   return r.ok ? r : Promise.reject(r.status);
 }
 
+// ---- Theme ----
+const THEMES = {
+  purple: { '--bg':'#07050e','--card':'#0e0b18','--accent':'#3a1660','--accent-lt':'#a865d4','--border':'#2a1648','--thead-bg':'#07050e','--thead-fg':'#c4a0e0','--text':'#ede4f8','--muted':'#7a658e','--dot-color':'rgba(168,101,212,0.12)' },
+  rose:   { '--bg':'#0e0508','--card':'#180b10','--accent':'#601630','--accent-lt':'#d465a0','--border':'#481628','--thead-bg':'#0e0508','--thead-fg':'#e0a0c4','--text':'#f8e4ee','--muted':'#8e6578','--dot-color':'rgba(212,101,160,0.12)' },
+  navy:   { '--bg':'#050810','--card':'#0b1020','--accent':'#163060','--accent-lt':'#6590d4','--border':'#162048','--thead-bg':'#050810','--thead-fg':'#a0c0e0','--text':'#e4eef8','--muted':'#657888','--dot-color':'rgba(101,144,212,0.12)' },
+  forest: { '--bg':'#050e08','--card':'#0b1810','--accent':'#164a20','--accent-lt':'#65c478','--border':'#163820','--thead-bg':'#050e08','--thead-fg':'#a0d4a8','--text':'#e4f8e8','--muted':'#658a6a','--dot-color':'rgba(101,196,120,0.12)' },
+  mono:   { '--bg':'#080808','--card':'#121212','--accent':'#2a2a2a','--accent-lt':'#a0a0a0','--border':'#282828','--thead-bg':'#080808','--thead-fg':'#c0c0c0','--text':'#f0f0f0','--muted':'#707070','--dot-color':'rgba(160,160,160,0.08)' },
+};
+
+function applyTheme(name) {
+  const t = THEMES[name] || THEMES.purple;
+  const root = document.documentElement;
+  Object.entries(t).forEach(([k, v]) => root.style.setProperty(k, v));
+  localStorage.setItem('gloli_theme', name);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = t['--bg'];
+  document.querySelectorAll('.theme-swatch').forEach(s =>
+    s.classList.toggle('active', s.dataset.theme === name)
+  );
+}
+applyTheme(localStorage.getItem('gloli_theme') || 'purple');
+
 // ---- Budget ----
 let _monthBudgets = JSON.parse(localStorage.getItem('gloli_month_budgets') || '{}');
 

@@ -9,12 +9,13 @@
   --text:      #ede4f8;
   --muted:     #7a658e;
   --wine:      #6b1a2a;
+  --dot-color: rgba(168,101,212,0.12);
   --font-body: "Plus Jakarta Sans", "Hiragino Kaku Gothic ProN", "Hiragino Kaku Gothic Pro", "Hiragino Kaku Gothic", YuGothic, "Yu Gothic", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { background-color: var(--bg); background-image: radial-gradient(circle, rgba(168,101,212,0.12) 1px, transparent 1px); background-size: 24px 24px; }
+html { background-color: var(--bg); background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px); background-size: 24px 24px; }
 body { background: transparent; }
 
 body {
@@ -379,6 +380,19 @@ tr:hover td { background: rgba(168,164,184,0.07); }
 }
 .drawer-item:hover:not(.active) { background: rgba(168,164,184,0.08); color: var(--text); }
 .drawer-item.active { background: rgba(168,101,212,0.18); color: var(--accent-lt); font-weight: 600; }
+.drawer-theme {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 16px; border-top: 1px solid var(--border);
+}
+.theme-swatch {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+  padding: 0; transition: transform 0.15s, border-color 0.15s;
+  opacity: 0.65;
+}
+.theme-swatch:hover { transform: scale(1.2); opacity: 1; }
+.theme-swatch.active { border-color: var(--text); opacity: 1; transform: scale(1.15); }
 
 @keyframes tab-fadein {
   from { opacity: 0; transform: translateY(8px); }
