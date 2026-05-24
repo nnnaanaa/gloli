@@ -457,6 +457,7 @@ async function loadStats() {
   get('stats-empty').style.display = (hasData || wishlistItems.length) ? 'none' : '';
   if (!hasData && !wishlistItems.length) {
     get('stats-hero').innerHTML = '';
+    get('stats-recommend').innerHTML = '';
     get('stats-summary').innerHTML = '';
     get('stats-monthly').innerHTML = '';
     get('stats-planned').innerHTML = '';
@@ -554,6 +555,42 @@ async function loadStats() {
     ${forecastHtml}
   </div>`;
 
+  // --- within-budget recommendations ---
+  const remaining = thisMonthBudget ? budgetDiff : 0;
+  if (remaining > 0) {
+    const candidates = wishlistItems
+      .filter(i => i.status === 'WANTED' && i.price != null && Number(i.price) <= remaining)
+      .sort((a, b) => (PRIORITY_ORDER[b.priority] ?? 0) - (PRIORITY_ORDER[a.priority] ?? 0))
+      .slice(0, 5);
+    if (candidates.length) {
+      const recItems = candidates.map(i => {
+        const pClass = (i.priority || 'medium').toLowerCase();
+        const pLabel = i.priority ? i.priority[0] + i.priority.slice(1).toLowerCase() : 'Medium';
+        const afterBuy = remaining - Number(i.price);
+        return `<div class="plan-item${i.priority === 'GRAIL' ? ' grail' : ''}" data-url="${esc(i.url)}" onclick="const u=this.dataset.url;if(u)window.open(u,'_blank')">
+          ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" class="plan-thumb" alt="">` : '<div class="plan-thumb plan-thumb-empty"></div>'}
+          <div class="plan-item-info">
+            <span class="plan-item-name">${esc(i.name || i.url)}</span>
+            ${i.brand ? `<span class="plan-item-brand">${esc(i.brand.name)}</span>` : ''}
+          </div>
+          <div class="plan-item-right">
+            <span class="plan-item-price">¥${Number(i.price).toLocaleString()}</span>
+            <span class="plan-priority ${pClass}">${pLabel}</span>
+            <span class="rec-after">残 ¥${afterBuy.toLocaleString()}</span>
+          </div>
+        </div>`;
+      }).join('');
+      get('stats-recommend').innerHTML = `<div class="stats-recommend-block">
+        <div class="stats-section-title">Within budget this month <span class="rec-budget-label">¥${remaining.toLocaleString()} remaining</span></div>
+        <div class="plan-items">${recItems}</div>
+      </div>`;
+    } else {
+      get('stats-recommend').innerHTML = '';
+    }
+  } else {
+    get('stats-recommend').innerHTML = '';
+  }
+
   // --- summary cards (simplified) ---
   const plannedCardHtml = plannedItems.length ? `
     <div class="stat-card">
@@ -567,7 +604,7 @@ async function loadStats() {
     ${plannedCardHtml}`;
 
   // --- monthly table ---
-  if (!hasData) { get('stats-hero').innerHTML = ''; get('stats-monthly').innerHTML = ''; get('stats-planned').innerHTML = ''; return; }
+  if (!hasData) { get('stats-hero').innerHTML = ''; get('stats-recommend').innerHTML = ''; get('stats-monthly').innerHTML = ''; get('stats-planned').innerHTML = ''; return; }
   const map = {};
   _statsMonthItems = {};
   for (const i of purchasedItems) {

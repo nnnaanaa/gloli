@@ -1020,6 +1020,19 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 .plan-budget-chip { margin-top: 0; }
 .plan-month-block.plan-over { border-color: #7e3030; }
 
+/* ---- Within-budget recommendations ---- */
+.stats-recommend-block {
+  background: var(--card); border: 1px solid var(--accent);
+  border-radius: 12px; overflow: hidden; margin-bottom: 18px;
+}
+.stats-recommend-block > .stats-section-title {
+  padding: 10px 14px; background: rgba(168,101,212,0.08);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; margin: 0;
+}
+.rec-budget-label { font-size: 0.72rem; color: var(--accent-lt); font-weight: 400; }
+.rec-after { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+
 /* ---- Planned purchases / Monthly spending timeline ---- */
 .plan-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; margin-bottom: 28px; }
 .month-bar-wrap { padding: 6px 14px 8px; position: relative; }
