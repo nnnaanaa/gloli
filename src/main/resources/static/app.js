@@ -70,8 +70,9 @@ async function api(path, opt) {
 // ---- Budget ----
 let _monthBudgets = JSON.parse(localStorage.getItem('gloli_month_budgets') || '{}');
 
+const DEFAULT_MONTH_BUDGET = 30000;
 function getMonthBudget(month) {
-  return _monthBudgets[month] || null;
+  return _monthBudgets[month] || DEFAULT_MONTH_BUDGET;
 }
 
 function editMonthBudget(evt, month, el) {
@@ -82,7 +83,7 @@ function editMonthBudget(evt, month, el) {
   input.className = 'month-budget-input';
   input.min = '0';
   input.step = '1000';
-  input.placeholder = '0';
+  input.placeholder = String(DEFAULT_MONTH_BUDGET);
   const save = () => {
     const val = parseInt(input.value) || 0;
     if (val) _monthBudgets[month] = val;
