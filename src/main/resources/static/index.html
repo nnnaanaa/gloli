@@ -98,11 +98,6 @@
   </div>
 
   <div id="summary-bar"></div>
-  <div id="budget-bar">
-    <label for="budget-input">Budget</label>
-    <input id="budget-input" type="number" placeholder="No limit" oninput="onBudgetInput()">
-    <span id="budget-diff"></span>
-  </div>
 
   <div class="table-wrap">
     <table>
@@ -220,6 +215,10 @@
           <option value="HIGH">High</option>
           <option value="GRAIL">Grail</option>
         </select>
+      </div>
+      <div>
+        <label class="modal-label">Planned date</label>
+        <input id="w-planned-at" type="date">
       </div>
       <input id="w-notes" placeholder="Notes">
       <input id="w-image-url" type="url" placeholder="Image URL">

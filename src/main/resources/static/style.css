@@ -850,23 +850,6 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
   opacity: 0.12;
 }
 
-/* ---- Budget bar ---- */
-#budget-bar {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.82rem; color: var(--muted);
-  padding: 6px 2px 10px;
-}
-#budget-bar label { flex-shrink: 0; }
-#budget-bar input {
-  width: 110px; padding: 3px 8px; font-size: 0.82rem;
-  border: 1px solid var(--border); border-radius: 5px;
-  background: transparent; color: var(--text); font-family: var(--font-body);
-}
-#budget-diff { font-weight: 600; }
-#budget-diff.over  { color: #be7e7e; }
-#budget-diff.under { color: #7eb87e; }
-
-
 /* ---- Monthly spending ---- */
 .monthly-spending { margin: 8px 0 18px; }
 .monthly-spending details summary {

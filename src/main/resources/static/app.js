@@ -97,20 +97,6 @@ function editMonthBudget(evt, month, el) {
   input.focus(); input.select();
 }
 
-let _budget = +localStorage.getItem('gloli_budget') || 0;
-function onBudgetInput() {
-  _budget = +get('budget-input').value || 0;
-  localStorage.setItem('gloli_budget', _budget);
-  updateBudgetDiff();
-}
-function updateBudgetDiff(totalPrice) {
-  const el = get('budget-diff');
-  if (!_budget) { el.textContent = ''; el.className = ''; return; }
-  const total = totalPrice ?? _items.filter(i => i.price != null).reduce((s,i) => s+Number(i.price), 0);
-  const diff = _budget - total;
-  el.textContent = diff >= 0 ? `¥${diff.toLocaleString()} remaining` : `¥${Math.abs(diff).toLocaleString()} over budget`;
-  el.className = diff >= 0 ? 'under' : 'over';
-}
 
 // ---- Wishlist ----
 let _items = [], _sortField = null, _sortAsc = true;
@@ -170,7 +156,6 @@ function renderSummary(items, totalOverride) {
   bar.innerHTML = countLabel
     + (priced.length ? `<span class="s-price">¥${totalPrice.toLocaleString()}</span>` : '')
     + chips;
-  updateBudgetDiff(priced.length ? totalPrice : null);
 }
 
 function renderItems() {
@@ -251,14 +236,16 @@ async function addItem() {
   const price = get('w-price').value;
   const notes = get('w-notes').value.trim();
   const imgUrl = get('w-image-url').value.trim();
+  const plannedAt = get('w-planned-at').value;
   if (name) body.name = name;
   if (brandId) body.brandId = +brandId;
   if (categoryId) body.categoryId = +categoryId;
   if (price) body.price = +price;
   if (notes) body.notes = notes;
   if (imgUrl) body.imageUrl = imgUrl;
+  if (plannedAt) body.plannedAt = plannedAt;
   await api('/wishlist', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-  get('w-url').value = get('w-name').value = get('w-price').value = get('w-notes').value = get('w-image-url').value = '';
+  get('w-url').value = get('w-name').value = get('w-price').value = get('w-notes').value = get('w-image-url').value = get('w-planned-at').value = '';
   get('w-brand').value = get('w-category').value = '';
   showToast('Item added.');
   closeAddModal();
@@ -413,7 +400,7 @@ async function loadStats() {
   // This month budget card
   const thisMonthBudget = getMonthBudget(thisMonth);
   let budgetCardHtml = '';
-  if (thisMonthBudget && thisMonthHasPrice) {
+  if (thisMonthBudget) {
     const diff = thisMonthBudget - thisMonthTotal;
     const cls  = diff >= 0 ? 'under' : 'over';
     const sign = diff >= 0 ? 'remaining' : 'over budget';
@@ -877,7 +864,6 @@ let _lmi = 0;
 const _lb = document.getElementById('loading-bubble');
 const _lmTimer = setInterval(() => { _lb.textContent = _loadMsgs[++_lmi % _loadMsgs.length]; }, 1000);
 
-if (_budget) get('budget-input').value = _budget;
 function _dismissLoading() {
   clearInterval(_lmTimer);
   const ls = document.getElementById('loading-screen');

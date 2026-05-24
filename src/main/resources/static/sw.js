@@ -1,5 +1,5 @@
-const CACHE = 'gloli-v1';
-const PRECACHE = ['/', '/favicon.svg', '/manifest.json'];
+const CACHE = 'gloli-v2';
+const PRECACHE = ['/', '/app.js', '/style.css', '/favicon.png', '/manifest.json', '/gloli.png', '/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE)));
