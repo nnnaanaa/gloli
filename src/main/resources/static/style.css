@@ -786,13 +786,6 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
 }
 #loading-screen.fade-out { opacity: 0; pointer-events: none; }
 #loading-screen img { width: 220px; display: block; }
-#loading-screen .loading-title {
-  margin-top: 16px;
-  font-family: var(--font-body);
-  font-size: 1.4rem;
-  letter-spacing: 0.22em;
-  color: var(--accent-lt);
-}
 .loading-bubble {
   background: #1a1030;
   border: 1px solid var(--accent);
