@@ -664,6 +664,12 @@ async function openEdit(id, context) {
   get('edit-planned-at').value = i.plannedAt ?? '';
   get('edit-purchased-at').value = i.purchasedAt ?? '';
   get('edit-notes').value = i.notes ?? '';
+  const editPri = get('edit-priority');
+  editPri.value = i.priority ?? 'MEDIUM';
+  editPri.className = 'priority-sel ' + (i.priority ?? 'MEDIUM').toLowerCase();
+  const editSt = get('edit-status');
+  editSt.value = i.status ?? 'WANTED';
+  editSt.className = 'status-sel ' + (i.status ?? 'WANTED').toLowerCase();
   // sync select options then restore value
   const bSel = get('edit-brand');
   bSel.innerHTML = get('w-brand').innerHTML;
@@ -719,7 +725,7 @@ async function saveItem() {
   const url = get('edit-url').value.trim();
   if (!url) return alert('URL is required.');
   const id = get('edit-id').value;
-  const body = { url, priority: _editItem?.priority ?? 'MEDIUM', status: _editItem?.status ?? 'WANTED' };
+  const body = { url, priority: get('edit-priority').value, status: get('edit-status').value };
   const name = get('edit-name').value.trim();
   const brandId = get('edit-brand').value;
   const categoryId = get('edit-category').value;

@@ -143,6 +143,25 @@
         <button onclick="closeInlineCat('edit-category')">✕</button>
       </div>
       <input id="edit-price" type="number" placeholder="Price">
+      <div class="edit-sel-row">
+        <div>
+          <label class="modal-label">Priority</label>
+          <select id="edit-priority" class="priority-sel medium" onchange="this.className='priority-sel '+this.value.toLowerCase()">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="GRAIL">Grail</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">Status</label>
+          <select id="edit-status" class="status-sel wanted" onchange="this.className='status-sel '+this.value.toLowerCase()">
+            <option value="WANTED">Wanted</option>
+            <option value="ORDERED">Ordered</option>
+            <option value="OWNED">Owned</option>
+          </select>
+        </div>
+      </div>
       <div>
         <label class="modal-label">Planned date</label>
         <input id="edit-planned-at" type="date">
