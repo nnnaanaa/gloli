@@ -850,6 +850,56 @@ body::after  { top: 0; right: 0; bottom: 0; width: 10px; }
   opacity: 0.12;
 }
 
+/* ---- Stats hero ---- */
+.stats-hero {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 18px;
+}
+.stats-hero-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.stats-hero-month { font-size: 0.8rem; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; }
+.stats-hero-item-count { font-size: 0.78rem; color: var(--muted); }
+.stats-hero-amount { font-size: 2rem; font-weight: 700; color: var(--accent-lt); line-height: 1.1; margin-bottom: 14px; }
+.stats-hero-amount.over { color: #be7e7e; }
+.stats-hero-bar-wrap {
+  position: relative; height: 10px; background: rgba(255,255,255,0.07);
+  border-radius: 5px; overflow: visible; margin-bottom: 6px;
+}
+.stats-hero-bar {
+  height: 100%; border-radius: 5px; min-width: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-lt));
+  transition: width 0.5s ease;
+}
+.stats-hero-bar.over { background: linear-gradient(90deg, #7e3030, #be7e7e); }
+.stats-hero-budget-marker {
+  position: absolute; top: -3px; bottom: -3px; width: 2px;
+  background: rgba(200,180,220,0.45); border-radius: 1px; pointer-events: none;
+}
+.stats-hero-budget-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; }
+.stats-hero-meta { min-height: 20px; margin-bottom: 4px; }
+.stats-hero-vs {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 0.8rem; color: var(--muted);
+  border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px;
+}
+.stats-hero-vs .vs-up   { color: #be7e7e; font-weight: 600; }
+.stats-hero-vs .vs-down { color: #60b878; font-weight: 600; }
+.stats-hero-vs .vs-neutral { color: var(--muted); }
+.stats-hero-vs-counts { color: rgba(122,101,142,0.6); font-size: 0.75rem; }
+.stats-hero-forecast { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+.stats-hero-forecast-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 8px; }
+.stats-hero-forecast-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.stats-forecast-chip {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 12px; min-width: 80px;
+}
+.stats-forecast-chip.current { border-color: var(--accent); }
+.fc-month { font-size: 0.72rem; color: var(--muted); margin-bottom: 2px; }
+.fc-amount { font-size: 0.9rem; font-weight: 700; color: var(--accent-lt); }
+.fc-count  { font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
+
 /* ---- Monthly spending ---- */
 .monthly-spending { margin: 8px 0 18px; }
 .monthly-spending details summary {

@@ -380,37 +380,105 @@ async function loadStats() {
   const hasData = purchasedItems.some(i => i.purchasedAt);
   get('stats-empty').style.display = (hasData || wishlistItems.length) ? 'none' : '';
   if (!hasData && !wishlistItems.length) {
+    get('stats-hero').innerHTML = '';
     get('stats-summary').innerHTML = '';
     get('stats-monthly').innerHTML = '';
     get('stats-planned').innerHTML = '';
     return;
   }
 
-  // --- summary cards ---
+  // --- data prep ---
   const spent = purchasedItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
   const thisMonth = new Date().toISOString().slice(0, 7);
   const thisMonthItems = purchasedItems.filter(i => i.purchasedAt?.startsWith(thisMonth));
   const thisMonthHasPrice = thisMonthItems.some(i => i.price != null);
   const thisMonthTotal = thisMonthItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
+  const thisMonthBudget = getMonthBudget(thisMonth);
 
-  // Planned spending (WANTED かつ plannedAt と price が設定されているアイテムのみ。ORDERED は purchasedItems で計上済み)
+  // last month
+  const lastMonthDate = new Date(); lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+  const lastMonth = lastMonthDate.toISOString().slice(0, 7);
+  const lastMonthItems = purchasedItems.filter(i => i.purchasedAt?.startsWith(lastMonth));
+  const lastMonthHasPrice = lastMonthItems.some(i => i.price != null);
+  const lastMonthTotal = lastMonthItems.filter(i => i.price != null).reduce((s, i) => s + Number(i.price), 0);
+
+  // planned items
   const plannedItems = wishlistItems.filter(i => i.status === 'WANTED' && i.price != null && i.plannedAt != null);
   const plannedTotal = plannedItems.reduce((s, i) => s + Number(i.price), 0);
 
-  // This month budget card
-  const thisMonthBudget = getMonthBudget(thisMonth);
-  let budgetCardHtml = '';
-  if (thisMonthBudget) {
-    const diff = thisMonthBudget - thisMonthTotal;
-    const cls  = diff >= 0 ? 'under' : 'over';
-    const sign = diff >= 0 ? 'remaining' : 'over budget';
-    budgetCardHtml = `<div class="stat-card stat-budget-card ${cls}">
-      <div class="stat-val">¥${Math.abs(diff).toLocaleString()}</div>
-      <div class="stat-label">This month ${sign}</div>
+  // --- hero: this month ---
+  const heroMax = Math.max(thisMonthTotal, thisMonthBudget || 0, 1);
+  const heroBarPct = Math.min(Math.round(thisMonthTotal / heroMax * 100), 100);
+  const heroBudgetPct = thisMonthBudget ? Math.round(thisMonthBudget / heroMax * 100) : null;
+  const heroOver = thisMonthBudget && thisMonthTotal > thisMonthBudget;
+  const budgetDiff = thisMonthBudget - thisMonthTotal;
+  const [ty, tm] = thisMonth.split('-');
+  const budgetBadge = thisMonthBudget
+    ? (budgetDiff >= 0
+        ? `<span class="diff-badge under">¥${budgetDiff.toLocaleString()} remaining</span>`
+        : `<span class="diff-badge over">▲ ¥${Math.abs(budgetDiff).toLocaleString()} over</span>`)
+    : '';
+
+  // vs last month
+  let vsHtml = '';
+  if (thisMonthHasPrice || lastMonthHasPrice) {
+    const diff = thisMonthTotal - lastMonthTotal;
+    const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
+    const cls   = diff > 0 ? 'vs-up' : diff < 0 ? 'vs-down' : 'vs-neutral';
+    const diffTxt = diff !== 0 ? `¥${Math.abs(diff).toLocaleString()}` : '変化なし';
+    vsHtml = `<div class="stats-hero-vs">
+      vs 先月
+      <span class="${cls}">${arrow} ${diffTxt}</span>
+      <span class="stats-hero-vs-counts">${lastMonthItems.length} → ${thisMonthItems.length} items</span>
     </div>`;
   }
 
-  // Planned spending card
+  // upcoming forecast (WANTED items with plannedAt, future months only)
+  const forecastMap = {};
+  for (const i of wishlistItems.filter(i => i.status === 'WANTED' && i.plannedAt)) {
+    const m = i.plannedAt.slice(0, 7);
+    if (m >= thisMonth) {
+      if (!forecastMap[m]) forecastMap[m] = { count: 0, total: 0, hasPrice: false };
+      forecastMap[m].count++;
+      if (i.price != null) { forecastMap[m].total += Number(i.price); forecastMap[m].hasPrice = true; }
+    }
+  }
+  const forecastKeys = Object.keys(forecastMap).sort().slice(0, 4);
+  const forecastHtml = forecastKeys.length ? `
+    <div class="stats-hero-forecast">
+      <div class="stats-hero-forecast-label">Upcoming</div>
+      <div class="stats-hero-forecast-chips">
+        ${forecastKeys.map(k => {
+          const [fy, fm] = k.split('-');
+          const fd = forecastMap[k];
+          const isCurrent = k === thisMonth;
+          return `<div class="stats-forecast-chip${isCurrent ? ' current' : ''}">
+            <div class="fc-month">${fy}/${parseInt(fm)}</div>
+            <div class="fc-amount">${fd.hasPrice ? '¥'+fd.total.toLocaleString() : '—'}</div>
+            <div class="fc-count">${fd.count} items</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  get('stats-hero').innerHTML = `<div class="stats-hero">
+    <div class="stats-hero-top">
+      <span class="stats-hero-month">${ty}/${parseInt(tm)}</span>
+      <span class="stats-hero-item-count">${thisMonthItems.length} items</span>
+    </div>
+    <div class="stats-hero-amount${heroOver ? ' over' : ''}">${thisMonthHasPrice ? '¥'+thisMonthTotal.toLocaleString() : '—'}</div>
+    ${thisMonthBudget ? `
+      <div class="stats-hero-bar-wrap">
+        ${heroBudgetPct != null ? `<div class="stats-hero-budget-marker" style="left:${heroBudgetPct}%"></div>` : ''}
+        <div class="stats-hero-bar${heroOver ? ' over' : ''}" style="width:${heroBarPct}%"></div>
+      </div>
+      <div class="stats-hero-budget-label">budget ¥${thisMonthBudget.toLocaleString()}</div>` : ''}
+    <div class="stats-hero-meta">${budgetBadge}</div>
+    ${vsHtml}
+    ${forecastHtml}
+  </div>`;
+
+  // --- summary cards (simplified) ---
   const plannedCardHtml = plannedItems.length ? `
     <div class="stat-card">
       <div class="stat-val">¥${plannedTotal.toLocaleString()}</div>
@@ -419,14 +487,11 @@ async function loadStats() {
 
   get('stats-summary').innerHTML = `
     <div class="stat-card"><div class="stat-val">${purchasedItems.length}</div><div class="stat-label">Total purchased</div></div>
-    <div class="stat-card"><div class="stat-val">${purchasedItems.filter(i=>i.price!=null).length ? '¥'+spent.toLocaleString() : '-'}</div><div class="stat-label">Total spent</div></div>
-    <div class="stat-card"><div class="stat-val">${thisMonthItems.length}</div><div class="stat-label">This month's items</div></div>
-    <div class="stat-card"><div class="stat-val">${thisMonthHasPrice ? '¥'+thisMonthTotal.toLocaleString() : '-'}</div><div class="stat-label">This month's spending</div></div>
-    ${budgetCardHtml}
+    <div class="stat-card"><div class="stat-val">${purchasedItems.filter(i=>i.price!=null).length ? '¥'+spent.toLocaleString() : '—'}</div><div class="stat-label">Total spent</div></div>
     ${plannedCardHtml}`;
 
   // --- monthly table ---
-  if (!hasData) { get('stats-monthly').innerHTML = ''; get('stats-planned').innerHTML = ''; return; }
+  if (!hasData) { get('stats-hero').innerHTML = ''; get('stats-monthly').innerHTML = ''; get('stats-planned').innerHTML = ''; return; }
   const map = {};
   _statsMonthItems = {};
   for (const i of purchasedItems) {
