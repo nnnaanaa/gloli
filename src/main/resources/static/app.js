@@ -225,6 +225,39 @@ async function loadItems() {
   renderItems();
 }
 
+async function exportCsv() {
+  const [wishlist, owned, deleted] = await Promise.all([
+    api('/wishlist').then(r => r.json()),
+    api('/wishlist/owned').then(r => r.json()),
+    api('/wishlist/deleted').then(r => r.json()),
+  ]);
+  const allItems = [
+    ...wishlist.map(i => ({ ...i, _source: 'Wishlist' })),
+    ...owned.map(i => ({ ...i, _source: 'Collection' })),
+    ...deleted.map(i => ({ ...i, _source: 'Archive' })),
+  ];
+  const cols = ['ID', 'Name', 'URL', 'Price', 'Priority', 'Status', 'Brand', 'Category', 'Notes', 'Image URL', 'Planned Date', 'Purchase Date', 'List'];
+  const csvCell = v => {
+    const s = String(v ?? '');
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const rows = [
+    cols.join(','),
+    ...allItems.map(i => [
+      i.id, i.name, i.url, i.price, i.priority, i.status,
+      i.brand?.name, i.category?.name, i.notes, i.imageUrl,
+      i.plannedAt, i.purchasedAt, i._source,
+    ].map(csvCell).join(',')),
+  ];
+  const blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `gloli-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Exported.');
+}
+
 async function addItem() {
   const url = get('w-url').value.trim();
   if (!url) return alert('URL is required.');
