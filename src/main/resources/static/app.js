@@ -92,6 +92,27 @@ applyTheme(localStorage.getItem('gloli_theme') || 'purple');
 // ---- Budget ----
 let _monthBudgets = JSON.parse(localStorage.getItem('gloli_month_budgets') || '{}');
 
+async function _loadMonthBudgets() {
+  try {
+    const r = await fetch('/api/settings/month-budgets');
+    if (r.ok) {
+      _monthBudgets = await r.json();
+      localStorage.setItem('gloli_month_budgets', JSON.stringify(_monthBudgets));
+    }
+  } catch { /* オフライン時は localStorage のまま使用 */ }
+}
+
+async function _saveMonthBudgets() {
+  localStorage.setItem('gloli_month_budgets', JSON.stringify(_monthBudgets));
+  try {
+    await fetch('/api/settings/month-budgets', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_monthBudgets),
+    });
+  } catch { /* 保存失敗時は localStorage のみ */ }
+}
+
 const DEFAULT_MONTH_BUDGET = 30000;
 function getMonthBudget(month) {
   return _monthBudgets[month] || DEFAULT_MONTH_BUDGET;
@@ -110,7 +131,7 @@ function editMonthBudget(evt, month, el) {
     const val = parseInt(input.value) || 0;
     if (val) _monthBudgets[month] = val;
     else delete _monthBudgets[month];
-    localStorage.setItem('gloli_month_budgets', JSON.stringify(_monthBudgets));
+    _saveMonthBudgets();
     loadStats();
   };
   input.onblur = save;
@@ -1013,7 +1034,7 @@ function _dismissLoading() {
 }
 // Hard fallback: force-dismiss after 8 seconds no matter what
 setTimeout(_dismissLoading, 8000);
-Promise.all([loadItems(), loadBrands(), loadCategories()])
+Promise.all([loadItems(), loadBrands(), loadCategories(), _loadMonthBudgets()])
   .then(_dismissLoading)
   .catch(err => { _dismissLoading(); showToast('Failed to load data.'); console.error('Initial load failed:', err); });
 
