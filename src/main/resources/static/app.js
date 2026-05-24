@@ -900,34 +900,32 @@ const _lb = document.getElementById('loading-bubble');
 const _lmTimer = setInterval(() => { _lb.textContent = _loadMsgs[++_lmi % _loadMsgs.length]; }, 1000);
 
 if (_budget) get('budget-input').value = _budget;
-const _loadStart = Date.now();
 function _dismissLoading() {
   clearInterval(_lmTimer);
-  const elapsed = Date.now() - _loadStart;
-  const wait = Math.max(0, 2000 - elapsed);
+  const ls = document.getElementById('loading-screen');
+  if (!ls) return;
+  ls.classList.add('fade-out');
   setTimeout(() => {
-    const ls = document.getElementById('loading-screen');
-    ls.classList.add('fade-out');
+    if (ls.parentNode) ls.remove();
+    document.querySelectorAll('.card-anim').forEach((el, idx) => {
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = '';
+      el.style.animationDelay = (idx * 0.07) + 's';
+    });
     setTimeout(() => {
-      ls.remove();
-      document.querySelectorAll('.card-anim').forEach((el, idx) => {
-        el.style.animation = 'none';
-        void el.offsetWidth;
-        el.style.animation = '';
-        el.style.animationDelay = (idx * 0.07) + 's';
-      });
-      setTimeout(() => {
-        if (window.mascotSay) {
-          const _gs = ['いらっしゃい！今日もチェックしに来たの？', 'おかえり！ほしいものは増えてる？', 'こんにちは！何か気になるものある？', 'また来たの？うれしい！'];
-          window.mascotSay(_gs[Math.floor(Math.random() * _gs.length)]);
-        }
-      }, 600);
-    }, 550);
-  }, wait);
+      if (window.mascotSay) {
+        const _gs = ['いらっしゃい！今日もチェックしに来たの？', 'おかえり！ほしいものは増えてる？', 'こんにちは！何か気になるものある？', 'また来たの？うれしい！'];
+        window.mascotSay(_gs[Math.floor(Math.random() * _gs.length)]);
+      }
+    }, 400);
+  }, 500);
 }
+// Hard fallback: force-dismiss after 8 seconds no matter what
+setTimeout(_dismissLoading, 8000);
 Promise.all([loadItems(), loadBrands(), loadCategories()])
   .then(_dismissLoading)
-  .catch(err => { _dismissLoading(); showToast('Failed to load data. Check the server.'); console.error('Initial load failed:', err); });
+  .catch(err => { _dismissLoading(); showToast('Failed to load data.'); console.error('Initial load failed:', err); });
 
 // ---- Mascot ----
 (function() {
