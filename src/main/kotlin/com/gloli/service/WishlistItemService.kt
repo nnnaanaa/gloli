@@ -137,7 +137,7 @@ class WishlistItemService(
     }
 
     /**
-     * 全アクティブアイテムのURLを再スクレイプし、price と（名前が未設定の場合は）name を更新する。
+     * 全アクティブアイテムのURLを再スクレイプし、price と name を更新する。
      * 1件ごとに失敗してもほかのアイテムの処理は継続する。
      */
     fun refreshAll(): BulkRefreshResult {
@@ -147,7 +147,7 @@ class WishlistItemService(
         for (item in items) {
             try {
                 val info = scraperService.scrape(item.url)
-                if (item.name.isNullOrBlank() && !info.name.isNullOrBlank()) item.name = info.name
+                if (!info.name.isNullOrBlank()) item.name = info.name
                 if (info.price != null) item.price = info.price
                 // 画像が未設定の場合のみスクレイプ結果で補完する
                 if (item.imagePath == null && item.imageUrl == null && !info.imageUrl.isNullOrBlank()) {
