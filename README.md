@@ -11,7 +11,7 @@ A wishlist management PWA for Lolita fashion. Track items you want, manage your 
 | Archive | Holds deleted items (restore or permanently delete) |
 | Brands / Categories | Tag management for brands and categories |
 | Scraper | Automatically fetches product name, price, and image from a URL (Jsoup) |
-| Bulk Refresh | Re-scrapes all item URLs to update prices and names |
+| Bulk Refresh | Re-scrapes all item URLs to update prices and names; shows a per-item change summary on completion |
 | Image Management | Supports both external URLs and file uploads |
 | Stats | Monthly spending dashboard with budget tracking, month-over-month comparison, and upcoming purchases |
 | Monthly Budget | Set a spending limit per month (default ¥30,000), synced across devices via DB |
@@ -74,7 +74,7 @@ Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 | `GET` | `/api/wishlist/{id}/image` | Get image |
 | `GET` | `/api/wishlist/owned` | List Collection (owned items) |
 | `GET` | `/api/wishlist/deleted` | List Archive (deleted items) |
-| `POST` | `/api/wishlist/refresh-all` | Re-scrape all items to update prices and names |
+| `POST` | `/api/wishlist/refresh-all` | Re-scrape all items; response includes per-item change details |
 | `GET` | `/api/scrape?url=` | Fetch product info from URL |
 | `GET/POST` | `/api/brands` | List / add brands |
 | `PUT/DELETE` | `/api/brands/{id}` | Update / delete brand |

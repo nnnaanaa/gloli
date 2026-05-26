@@ -6,6 +6,8 @@ import com.gloli.domain.enums.Status
 import com.gloli.dto.BrandResponse
 import com.gloli.dto.BulkRefreshResult
 import com.gloli.dto.CategoryResponse
+import com.gloli.dto.FieldChange
+import com.gloli.dto.ItemChangeDetail
 import com.gloli.dto.WishlistItemRequest
 import com.gloli.dto.WishlistItemResponse
 import com.gloli.repository.BrandRepository
@@ -144,22 +146,35 @@ class WishlistItemService(
         val items = repo.findAllByDeletedAtIsNull()
         var updated = 0
         var failed = 0
+        val changes = mutableListOf<ItemChangeDetail>()
         for (item in items) {
             try {
                 val info = scraperService.scrape(item.url)
-                if (!info.name.isNullOrBlank()) item.name = info.name
-                if (info.price != null) item.price = info.price
+                val fields = mutableListOf<FieldChange>()
+                if (!info.name.isNullOrBlank()) {
+                    if (info.name != item.name) fields.add(FieldChange("name", item.name, info.name))
+                    item.name = info.name
+                }
+                if (info.price != null) {
+                    val priceChanged = item.price == null || info.price.compareTo(item.price) != 0
+                    if (priceChanged) fields.add(FieldChange("price",
+                        item.price?.stripTrailingZeros()?.toPlainString(),
+                        info.price.stripTrailingZeros().toPlainString()))
+                    item.price = info.price
+                }
                 // 画像が未設定の場合のみスクレイプ結果で補完する
                 if (item.imagePath == null && item.imageUrl == null && !info.imageUrl.isNullOrBlank()) {
+                    fields.add(FieldChange("imageUrl", null, info.imageUrl))
                     item.imageUrl = info.imageUrl
                 }
                 repo.save(item)
                 updated++
+                if (fields.isNotEmpty()) changes.add(ItemChangeDetail(item.id, item.name, fields))
             } catch (_: Exception) {
                 failed++
             }
         }
-        return BulkRefreshResult(total = items.size, updated = updated, failed = failed)
+        return BulkRefreshResult(total = items.size, updated = updated, failed = failed, changes = changes)
     }
 
     /** deletedAt をセットするだけでDBからは削除しない（アーカイブへ移動）*/

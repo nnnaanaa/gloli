@@ -436,6 +436,16 @@ tr:hover td { background: rgba(168,164,184,0.07); }
 .sort-sep { flex: 1; }
 .sort-label, .col-label { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
 
+/* ---- Brands / Categories add form ---- */
+.form-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.form-row input { flex: 1; min-width: 120px; }
+
 /* ---- Filter bar ---- */
 .filter-bar {
   display: flex;
@@ -502,6 +512,23 @@ tr:hover td { background: rgba(168,164,184,0.07); }
 #refresh-all-btn:hover { border-color: var(--accent-lt); color: var(--accent-lt); opacity: 1; box-shadow: none; }
 #refresh-all-btn:disabled { opacity: 0.4; }
 button.spinning svg { animation: spin 0.8s linear infinite; }
+
+/* Refresh result modal */
+.rr-list { max-height: 400px; overflow-y: auto; padding-right: 4px; }
+.rr-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.rr-item:last-child { border-bottom: none; }
+.rr-item-name { font-weight: 600; color: var(--text); font-size: 0.88rem; margin-bottom: 5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.rr-field { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; padding: 2px 0; }
+.rr-label { width: 44px; color: var(--accent-lt); font-size: 0.76rem; flex-shrink: 0; }
+.rr-from { color: var(--muted); text-decoration: line-through; min-width: 0; flex-shrink: 1;
+  max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rr-to { color: var(--text); min-width: 0; flex-shrink: 1;
+  max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rr-arrow { color: var(--accent-lt); flex-shrink: 0; }
+.rr-empty { color: var(--muted); }
+.refresh-no-changes { color: var(--muted); font-size: 0.9rem; margin: 8px 0; }
+
 .csv-btn {
   display: flex; align-items: center; gap: 5px;
   background: transparent; border: 1px solid var(--border);

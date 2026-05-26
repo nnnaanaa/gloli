@@ -1202,11 +1202,8 @@ async function refreshAllItems() {
   btn.classList.add('spinning');
   try {
     const result = await (await api('/wishlist/refresh-all', { method: 'POST' })).json();
-    const msg = result.failed > 0
-      ? `Updated ${result.updated} / ${result.total} items (${result.failed} failed)`
-      : `Updated ${result.updated} / ${result.total} items`;
-    showToast(msg);
     loadItems();
+    showRefreshResult(result);
     if (window.mascotSay) {
       if (result.failed > 0) window.mascotSay('いくつか取得できなかったの…');
       else window.mascotSay('全部チェックしたよ！価格が変わってないといいね…');
@@ -1217,6 +1214,47 @@ async function refreshAllItems() {
     btn.disabled = false;
     btn.classList.remove('spinning');
   }
+}
+
+function showRefreshResult(result) {
+  const changes = result.changes || [];
+  let titleText = `Refresh complete — ${result.updated} / ${result.total} scraped`;
+  if (result.failed > 0) titleText += `, ${result.failed} failed`;
+  get('refresh-result-title').textContent = titleText;
+
+  if (!changes.length) {
+    get('refresh-result-body').innerHTML = '<p class="refresh-no-changes">No changes detected.</p>';
+  } else {
+    const fmtPrice = v => v != null ? '¥' + Number(v).toLocaleString() : '—';
+    const rows = changes.map(c => {
+      const itemName = esc(c.name || `#${c.id}`);
+      const fieldRows = c.fields.map(f => {
+        let label, fromHtml, toHtml;
+        if (f.field === 'name') {
+          label = 'Name';
+          fromHtml = f.from ? `<span class="rr-from">${esc(f.from)}</span>` : '<span class="rr-empty">—</span>';
+          toHtml   = `<span class="rr-to">${esc(f.to)}</span>`;
+        } else if (f.field === 'price') {
+          label = 'Price';
+          fromHtml = `<span class="rr-from">${fmtPrice(f.from)}</span>`;
+          toHtml   = `<span class="rr-to">${fmtPrice(f.to)}</span>`;
+        } else {
+          label = 'Image';
+          fromHtml = '<span class="rr-empty">—</span>';
+          toHtml   = '<span class="rr-to">Set</span>';
+        }
+        return `<div class="rr-field"><span class="rr-label">${label}</span>${fromHtml}<span class="rr-arrow">→</span>${toHtml}</div>`;
+      }).join('');
+      return `<div class="rr-item"><div class="rr-item-name">${itemName}</div>${fieldRows}</div>`;
+    }).join('');
+    get('refresh-result-body').innerHTML = `<div class="rr-list">${rows}</div>`;
+  }
+
+  get('refresh-result-modal').style.display = 'flex';
+}
+
+function closeRefreshResult() {
+  get('refresh-result-modal').style.display = 'none';
 }
 
 // ---- Refresh ----

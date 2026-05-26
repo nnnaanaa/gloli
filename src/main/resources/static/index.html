@@ -259,6 +259,17 @@
   </div>
 </div>
 
+<!-- refresh result modal -->
+<div id="refresh-result-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeRefreshResult()">
+  <div class="modal-box" style="max-width:520px">
+    <h3 id="refresh-result-title"></h3>
+    <div id="refresh-result-body"></div>
+    <div class="modal-footer">
+      <button onclick="closeRefreshResult()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- image viewer -->
 <div id="img-modal" style="display:none;position:fixed;inset:0;background:rgba(4,4,4,0.90);z-index:200;cursor:pointer" onclick="this.style.display='none'">
   <img id="img-modal-src" style="max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid #a8a4b8">
