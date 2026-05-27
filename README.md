@@ -1,6 +1,6 @@
 # gloli
 
-A wishlist management PWA for Lolita fashion. Track items you want, manage your collection, monitor spending statistics, and set monthly budgets.
+A wishlist PWA for the dedicated collector. Track brand items, build your dream coords, and stay within your monthly budget.
 
 ## Features
 
